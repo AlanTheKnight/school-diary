@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    <title>Расписание</title>
+{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="alert alert-danger" role="alert" style="display: {{ display }}">
+            Такой пользователь уже существует
+        </div>
+            <form method="POST" class="my-5 mx-5">
+                <div class="form-group">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                </div>
+                <button type="submit" class="btn btn-primary">Зарегестрироваться</button>
+            </form>
+        <div class=" py-2">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Уже зарегестрированы?</h5>
+
+                    <a href="{% url 'login' %}" class="btn btn-primary">Войти</a>
+				</div>
+			</div>
+        </div>
+    </div>
+
+
+    </div>
+{% endblock %}
