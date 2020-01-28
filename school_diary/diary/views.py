@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render
+
+from .models import Students
 from .forms import StudentCreationForm, StudentsLogin
 from django.http import HttpResponseRedirect, HttpResponse
 
@@ -22,7 +24,7 @@ def students_login(request):
     if request.method == 'POST':
         form = StudentsLogin(request.POST)
         if form.is_valid():
-            user = authenticate(username=form.cleaned_data['email'], password=form.cleaned_data['password'])
+            user = Students.objects.get(email=form.cleaned_data['email'])
             if user is not None:
                 login(request, user)
                 return HttpResponseRedirect('/')
@@ -31,7 +33,7 @@ def students_login(request):
         else:
             form = StudentsLogin()
             # return render(request, 'login.html', {'form': form, 'display': 'block'})
-            return HttpResponse('fail')
+
     else:
         form = StudentsLogin()
         return render(request, 'login.html', {'form': form})

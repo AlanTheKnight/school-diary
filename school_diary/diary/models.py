@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.hashers import check_password
 from django.db import models
 from datetime import date
 
@@ -55,7 +57,6 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user
 
-
 class Subjects(models.Model):
     name = models.CharField(max_length=50, verbose_name="Название")
 
@@ -66,7 +67,6 @@ class Subjects(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class Teachers(AbstractBaseUser):
     first_name = models.CharField(max_length=50, verbose_name="Имя")
@@ -87,7 +87,6 @@ class Teachers(AbstractBaseUser):
     def __str__(self):
         return '{} {} {}'.format(self.surname, self.first_name, self.second_name)
 
-
 class Grades(models.Model):
     number = models.IntegerField(choices=GRADES, verbose_name="Класс")
     letter = models.CharField(max_length=2, verbose_name="Буква")
@@ -100,7 +99,6 @@ class Grades(models.Model):
 
     def __str__(self):
         return '{}{}'.format(self.number, self.letter)
-
 
 class Students(AbstractBaseUser):
     first_name = models.CharField(max_length=50, verbose_name="Имя")
@@ -125,6 +123,19 @@ class Students(AbstractBaseUser):
 
     def __str__(self):
         return '{} {} {}'.format(self.surname, self.first_name, self.second_name)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class HomeTasks(models.Model):

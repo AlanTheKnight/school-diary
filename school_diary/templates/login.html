@@ -14,7 +14,7 @@
 				<div class="card-body content-justify-center">
 					<h5 class="card-title">Войти</h5>
 					<div>
-                    <form>
+                    <form method="POST">
 						<div class="form-group">
 							{% csrf_token %}
                             {{ form|crispy }}
