@@ -18,6 +18,7 @@ DAYWEEK_NAMES = {
 
 
 def timetable(request):
+    """Gets grade from form and redirects to the page showing its timetable."""
     if request.method == 'POST':
         form = GetTimeTableForm(request.POST)
         if form.is_valid():
@@ -32,9 +33,12 @@ def timetable(request):
 
 
 def output(request, grade, litera):
+    """Shows the timetable depending on the url."""
     CURRENT_DAY = time.localtime().tm_wday + 1
-    current_day_name = DAYWEEK_NAMES[CURRENT_DAY]
-    next_day_name = DAYWEEK_NAMES[(CURRENT_DAY + 1) % 7]
+    # If current day isn't sunday, users will see timetable for today.
+    if CURRENT_DAY != 7: current_day_name = DAYWEEK_NAMES[CURRENT_DAY]
+    # If surrent day isn't friday, users will see timetable for tomorrow.
+    elif CURRENT_DAY != 6: next_day_name = DAYWEEK_NAMES[(CURRENT_DAY + 1) % 7]
     try:
         class_number = int(grade)
         class_letter = litera
