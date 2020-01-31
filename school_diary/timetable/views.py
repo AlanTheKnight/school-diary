@@ -38,7 +38,7 @@ def output(request, grade, litera):
     # If current day isn't sunday, users will see timetable for today.
     if CURRENT_DAY != 7: current_day_name = DAYWEEK_NAMES[CURRENT_DAY]
     # If surrent day isn't friday, users will see timetable for tomorrow.
-    elif CURRENT_DAY != 6: next_day_name = DAYWEEK_NAMES[(CURRENT_DAY + 1) % 7]
+    if CURRENT_DAY != 6: next_day_name = DAYWEEK_NAMES[(CURRENT_DAY + 1) % 7]
     try:
         class_number = int(grade)
         class_letter = litera
