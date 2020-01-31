@@ -34,7 +34,10 @@
       color: #ffffff9f;
     }
     </style>
+    <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'bootstrap.bundle.min.js' %}"></script>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #212529;">
       <div class="container">
@@ -72,10 +75,9 @@
   <!-- Main part of the webpage. Use { extends base.html } to use this template. -->
   {% block content %}
   {% endblock %}
-
-  <script src="{% static 'bootstrap.bundle.min.js' %}"></script>
-  <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
+  
 </body>
+
 <footer class="footer" style="background-color: #212529; width: 100%;">
   <div class="container">
     <div>
