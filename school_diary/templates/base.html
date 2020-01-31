@@ -7,9 +7,36 @@
     <link rel="shortcut icon" type="image/png" href="{% static 'bober.png' %}"/>
     {% block title %}
     {% endblock %}
+
+    <style>
+    html {
+      position: relative;
+      min-height: 100%;
+    }
+    body {
+      margin-bottom: 250px;
+    }
+    .footer{
+      line-height: 40px;
+      position: absolute;
+      left: 0px;
+      bottom: 0px;
+    }
+    footer.footer a:visited{
+      color: white;
+    }
+
+    footer.footer a:hover, footer.footer a:active footer.footer a:focus {
+      color: white;
+    }
+
+    footer.footer a {
+      color: #ffffff9f;
+    }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e7e7e7;">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #212529;">
       <div class="container">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -49,7 +76,7 @@
   <script src="{% static 'bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
 </body>
-<footer class="footer my-10 py-3" style="background-color: #e7e7e7;">
+<footer class="footer" style="background-color: #212529; width: 100%;">
   <div class="container">
     <div>
       <div class="row">
