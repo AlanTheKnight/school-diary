@@ -8,38 +8,38 @@ from django.contrib.auth.models import PermissionsMixin
 from .managers import UserManager
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-	email = models.EmailField('email address', unique=True)
-	first_name = models.CharField('first name', max_length=30, blank=True)
-	last_name = models.CharField('last name', max_length=30, blank=True)
-	date_joined = models.DateTimeField('date joined', auto_now_add=True)
-	is_active = models.BooleanField('active', default=True)
-	is_staff = models.BooleanField('active', default=True)
+TYPES = [
+	(0, "Root"),
+	(1, "Администратор"),
+	(2, "Учитель"),
+	(3, "Ученик"),
+]
+
+
+class Users(AbstractBaseUser, PermissionsMixin):
+	email = models.EmailField('Почта', unique=True)
+	account_type = models.IntegerField(verbose_name="Тип аккаунта", choices=TYPES, default=3)
+	date_joined = models.DateTimeField('Дата регистрации', auto_now_add=True)
+	is_active = models.BooleanField('Активный', default=True)
+	is_staff = models.BooleanField('Администратор', default=True)
 
 	objects = UserManager()
 
 	USERNAME_FIELD = 'email'
-	REQUIRED_FIELDS = []
+	REQUIRED_FIELDS = ['account_type']
 
 	class Meta:
-		verbose_name = 'user'
-		verbose_name_plural = 'users'
+		verbose_name = 'Пользователь'
+		verbose_name_plural = 'Пользователи'
 
 	def get_full_name(self):
-		'''
-		Returns the first_name plus the last_name, with a space in between.
-		'''
-		full_name = '%s %s' % (self.first_name, self.last_name)
-		return full_name.strip()
+		return self.email
 
 	def get_short_name(self):
-		'''
-		Returns the short name for the user.
-		'''
-		return self.first_name
+		return self.email
+
+	def get_username(self):
+		return self.email
 
 	def email_user(self, subject, message, from_email=None, **kwargs):
-		'''
-		Sends an email to this User.
-		'''
 		send_mail(subject, message, from_email, [self.email], **kwargs)
