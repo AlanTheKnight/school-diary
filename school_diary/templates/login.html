@@ -9,23 +9,22 @@
 {% block content %}
 <div class="container py-5">
 	<div class="row">
-		<div class=" py-2">
-			<div class="card">
-				<div class="card-body content-justify-center">
+		<div class="col-md-6 py-2">
+			<div class="card login">
+				<div class="card-body">
 					<h5 class="card-title">Войти</h5>
-					<div>
                     <form method="POST">
 						<div class="form-group">
 							{% csrf_token %}
                             {{ form|crispy }}
-							<a href="#">Забыли пароль?</a>
-                            <button type="submit" class="btn btn-primary">Залогиниться</button>
+							<button type="submit" class="btn btn-primary">Войти</button>
+							<p class="text-right"><a href="#">Забыли пароль?</a></p>
 						</div>
 					</form>
 				</div>
 			</div>
 		</div>
-		<div class=" py-2">
+		<div class="col-md-6 py-2">
 			<div class="card">
 				<div class="card-body">
 					<h5 class="card-title">Нет аккаунта?</h5>

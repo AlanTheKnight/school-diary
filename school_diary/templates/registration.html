@@ -8,9 +8,11 @@
 
 {% block content %}
     <div class="container my-5">
-        <div class="alert alert-danger" role="alert" style="display: {{ display }}">
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
             Такой пользователь уже существует
         </div>
+        {% endif %}
             <form method="POST" class="my-5 mx-5">
                 <div class="form-group">
                     {% csrf_token %}
