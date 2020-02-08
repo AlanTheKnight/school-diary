@@ -23,12 +23,12 @@ def students_registration(request):
 
 def students_login(request):
     if request.method == 'POST':
-        username = request.POST.get('email')
+        email = request.POST.get('email')
         password = request.POST.get('password')
-        user = authenticate(request, email=username, password=password)
+        user = authenticate(request, email=email, password=password)
+        print(user)
         if user is not None:
             login(request, user)
-            print("Registration was successful")
             return HttpResponseRedirect("/")
         else:
             messages.info(request, 'Username OR password is incorrect')

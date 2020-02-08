@@ -67,4 +67,3 @@ class StudentSignUpForm(UserCreationForm):
         # student.surname = self.cleaned_data['surname']
         # student.second_name = self.cleaned_data['second_name']
         return user
-        # TODO Fix form

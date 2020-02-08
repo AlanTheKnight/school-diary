@@ -1,0 +1,24 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    margin-bottom: 300px;
+}
+.footer{
+    line-height: 40px;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+}
+footer.footer a:visited{
+    color: white;
+}
+
+footer.footer a:hover, footer.footer a:active footer.footer a:focus {
+    color: white;
+}
+
+footer.footer a {
+    color: #ffffff9f;
+}

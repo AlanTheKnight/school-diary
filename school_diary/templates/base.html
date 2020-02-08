@@ -5,35 +5,10 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
     <link rel="shortcut icon" type="image/png" href="{% static 'bober.png' %}"/>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block title %}
     {% endblock %}
 
-    <style>
-    html {
-      position: relative;
-      min-height: 100%;
-    }
-    body {
-      margin-bottom: 300px;
-    }
-    .footer{
-      line-height: 40px;
-      position: absolute;
-      left: 0px;
-      bottom: 0px;
-    }
-    footer.footer a:visited{
-      color: white;
-    }
-
-    footer.footer a:hover, footer.footer a:active footer.footer a:focus {
-      color: white;
-    }
-
-    footer.footer a {
-      color: #ffffff9f;
-    }
-    </style>
     <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
     <script src="{% static 'bootstrap.bundle.min.js' %}"></script>
 </head>
@@ -47,6 +22,7 @@
       <a class="navbar-brand" href="/">
         <img src="{% static 'bober.png' %}" width="40" height="40" class="d-inline-block align-center" alt="">
         Гимназия 56
+          {{ user.email }} {# For test #}
       </a>
       <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
@@ -68,7 +44,9 @@
         </ul>
         <a href="/diary/login/" class="btn btn-outline-success mx-1">Войти</a>
         <a href="/diary/register/" class="btn btn-success">Зарегистрироваться</a>
+          {{ user.email }}
       </div>
+
     </div>
     </nav>
 
