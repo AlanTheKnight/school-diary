@@ -42,9 +42,12 @@
             <a class="nav-link" href="/help" tabindex="-1" aria-disabled="true">Помощь</a>
           </li>
         </ul>
-        <a href="/diary/login/" class="btn btn-outline-success mx-1">Войти</a>
-        <a href="/diary/register/" class="btn btn-success">Зарегистрироваться</a>
-          {{ user.email }}
+          {% if user.is_authenticated%}
+            hello {{ user.first_name }}
+          {% else %}
+              <a href="/diary/login/" class="btn btn-outline-success mx-1">Войти</a>
+              <a href="/diary/register/" class="btn btn-success">Зарегистрироваться</a>
+          {% endif %}
       </div>
 
     </div>
