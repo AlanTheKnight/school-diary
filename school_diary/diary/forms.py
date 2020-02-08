@@ -58,6 +58,8 @@ class StudentSignUpForm(UserCreationForm):
     def save(self):
         user = super().save(commit=False)
         user.account_type = 3
+        user.is_superuser = False
+        user.is_staff = False
         user.save()
         student = Students.objects.create(account=user,
                                           first_name=self.cleaned_data['first_name'],

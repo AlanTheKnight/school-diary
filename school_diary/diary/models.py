@@ -122,12 +122,12 @@ class Students(models.Model):
     account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(verbose_name="Имя", max_length=100)
     surname = models.CharField(verbose_name="Фамилия", max_length=100)
-    second_name = models.CharField(verbose_name="Отчество", max_length=100, blank=True)
+    second_name = models.CharField(verbose_name="Отчество", max_length=100, blank=True, default="")
     grade = models.ForeignKey(Grades, on_delete=models.SET_NULL, null=True, default=None, verbose_name="Класс",
                               blank=True)
 
     class Meta:
         ordering = ['grade', 'surname', 'first_name', 'second_name']
         verbose_name = "Ученик"
-        verbose_name_plural = "Ученик"
+        verbose_name_plural = "Ученики"
 
