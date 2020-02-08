@@ -44,6 +44,7 @@ class StudentsLogin(forms.Form):
     email = forms.EmailField(label="Электронная почта: ", max_length=50)
     password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput)
 
+
 class StudentSignUpForm(UserCreationForm):
     first_name = forms.CharField(label="Имя", max_length=100)
     surname = forms.CharField(label="Фамилия", max_length=100)
@@ -58,7 +59,12 @@ class StudentSignUpForm(UserCreationForm):
         user = super().save(commit=False)
         user.account_type = 3
         user.save()
-        student = Students.objects.create(account=user)
-        student.add(first_name=self.first_name, surname=self.surname, second_name=self.second_name)
+        student = Students.objects.create(account=user,
+                                          first_name=self.cleaned_data['first_name'],
+                                          surname=self.cleaned_data['surname'],
+                                          second_name=self.cleaned_data['second_name'],)
+        # student.first_name = self.cleaned_data['first_name']
+        # student.surname = self.cleaned_data['surname']
+        # student.second_name = self.cleaned_data['second_name']
         return user
         # TODO Fix form

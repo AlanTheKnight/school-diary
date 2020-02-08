@@ -52,7 +52,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField('Почта', unique=True)
     account_type = models.IntegerField(verbose_name="Тип аккаунта", default=3, choices=TYPES)
     is_active = models.BooleanField('Активный', default=True)
-    is_staff = models.BooleanField('Администратор', default=True)
+    is_staff = models.BooleanField('Администратор', default=False)
 
     objects = UserManager()
 
