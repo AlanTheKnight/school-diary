@@ -17,7 +17,7 @@ DAYWEEK_NAMES = {
     7:"Воскресенье"
 }
 
-@login_required
+@login_required(login_url='login')
 def timetable(request):
     """Gets grade from form and redirects to the page showing its timetable."""
     if request.method == 'POST':
