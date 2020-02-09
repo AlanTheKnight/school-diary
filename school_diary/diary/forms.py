@@ -2,41 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from .models import Users, Students, Administrators, Teachers, Grades, Subjects
-
-
-# class StudentRegistration(forms.Form):
-#     email = forms.EmailField(label="Электронная почта: ", max_length=50)
-#     first_name = forms.CharField(label="Имя: ", max_length=50)
-#     surname = forms.CharField(label="Фамилия: ", max_length=50)
-#     password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput)
-#     conform_password = forms.CharField(label="Подтверждение пароля: ", widget=forms.PasswordInput)
-#     grade = forms.ChoiceField(label="Класс:", choices=[
-#         (1, 1),
-#         (2, 2),
-#         (3, 3),
-#         (4, 4),
-#         (5, 5),
-#         (6, 6),
-#         (7, 7),
-#         (8, 8),
-#         (9, 9),
-#         (10, 10),
-#         (11, 11)])
-#     litera = forms.ChoiceField(label="Литера:", choices=[
-#         ("А", "А"),
-#         ("Б", "Б"),
-#         ("В", "В"),
-#         ("Г", "Г"),
-#         ("Д", "Д"),
-#         ("Е", "Е"),
-#         ("Ж", "Ж"),
-#         ("З", "З")])
-
-
-# class StudentCreationForm(UserCreationForm):
-#     class Meta(UserCreationForm):
-#         model = Students
-#         fields = ('email', 'first_name', 'surname', 'second_name', 'grade')
+from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class UserLogin(forms.Form):
@@ -59,6 +26,11 @@ class StudentSignUpForm(UserCreationForm):
         user.account_type = 3
         user.is_superuser = False
         user.is_staff = False
+        try:
+            user_group = Group.objects.get(name='students')
+        except ObjectDoesNotExist:
+            user_group = Group.objects.create(name='students')
+        user.groups.add(user_group)
         user.save()
         student = Students.objects.create(account=user,
                                           first_name=self.cleaned_data['first_name'],
@@ -83,6 +55,11 @@ class AdminSignUpForm(UserCreationForm):
         user.is_superuser = False
         user.is_staff = True
         user.save()
+        try:
+            user_group = Group.objects.get(name='admins')
+        except ObjectDoesNotExist:
+            user_group = Group.objects.create(name='admins')
+        user.groups.add(user_group)
         admin = Administrators.objects.create(account=user,
                                           first_name=self.cleaned_data['first_name'],
                                           surname=self.cleaned_data['surname'],
@@ -107,6 +84,11 @@ class TeacherSignUpForm(UserCreationForm):
         user.is_superuser = False
         user.is_staff = False
         user.save()
+        try:
+            user_group = Group.objects.get(name='teachers')
+        except ObjectDoesNotExist:
+            user_group = Group.objects.create(name='teachers')
+        user.groups.add(user_group)
         admin = Teachers.objects.create(account=user,
                                           first_name=self.cleaned_data['first_name'],
                                           surname=self.cleaned_data['surname'],

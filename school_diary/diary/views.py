@@ -66,7 +66,7 @@ def admin_register(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Новый администратор был создан успешно.")
-            return redirect('/dairy/login/')
+            return redirect('/diary/login/')
     if request.POST:
         form = AdminSignUpForm(request.POST)
     else:
@@ -82,7 +82,7 @@ def teacher_register(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Новый администратор был создан успешно.")
-            return redirect('/dairy/login/')
+            return redirect('/diary/login/')
     if request.POST:
         form = TeacherSignUpForm(request.POST)
     else:

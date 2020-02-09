@@ -14,6 +14,16 @@ class UsersAdmin(admin.ModelAdmin):
     list_filter = ('grade',)
 
 
-admin.site.register(Teachers)
+@admin.register(Administrators)
+class UsersAdmin(admin.ModelAdmin):
+    list_display = ('account', 'first_name', 'surname')
+
+
+@admin.register(Teachers)
+class UsersAdmin(admin.ModelAdmin):
+    list_display = ('account', 'first_name', 'surname')
+    list_filter = ('subjects',)
+
+
 admin.site.register(Grades)
 admin.site.register(Subjects)
