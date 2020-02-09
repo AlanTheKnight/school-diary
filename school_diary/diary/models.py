@@ -134,21 +134,35 @@ class Students(models.Model):
         verbose_name_plural = "Ученики"
 
 
-# TODO сделать verbose_name, Meta
+# TODO сделать verbose_name
 class Lessons(models.Model):
     date = models.DateField(verbose_name='Дата')
     number = models.IntegerField(verbose_name='Номер урока')
     homework = models.TextField(blank=True)
-    Theme = models.CharField()
+    Theme = models.CharField(max_length=120)
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE)
     grade = models.ForeignKey(Grades, on_delete=models.CASCADE)
 
+    class Meta:
 
+        verbose_name = "Урок"
+        verbose_name_plural = "Уроки"
+
+    def __str__(self):
+        return '{} {} {}'.format(self.subject, self.grade, self.date)
 # TODO Weights system
 
 
-# TODO сделать verbose_name, Meta
+# TODO сделать verbose_name
 class Marks(models.Model):
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE)
     student = models.ForeignKey(Students, on_delete=models.CASCADE)
+    mark = models.IntegerField(verbose_name='оценка', default=5)
     # weight = models.ForeignKey(Weights, on_delete=models.CASCADE)
+    class Meta:
+
+        verbose_name = "Оценка"
+        verbose_name_plural = "Оценки"
+
+    def __str__(self):
+        return '{} {} {}'.format(self.subject, self.grade, self.date)
