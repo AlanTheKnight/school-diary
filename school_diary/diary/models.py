@@ -108,7 +108,7 @@ class Grades(models.Model):
     number = models.IntegerField(choices=GRADES, verbose_name="Класс")
     letter = models.CharField(max_length=2, verbose_name="Буква")
     teachers = models.ManyToManyField(Teachers, verbose_name="Учителя")
-
+    subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
     class Meta:
         ordering = ['number', 'letter']
         verbose_name = "Класс"
