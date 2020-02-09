@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from .forms import StudentSignUpForm, StudentsLogin
-from .models import Students
+from .models import Students, Subjects
 
 
 def user_register(request):
@@ -47,6 +47,10 @@ def user_profile(request):
 
 def diary(request):
     if request.user.account_type == 3:
-        aa = Students.objects.get(account=request.user)
-        context = {'Student':aa}
-        return render(request,'student_subjects.html', context)
+        student = Students.objects.get(account=request.user)
+        context = {'Student':student,
+                   'subjects':Subjects.objects.all(),
+                   'daylist':['09.02','10.02','11.02'],
+                   'marks':student.mark_set.order_by('date')}
+        #return render(request,'student_subjects_TEST.html', context)
+        return render(request, 'marklist.html', context)

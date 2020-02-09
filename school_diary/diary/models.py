@@ -131,3 +131,17 @@ class Students(models.Model):
         verbose_name = "Ученик"
         verbose_name_plural = "Ученики"
 
+    def __str__(self):
+        return '{}{}'.format(self.first_name, self.grade
+                             )
+
+
+class Mark(models.Model):
+    student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
+    amount = models.DecimalField(verbose_name="Балл", decimal_places=2,max_digits=3)
+    date = models.DateField(verbose_name="Дата")
+
+    class Meta:
+        ordering = ['date','amount']
+        verbose_name = "оценка"
+        verbose_name_plural = "оценки"

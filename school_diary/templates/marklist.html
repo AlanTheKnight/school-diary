@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          {% for day in daylist %}
+            <th scope="col">{{ day }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+  <tbody>
+        {% for subject in subjects %}
+        <tr>
+          <th scope="row">{{ subject }}</th>
+          <td>оценка 1</td>
+          <td>оценка 2</td>
+          <td>оценка 3</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% for mark in marklist %}
+        {{ mark }}
+    {% endfor %}
+{% endblock %}
