@@ -133,6 +133,8 @@ class Students(models.Model):
         verbose_name = "Ученик"
         verbose_name_plural = "Ученики"
 
+    def __str__(self):
+        return '{} {} {}'.format(self.surname, self.first_name, self.second_name)
 
 # TODO сделать verbose_name
 class Lessons(models.Model):
@@ -165,4 +167,4 @@ class Marks(models.Model):
         verbose_name_plural = "Оценки"
 
     def __str__(self):
-        return '{} {} {}'.format(self.subject, self.grade, self.date)
+        return '"{}" {} {}'.format(self.mark, self.lesson, self.student)
