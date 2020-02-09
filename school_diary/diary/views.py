@@ -43,3 +43,8 @@ def user_logout(request):
 def user_profile(request):
     context = {}
     return render(request, 'profile.html', {})
+
+def diary(request):
+    if request.user.account_type == 3:
+        context = {}
+        return render(request,'student.html', context)
