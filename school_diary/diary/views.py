@@ -3,8 +3,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from .forms import StudentSignUpForm, StudentsLogin
+from .decorators import unauthenticated_user, admin_only
 
 
+@unauthenticated_user
 def user_register(request):
     if request.method == 'POST':
         form = StudentSignUpForm(request.POST)
@@ -19,6 +21,7 @@ def user_register(request):
     return render(request, 'registration.html', {'form': form, 'error': 0})
 
 
+@unauthenticated_user
 def user_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -43,3 +46,9 @@ def user_logout(request):
 def user_profile(request):
     context = {}
     return render(request, 'profile.html', {})
+
+
+@admin_only
+def diary(request):
+    context = {}
+    return render(request, 'diary.html', context)
