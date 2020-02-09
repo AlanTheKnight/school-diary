@@ -88,7 +88,7 @@ class Subjects(models.Model):
         return self.name
 
 
-class Teachers(AbstractBaseUser):
+class Teachers(models.Model):
     account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     surname = models.CharField(max_length=100, verbose_name="Фамилия")
@@ -109,6 +109,8 @@ class Grades(models.Model):
     letter = models.CharField(max_length=2, verbose_name="Буква")
     teachers = models.ManyToManyField(Teachers, verbose_name="Учителя")
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
+    # main_teacher = models.ForeignKey(Teachers, verbose_name='Классный учитель', on_delete=models.PROTECT) TODO сделаь классного учителя
+
     class Meta:
         ordering = ['number', 'letter']
         verbose_name = "Класс"
@@ -131,3 +133,22 @@ class Students(models.Model):
         verbose_name = "Ученик"
         verbose_name_plural = "Ученики"
 
+
+# TODO сделать verbose_name, Meta
+class Lessons(models.Model):
+    date = models.DateField(verbose_name='Дата')
+    number = models.IntegerField(verbose_name='Номер урока')
+    homework = models.TextField(blank=True)
+    Theme = models.CharField()
+    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE)
+    grade = models.ForeignKey(Grades, on_delete=models.CASCADE)
+
+
+# TODO Weights system
+
+
+# TODO сделать verbose_name, Meta
+class Marks(models.Model):
+    lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE)
+    student = models.ForeignKey(Students, on_delete=models.CASCADE)
+    # weight = models.ForeignKey(Weights, on_delete=models.CASCADE)

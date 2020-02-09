@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -45,8 +46,11 @@ def user_profile(request):
     context = {}
     return render(request, 'profile.html', {})
 
+@login_required(login_url='login')
 def diary(request):
     if request.user.account_type == 3:
         aa = Students.objects.get(account=request.user)
         context = {'Student':aa}
         return render(request,'student_subjects.html', context)
+    elif request.user.account_type == 2:
+        pass
