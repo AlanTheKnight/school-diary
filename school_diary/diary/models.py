@@ -1,10 +1,7 @@
-from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.hashers import check_password
-from django.db import models
-from datetime import date
-from django.core.mail import send_mail
 from django.contrib.auth.models import PermissionsMixin
+from django.core.mail import send_mail
+from django.db import models
 from .managers import UserManager
 
 TYPES = [
@@ -37,14 +34,6 @@ LITERAS = [
     ("Е", "Е"),
     ("Ж", "Ж"),
     ("З", "З")
-]
-
-MARKS = [
-    (5, "5 - отлично"),
-    (4, "4 - хорошо"),
-    (3, "3 - удовлетворительно"),
-    (2, "2 - плохо"),
-    (1, "1 - ужасно")
 ]
 
 
@@ -136,14 +125,15 @@ class Students(models.Model):
     def __str__(self):
         return '{} {} {}'.format(self.surname, self.first_name, self.second_name)
 
-# TODO сделать verbose_name
+
+
 class Lessons(models.Model):
     date = models.DateField(verbose_name='Дата')
     number = models.IntegerField(verbose_name='Номер урока')
-    homework = models.TextField(blank=True)
-    Theme = models.CharField(max_length=120)
-    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE)
-    grade = models.ForeignKey(Grades, on_delete=models.CASCADE)
+    homework = models.TextField(blank=True, verbose_name='ДЗ')
+    Theme = models.CharField(max_length=120, verbose_name='Тема')
+    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name='Предмет')
+    grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
 
     class Meta:
 
@@ -155,10 +145,9 @@ class Lessons(models.Model):
 # TODO Weights system
 
 
-# TODO сделать verbose_name
 class Marks(models.Model):
-    lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE)
-    student = models.ForeignKey(Students, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок')
+    student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name='Ученик')
     mark = models.IntegerField(verbose_name='оценка', default=5)
     # weight = models.ForeignKey(Weights, on_delete=models.CASCADE)
     class Meta:
