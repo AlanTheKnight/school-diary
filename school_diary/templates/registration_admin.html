@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    <title>Регистрация администратора</title>
+    <style>
+        .card {
+        margin: 0 auto; /* Added */
+        float: none; /* Added */
+        margin-bottom: 10px; /* Added */
+        }
+        .form-group{
+            line-height: 50%;
+        }
+        input {
+            width: 100%
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        Такой администратор уже существует
+    </div>
+    {% endif %}
+    <div class="card w-75">
+        <div class="card-body">
+            <h3 class="card-title text-center">Регистрация нового администратора</h3>
+            <form method="POST" class="my-5 mx-5">
+                {% csrf_token %}
+                <div class="form-group">
+                    <p>{{ form.email.label }}</p>
+                    <p>{{ form.email }}</p>
+                </div>
+                <div class="form-group">
+                    <p>{{ form.first_name.label }}</p>
+                    <p>{{ form.first_name }}</p>
+                </div>
+                <div class="form-group">
+                    <p>{{ form.surname.label }}</p>
+                    <p>{{ form.surname }}</p>
+                </div>
+                <div class="form-group">
+                    <p>{{ form.second_name.label }} (необязательно)</p>
+                    <p>{{ form.second_name }}</p>
+                </div>
+                <div class="form-group">
+                    <p>{{ form.password1.label }}</p>
+                    <p>{{ form.password1 }}</p>
+                    <ul style="line-height: 100%;">
+                        <li class="text-muted"><small>Пароль не должен совпадать с вашей персональной информацией</small></li>
+                        <li class="text-muted"><small>Длина пароля должна быть не менее 8 символов</small></li>
+                        <li class="text-muted"><small>Не рекомендовано использовать очень легкие пароли</small></li>
+                        <li class="text-muted"><small>Пароль не может состоять полностью из цифр</small></li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <p>{{ form.password2.label }}</p>
+                    <p>{{ form.password2 }}</p>
+                </div>
+                <p><small>Регистрируясь на этом сайте, вы принимаете условия <a href=#>пользовательского договора</a>.</small></p>
+                <button type="submit" class="btn btn-primary">Зарегестрироваться</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

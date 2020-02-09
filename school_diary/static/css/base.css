@@ -31,3 +31,7 @@ footer.footer a:hover, footer.footer a:active footer.footer a:focus {
 footer.footer a {
     color: #ffffff9f;
 }
+
+a:hover {
+    text-decoration: none;
+}

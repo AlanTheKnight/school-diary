@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Администратор</title>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row my-5">
+        <div class="col-md-3 col-sm-6 my-3">
+            <div class="card h-100">
+                <a href="{% url 'admin_register' %}"><img src="{% static '/admin_gui/add_admin.png' %}" class="card-img-top" alt="Добавить администратора" title="Добавить администратора"></a>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 my-3">
+            <div class="card h-100">
+                <a href="{% url 'teacher_register' %}"><img src="{% static '/admin_gui/add_teacher.png' %}" class="card-img-top" alt="Добавить учителя" title="Добавить учителя"></a>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 my-3">
+            <div class="card h-100">
+                <a href="#"><img src="{% static '/admin_gui/view_admins.png' %}" class="card-img-top" alt="Просмотреть администраторов" title="Просмотреть администраторов"></a>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 my-3">
+            <div class="card h-100">
+                <a href="#"><img src="{% static '/admin_gui/view_teachers.png' %}" class="card-img-top" alt="Просмотреть учителей" title="Просмотреть учителей"></a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 col-sm-6 my-3">
+            <div class="card h-100">
+                <a href="/admin/"><img src="{% static '/admin_gui/admin_panel.png' %}" class="card-img-top" alt="Панель администратора" title="Панель администратора"></a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
