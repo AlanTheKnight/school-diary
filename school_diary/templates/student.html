@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row my-5">
+        <div class="col-md-4 col-sm-6 my-3">
+            <div class="card h-100">
+                <img src="{% static 'diary.png' %}" class="card-img-top" alt="Дневник">
+                <div class="card-body">
+                    <h5 class="card-title">Дневник</h5>
+                    <p class="card-text text-muted">Просматривайте свои оценки, успеваемость и домашнее задание.</p>
+                    <a href="#" class="btn btn-primary">Перейти</a>
+                  </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6 my-3">
+            <div class="card h-100">
+                <img src="{% static 'timetable.png' %}" class="card-img-top" alt="Расписание">
+                <div class="card-body">
+                    <h5 class="card-title">Расписание</h5>
+                    <p class="card-text text-muted">Расписание вашего учебного дня с учетом последних изменений.</p>
+                    <a href="{% url 'timetable' %}" class="btn btn-primary">Перейти</a>
+                  </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6 my-3">
+            <div class="card h-100">
+                <img src="{% static 'minimum.png' %}" class="card-img-top" alt="Минимум">
+                <div class="card-body">
+                    <h5 class="card-title">Минимум</h5>
+                    <p class="card-text text-muted">Образовательный минимум по всем предметам.</p>
+                    <a href="{% url 'minimum' %}" class="btn btn-primary">Перейти</a>
+                  </div>
+            </div>
+        </div>
+
+
+</div>
+{% endblock %}
