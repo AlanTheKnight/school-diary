@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -94,12 +93,16 @@ TEMPLATES = [
     },
 ]
 
+# CUSTOM USER MODEL SUPPORT
+AUTH_USER_MODEL = 'diary.Users'
+
 WSGI_APPLICATION = 'school_diary.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# TODO: Change database to PostgreSQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -146,13 +149,15 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# TODO: STATIC_ROOT variable
 
 STATICFILES_DIRS = [
-os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "static"),
 ]
 
 
 MEDIA_URL = '/media/'
-
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+AUTH_USER_MODEL = 'diary.Users'
+ACCOUNT_AUTHENTICATION_METHOD = 'email'

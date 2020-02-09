@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Доступ запрещен</title>
+<style>
+    .image {
+        margin: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+    <div class="card my-5">
+        <div class="card-body">
+            <img src="{% static 'lock.png' %}" alt="" width=50 class="image">
+            <h3>Доступ запрещен.</h3>
+            <p class="text-muted">{{ message }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

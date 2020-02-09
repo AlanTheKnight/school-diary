@@ -4,38 +4,56 @@
 
 {% block title %}
 <title>Войти в аккаунт</title>
+<style>
+	.card {
+	margin: 0 auto; /* Added */
+	float: none; /* Added */
+	margin-bottom: 10px; /* Added */
+	}
+	.form-group{
+		line-height: 50%;
+	}
+	input {
+		width: 100%
+	}
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-	<div class="row">
-		<div class=" py-2">
-			<div class="card">
-				<div class="card-body content-justify-center">
-					<h5 class="card-title">Войти</h5>
-					<div>
-                    <form method="POST">
-						<div class="form-group">
-							{% csrf_token %}
-                            {{ form|crispy }}
-							<a href="#">Забыли пароль?</a>
-                            <button type="submit" class="btn btn-primary">Залогиниться</button>
-						</div>
-					</form>
-				</div>
+<div class="container">
+	<div class="card login my-5 w-50">
+		<div class="card-body">
+			<h5 class="card-title">Войти</h5>
+			{% if messages %}
+			<div class="alert alert-info">
+			{% for message in messages %}
+			{{ message }}
+			{% endfor %}
 			</div>
+			{% endif %}
+			<form method="POST">
+				{% csrf_token %}
+				<div class="form-group">
+					<p>{{ form.email.label }}</p>
+					<p>{{ form.email }}</p>
+				</div>
+				<div class="form-group">
+					<p>{{ form.password.label }}</p>
+					<p>{{ form.password }}</p>
+				</div>
+				<button type="submit" class="btn btn-primary">Войти</button>
+				<p class="text-right"><a href="#">Забыли пароль?</a></p>
+			</form>
 		</div>
-		<div class=" py-2">
-			<div class="card">
-				<div class="card-body">
-					<h5 class="card-title">Нет аккаунта?</h5>
-					<p>Бесплатно зарегистрируйтесь в системе и получите
-						доступ к электронному дневнику, домашнему заданию,
-						минимумам и расписанию. 
-					</p>
-                    <a href="/diary/register/" class="btn btn-primary">Создать аккаунт</a>
-				</div>
-			</div>
+	</div>
+	<div class="card my-5 w-50">
+		<div class="card-body">
+			<h5 class="card-title">Нет аккаунта?</h5>
+			<p>Бесплатно зарегистрируйтесь в системе и получите
+				доступ к электронному дневнику, домашнему заданию,
+				минимумам и расписанию. 
+			</p>
+			<a href="{% url 'register' %}" class="btn btn-primary">Создать аккаунт</a>
 		</div>
 	</div>
 </div>

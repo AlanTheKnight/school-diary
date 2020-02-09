@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from urllib.parse import unquote
 from .forms import GetTimeTableForm

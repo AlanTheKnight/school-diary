@@ -7,6 +7,14 @@
 
 {% block content %}
 <div class="container">
+    {% if user.account_type == 0 or user.account_type == 1 %}
+    <div class="card my-5">
+        <div class="card-body">
+            <h3 class="card-title">Панель админстратора</h3>
+            <p>Вы вошли в аккаунт администратора. Перейти на <a href="/admin/">панель администратора</a>.</p>
+        </div>
+    </div>
+    {% endif %}
     <div class="row my-5">
         <div class="col-md-4 col-sm-6 my-3">
             <div class="card h-100">

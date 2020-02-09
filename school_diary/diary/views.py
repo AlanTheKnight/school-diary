@@ -1,39 +1,54 @@
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.contrib import messages
+from .forms import StudentSignUpForm, StudentsLogin
+from .decorators import unauthenticated_user, admin_only
 
-from .models import Students
-from .forms import StudentCreationForm, StudentsLogin
-from django.http import HttpResponseRedirect, HttpResponse
 
-
-def students_registration(request):
+@unauthenticated_user
+def user_register(request):
     if request.method == 'POST':
-        form = StudentCreationForm(request.POST)
+        form = StudentSignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect('/')
-        else:
-            form = StudentCreationForm()
-            return render(request, 'registration.html', {'form': form, 'display': 'block'})
+            messages.success(request, "Учётная запись была создана успешно.")
+            return redirect('/diary/login')
+    if request.POST:
+        form = StudentSignUpForm(request.POST)
     else:
-        form = StudentCreationForm()
-        return render(request, 'registration.html', {'form': form, 'display': 'none'})
+        form = StudentSignUpForm()
+    return render(request, 'registration.html', {'form': form, 'error': 0})
 
 
-def students_login(request):
+@unauthenticated_user
+def user_login(request):
     if request.method == 'POST':
-        form = StudentsLogin(request.POST)
-        if form.is_valid():
-            user = Students.objects.get(email=form.cleaned_data['email'])
-            if user is not None:
-                login(request, user)
-                return HttpResponseRedirect('/')
-            else:
-                return HttpResponse('not login')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = authenticate(request, email=email, password=password)
+        print(user)
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect("/")
         else:
-            form = StudentsLogin()
-            # return render(request, 'login.html', {'form': form, 'display': 'block'})
+            messages.info(request, 'Неправильный адрес электронной почты или пароль.')
+    form = StudentsLogin()
+    context = {'form': form}
+    return render(request, 'login.html', context)
 
-    else:
-        form = StudentsLogin()
-        return render(request, 'login.html', {'form': form})
+
+def user_logout(request):
+    logout(request)
+    return redirect('/diary/login/')
+
+
+def user_profile(request):
+    context = {}
+    return render(request, 'profile.html', {})
+
+
+@admin_only
+def diary(request):
+    context = {}
+    return render(request, 'diary.html', context)
