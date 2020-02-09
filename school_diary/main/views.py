@@ -16,9 +16,18 @@ def social(request):
 def get_help(request):
     return render(request, 'help.html')
 
+
 def error404(request):
     return render(request, 'error.html', {
         'error': "404", 
-        'title': "Файл не найден.", 
-        "description": "Мы не можем найти файл, который вы ищите."
+        'title': "Страница не найдена.", 
+        "description": "Мы не можем найти страницу, которую вы ищите."
+        })
+
+
+def error500(request):
+    return render(request, 'error.html', {
+        'error': "500", 
+        'title': "Что-то пошло не так", 
+        "description": "Мы работаем над этим."
         })
