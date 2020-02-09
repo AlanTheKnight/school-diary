@@ -10,7 +10,7 @@ cat <<EOT >> $name
 <title></title>
 {% endblock %}
 
-{% block container %}
+{% block content %}
 <div class="container">
 
 </div>

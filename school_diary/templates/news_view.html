@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title></title>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {% if news %}
+    <div class="table-responsive-sm">
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Заголовок</th>
+                    <th scope="col">Дата создания</th>
+                    <th scope="col">Изменить</th>
+                    <th scope="col">Удалить</th>
+                    <th scope="col">Просмотреть</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in news %}
+                    <tr>
+                        <td>{{ post.title }}</td>
+                        <td>{{ post.publication_date }}</td>
+                        <td><a class="btn btn-sm btn-info" href="{% url 'news_update' post.id %}">Обновить</a></td>
+                        <td><a class="btn btn-sm btn-danger" href="{% url 'news_delete' post.id %}">Удалить</a></td>
+                        <td><a href="/news/articles/{{ post.slug }}" class="btn btn-primary btn-sm">Просмотр</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p>Новости еще не были добавлены.</p>
+    </div>
+    {% endif %}
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if news.has_previous %}
+                <li class="page-item"><a href="/news/dashboard/1" class="page-link">&laquo;</a></li>
+                <li class="page-item"></li><a href="/news/dashboard/{{ news.previous_page_number }}" class="page-link">&lt;</a>
+            {% endif %}
+
+            <span class="current">
+                <li class="page-item active"><a href="#" class="page-link">{{ news.number }}</a></li>
+            </span>
+
+            {% if news.has_next %}
+                <li class="page-item"><a href="/news/dashboard/{{ news.next_page_number }}" class="page-link">&gt;</a></li>
+                <li class="page-item"><a href="/news/dashboard/{{ news.paginator.num_pages }}" class="page-link">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

@@ -42,7 +42,12 @@
     <div class="row">
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
-                <a href="{% url 'news_create' %}"><img src="{% static '/admin_gui/news_add.png' %}" class="card-img-top" alt="Панель администратора" title="Создать новость"></a>
+                <a href="{% url 'news_create' %}"><img src="{% static '/admin_gui/news_add.png' %}" class="card-img-top" alt="Добавить новость" title="Создать новость"></a>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 my-3">
+            <div class="card h-100">
+                <a href="{% url 'news_dashboard' %}"><img src="{% static '/admin_gui/news_view.png' %}" class="card-img-top" alt="Панель новостей" title="Просмотресть новости"></a>
             </div>
         </div>
     </div>
