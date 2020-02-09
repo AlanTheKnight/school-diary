@@ -1,10 +1,7 @@
-from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.hashers import check_password
-from django.db import models
-from datetime import date
-from django.core.mail import send_mail
 from django.contrib.auth.models import PermissionsMixin
+from django.core.mail import send_mail
+from django.db import models
 from .managers import UserManager
 
 TYPES = [
@@ -37,14 +34,6 @@ LITERAS = [
     ("Е", "Е"),
     ("Ж", "Ж"),
     ("З", "З")
-]
-
-MARKS = [
-    (5, "5 - отлично"),
-    (4, "4 - хорошо"),
-    (3, "3 - удовлетворительно"),
-    (2, "2 - плохо"),
-    (1, "1 - ужасно")
 ]
 
 
@@ -88,7 +77,7 @@ class Subjects(models.Model):
         return self.name
 
 
-class Teachers(AbstractBaseUser):
+class Teachers(models.Model):
     account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     surname = models.CharField(max_length=100, verbose_name="Фамилия")
@@ -109,6 +98,8 @@ class Grades(models.Model):
     letter = models.CharField(max_length=2, verbose_name="Буква")
     teachers = models.ManyToManyField(Teachers, verbose_name="Учителя")
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
+    # main_teacher = models.ForeignKey(Teachers, verbose_name='Классный учитель', on_delete=models.PROTECT) TODO сделаь классного учителя
+
     class Meta:
         ordering = ['number', 'letter']
         verbose_name = "Класс"
@@ -132,8 +123,25 @@ class Students(models.Model):
         verbose_name_plural = "Ученики"
 
     def __str__(self):
-        return '{}{}'.format(self.first_name, self.grade
-                             )
+        return '{} {} {}'.format(self.surname, self.first_name, self.second_name)
+
+
+class Lessons(models.Model):
+    date = models.DateField(verbose_name='Дата')
+    number = models.IntegerField(verbose_name='Номер урока')
+    homework = models.TextField(blank=True, verbose_name='ДЗ')
+    Theme = models.CharField(max_length=120, verbose_name='Тема')
+    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name='Предмет')
+    grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
+
+    class Meta:
+
+        verbose_name = "Урок"
+        verbose_name_plural = "Уроки"
+
+    def __str__(self):
+        return '{} {} {}'.format(self.subject, self.grade, self.date)
+# TODO Weights system
 
 
 class Mark(models.Model):
@@ -142,6 +150,10 @@ class Mark(models.Model):
     date = models.DateField(verbose_name="Дата")
 
     class Meta:
+
+        verbose_name = "Оценка"
+        verbose_name_plural = "Оценки"
         ordering = ['date','amount']
-        verbose_name = "оценка"
-        verbose_name_plural = "оценки"
+
+    def __str__(self):
+        return '"{}" {} {}'.format(self.mark, self.lesson, self.student)

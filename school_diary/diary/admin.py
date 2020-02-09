@@ -17,5 +17,5 @@ class UsersAdmin(admin.ModelAdmin):
 admin.site.register(Teachers)
 admin.site.register(Grades)
 admin.site.register(Subjects)
-admin.site.register(Marks)
+admin.site.register(Mark)
 admin.site.register(Lessons)

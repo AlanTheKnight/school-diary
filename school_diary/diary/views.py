@@ -1,9 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from .forms import StudentSignUpForm, StudentsLogin
-from .models import Students, Subjects
+from .models import Students, Teachers, Subjects
 
 
 def user_register(request):
@@ -45,12 +46,20 @@ def user_profile(request):
     context = {}
     return render(request, 'profile.html', {})
 
+
+@login_required(login_url='login')
 def diary(request):
     if request.user.account_type == 3:
         student = Students.objects.get(account=request.user)
-        context = {'Student':student,
-                   'subjects':Subjects.objects.all(),
-                   'daylist':['09.02','10.02','11.02'],
-                   'marks':student.mark_set.order_by('date')}
-        #return render(request,'student_subjects_TEST.html', context)
-        return render(request, 'marklist.html', context)
+        context = {'Student': student,
+                   'subjects': Subjects.objects.all(),
+                   'daylist': ['09.02', '10.02', '11.02'],
+                   'marks': student.mark_set.order_by('date')}
+
+        return render(request, 'student.html', context)
+    elif request.user.account_type == 2:
+        teacher = Teachers.objects.get(account=request.user)
+        context = {'Teacher': teacher}
+        return render(request, 'teacher.html', context)
+    else:
+        redirect('/')
