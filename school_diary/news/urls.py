@@ -3,7 +3,8 @@ from . import views
 
 
 urlpatterns = [
-    path('<int:page>', views.get_posts),
-    path('', views.redirect),
-    path('articles/<slug:url>', views.post)
+    path('page/<int:page>', views.get_posts),
+    path('', views.first_page, name='news'),
+    path('articles/<slug:url>', views.post),
+    path('create/', views.create_post, name="news_create")
 ]
