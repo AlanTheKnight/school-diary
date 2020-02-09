@@ -10,6 +10,7 @@
 <div class="container">
     <div class="card my-5">
         <div class="card-body">
+
             {% if user.account_type == 0 %}
             <div class="text-center">
                 <img src="{% static 'user_types/roots.png' %}" alt="Суперпользователь" height=100 class="avatar">
@@ -17,7 +18,16 @@
             </div>
             <p><b>Адрес электронной почты: </b>{{ user.email }}</p>
             <a href="/admin/" class="">Перейти на панель администратора</a>
+
+            {% elif user.account_type == 1 %}
+            <div class="text-center">
+                <img src="{% static 'user_types/roots.png' %}" alt="Администратор" height=100 class="avatar">
+                <p class="text-muted">Администратор</p>
+            </div>
+            <p><b>Адрес электронной почты: </b>{{ user.email }}</p>
+            <a href="/admin/" class="">Перейти на панель администратора</a>
             {% endif %}
+            
         </div>
     </div>
 </div>
