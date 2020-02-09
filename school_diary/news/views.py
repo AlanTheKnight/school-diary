@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import Publications
 from django.db.models import Max
@@ -7,7 +8,7 @@ from django.http import HttpResponseRedirect
 def redirect(request):
     return HttpResponseRedirect('/news/1')
 
-
+@login_required(login_url='login')
 def get_posts(request, page):
     POSTS_ON_PAGE = 15
     news = Publications.objects.all()
