@@ -10,12 +10,6 @@
 	float: none; /* Added */
 	margin-bottom: 10px; /* Added */
 	}
-	.form-group{
-		line-height: 50%;
-	}
-	input {
-		width: 100%
-	}
 </style>
 {% endblock %}
 
@@ -34,15 +28,15 @@
 			<form method="POST">
 				{% csrf_token %}
 				<div class="form-group">
-					<p>{{ form.email.label }}</p>
-					<p>{{ form.email }}</p>
+					{{ form.email.label }}
+					{{ form.email }}
 				</div>
 				<div class="form-group">
-					<p>{{ form.password.label }}</p>
-					<p>{{ form.password }}</p>
+					{{ form.password.label }}
+					{{ form.password }}
 				</div>
 				<button type="submit" class="btn btn-primary">Войти</button>
-				<p class="text-right"><a href="#">Забыли пароль?</a></p>
+				<p class="text-right"><a href="{% url 'reset_password' %}">Забыли пароль?</a></p>
 			</form>
 		</div>
 	</div>

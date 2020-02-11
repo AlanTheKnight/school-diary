@@ -88,7 +88,7 @@ class Subjects(models.Model):
         return self.name
 
 
-class Teachers(AbstractBaseUser):
+class Teachers(models.Model):
     account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     surname = models.CharField(max_length=100, verbose_name="Фамилия")

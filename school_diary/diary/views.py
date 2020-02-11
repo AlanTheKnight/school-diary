@@ -5,6 +5,7 @@ from django.contrib import messages
 from .forms import StudentSignUpForm, UserLogin, AdminSignUpForm, TeacherSignUpForm
 from .decorators import unauthenticated_user, admin_only
 from django.contrib.auth.decorators import login_required
+from .models import *
 
 
 @unauthenticated_user
@@ -44,9 +45,12 @@ def user_logout(request):
     return redirect('/diary/login/')
 
 
+@login_required(login_url="/diary/login/")
 def user_profile(request):
-    context = {}
-    return render(request, 'profile.html', {})
+    if request.user.account_type == 3:
+        data = Students.objects.get(account=request.user)
+    context = {'data':data}
+    return render(request, 'profile.html', context)
 
 
 @login_required(login_url="/diary/login/")

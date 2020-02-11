@@ -65,7 +65,7 @@ def news_delete(request, id):
     article = Publications.objects.get(id=id)
     if request.method == "POST":
         article.delete()
-        return redirect('/news/board')
+        return redirect('/news/dashboard')
     context = {'item':article}
     return render(request, 'news_delete.html', context)
 
@@ -79,6 +79,6 @@ def news_update(request, id):
         form = ArticleCreationForm(request.POST, request.FILES, instance=article)
         if form.is_valid():
             form.save()
-            return redirect('/news/board/')
+            return redirect('news_dashboard')
     context = {'form':form}
     return render(request, 'news_editor.html', context)

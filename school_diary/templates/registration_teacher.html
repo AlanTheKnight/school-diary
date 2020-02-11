@@ -10,12 +10,6 @@
         float: none; /* Added */
         margin-bottom: 10px; /* Added */
         }
-        .form-group{
-            line-height: 50%;
-        }
-        input {
-            width: 100%
-        }
     </style>
 {% endblock %}
 
@@ -32,28 +26,28 @@
             <form method="POST" class="my-5 mx-5">
                 {% csrf_token %}
                 <div class="form-group">
-                    <p>{{ form.email.label }}</p>
-                    <p>{{ form.email }}</p>
+                    {{ form.email.label }}
+                    {{ form.email }}
                 </div>
                 <div class="form-group">
-                    <p>{{ form.first_name.label }}</p>
-                    <p>{{ form.first_name }}</p>
+                    {{ form.first_name.label }}
+                    {{ form.first_name }}
                 </div>
                 <div class="form-group">
-                    <p>{{ form.surname.label }}</p>
-                    <p>{{ form.surname }}</p>
+                    {{ form.surname.label }}
+                    {{ form.surname }}
                 </div>
                 <div class="form-group">
-                    <p>{{ form.second_name.label }} (необязательно)</p>
-                    <p>{{ form.second_name }}</p>
+                    {{ form.second_name.label }} (необязательно)
+                    {{ form.second_name }}
                 </div>
                 <div class="form-group">
-                    <p>{{ form.subjects.label }}</p>
-                    <p>{{ form.subjects }}</p>
+                    {{ form.subjects.label }}
+                    {{ form.subjects }}
                 </div>
                 <div class="form-group">
-                    <p>{{ form.password1.label }}</p>
-                    <p>{{ form.password1 }}</p>
+                    {{ form.password1.label }}
+                    {{ form.password1 }}
                     <ul style="line-height: 100%;">
                         <li class="text-muted"><small>Пароль не должен совпадать с вашей персональной информацией</small></li>
                         <li class="text-muted"><small>Длина пароля должна быть не менее 8 символов</small></li>
@@ -62,8 +56,8 @@
                     </ul>
                 </div>
                 <div class="form-group">
-                    <p>{{ form.password2.label }}</p>
-                    <p>{{ form.password2 }}</p>
+                    {{ form.password2.label }}
+                    {{ form.password2 }}
                 </div>
                 <p><small>Регистрируясь на этом сайте, вы принимаете условия <a href=#>пользовательского договора</a>.</small></p>
                 <button type="submit" class="btn btn-primary">Зарегестрироваться</button>
