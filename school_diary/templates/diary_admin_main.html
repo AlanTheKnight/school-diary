@@ -30,29 +30,22 @@
             </div>
         </div>
     </div>
-    <h3 class="mt-3 text-center">Панель администратора</h3>
+    <h3 class="mt-3 text-center">Панели администраторов</h3>
     <div class="row">
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
                 <a href="/admin/"><img src="{% static '/admin_gui/admin_panel.png' %}" class="card-img-top" alt="Панель администратора" title="Панель администратора"></a>
             </div>
         </div>
-    </div>
-    <h3 class="mt-3 text-center">Новостной блок</h3>
-    <div class="row">
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
                 <a href="{% url 'news_dashboard' %}"><img src="{% static 'news.png' %}" class="card-img-top" alt="Панель новостей" title="Панель новостей"></a>
             </div>
         </div>
-    </div>
-    <h3 class="mt-3 text-center">Расписание</h3>
-    <div class="row">
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
                 <a href="{% url 'timetable_dashboard' %}"><img src="{% static 'timetable.png' %}" class="card-img-top" alt="Панель расписания" title="Панель расписания"></a>
             </div>
         </div>
-    </div>
 </div>
 {% endblock %}

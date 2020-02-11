@@ -93,7 +93,7 @@ def dashboard(request):
             except ObjectDoesNotExist:
                 my_grade = Grades.objects.create(number=chosen_grade, letter=chosen_litera)
                 my_grade.save()
-            lessons = Lessons.objects.filter(connection=my_grade)
+            lessons = Lessons.objects.filter(connection=my_grade).order_by('day', 'number')
             return render(request, 'timetable/dashboard.html', {'form':form, 'lessons':lessons})
         
     form = GetTimeTableForm()

@@ -47,6 +47,12 @@ def user_logout(request):
 
 @login_required(login_url="/diary/login/")
 def user_profile(request):
+    if request.user.account_type == 0:
+        data = Users.objects.get(email=request.user)
+    if request.user.account_type == 1:
+        data = Administrators.objects.get(account=request.user)
+    if request.user.account_type == 2:
+        data = Teachers.objects.get(account=request.user)
     if request.user.account_type == 3:
         data = Students.objects.get(account=request.user)
     context = {'data':data}
@@ -55,7 +61,7 @@ def user_profile(request):
 
 @login_required(login_url="/diary/login/")
 def diary(request):
-    if request.user.account_type == 0:
+    if request.user.account_type == 0 or request.user.account_type == 1:
         return render(request, 'diary_admin_main.html')
     else:
         context = {}

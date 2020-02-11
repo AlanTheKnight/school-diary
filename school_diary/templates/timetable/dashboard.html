@@ -6,9 +6,9 @@
 <title>Расписание</title>
 <style>
 	.card {
-	margin: 0 auto; /* Added */
-	float: none; /* Added */
-	margin-bottom: 10px; /* Added */
+	margin: 0 auto;
+	float: none;
+	margin-bottom: 10px;
 	}
 </style>
 {% endblock %}
@@ -54,29 +54,9 @@
     <div class="alert alert-info">
         <p>Уроки для этого класса еще не были добавлены.</p>
     </div>
-
+    {% endif %}
     <div class="text-center my-3">
         <a href="{% url 'timetable_create' %}" class="btn btn-success text-white"><i class="fas fa-plus"></i></a>
     </div>
-    {% endif %}
-    <!--
-    <nav class="mt-5">
-        <ul class="pagination justify-content-center">
-            {% if news.has_previous %}
-                <li class="page-item"><a href="/news/dashboard/1" class="page-link">&laquo;</a></li>
-                <li class="page-item"></li><a href="/news/dashboard/{{ news.previous_page_number }}" class="page-link">&lt;</a>
-            {% endif %}
-
-            <span class="current">
-                <li class="page-item active"><a href="#" class="page-link">{{ news.number }}</a></li>
-            </span>
-
-            {% if news.has_next %}
-                <li class="page-item"><a href="/news/dashboard/{{ news.next_page_number }}" class="page-link">&gt;</a></li>
-                <li class="page-item"><a href="/news/dashboard/{{ news.paginator.num_pages }}" class="page-link">&raquo;</a></li>
-            {% endif %}
-        </ul>
-    </nav>
-    -->
 </div>
 {% endblock %}
