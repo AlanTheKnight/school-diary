@@ -100,6 +100,8 @@ def dashboard(request):
     return render(request, 'timetable/dashboard.html', {'form':form})
 
 
+@login_required(login_url="/diary/login/")
+@admin_only
 def edit_lesson(request, id):
     lesson = Lessons.objects.get(id=id)
     form = LessonCreateForm(instance=lesson)
@@ -112,6 +114,8 @@ def edit_lesson(request, id):
     return render(request, 'timetable/create.html', {'form':form})
 
 
+@login_required(login_url="/diary/login/")
+@admin_only
 def create_lesson(request):
     if request.method == "POST":
         form = LessonCreateForm(request.POST)
