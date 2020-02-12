@@ -1,14 +1,55 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
+from django.http import request
+
 from .models import Users, Students, Administrators, Teachers, Grades, Subjects
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 
 
-class UserLogin(forms.Form):
-    email = forms.EmailField(label="Электронная почта: ", max_length=50, widget=forms.EmailInput(attrs={'class':'form-control', 'placeholder':'myemail@example.com'}))
-    password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput(attrs={'class':'form-control'}))
+
+# class StudentRegistration(forms.Form):
+#     email = forms.EmailField(label="Электронная почта: ", max_length=50)
+#     first_name = forms.CharField(label="Имя: ", max_length=50)
+#     surname = forms.CharField(label="Фамилия: ", max_length=50)
+#     password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput)
+#     conform_password = forms.CharField(label="Подтверждение пароля: ", widget=forms.PasswordInput)
+#     grade = forms.ChoiceField(label="Класс:", choices=[
+#         (1, 1),
+#         (2, 2),
+#         (3, 3),
+#         (4, 4),
+#         (5, 5),
+#         (6, 6),
+#         (7, 7),
+#         (8, 8),
+#         (9, 9),
+#         (10, 10),
+#         (11, 11)])
+#     litera = forms.ChoiceField(label="Литера:", choices=[
+#         ("А", "А"),
+#         ("Б", "Б"),
+#         ("В", "В"),
+#         ("Г", "Г"),
+#         ("Д", "Д"),
+#         ("Е", "Е"),
+#         ("Ж", "Ж"),
+#         ("З", "З")])
+
+
+# class StudentCreationForm(UserCreationForm):
+#     class Meta(UserCreationForm):
+#         model = Students
+#         fields = ('email', 'first_name', 'surname', 'second_name', 'grade')
+
+
+# SUBJECTS = list()
+
+
+class UsersLogin(forms.Form):
+    email = forms.EmailField(label="Электронная почта: ", max_length=50)
+    password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput)
 
 
 class StudentSignUpForm(UserCreationForm):
@@ -109,8 +150,12 @@ class TeacherSignUpForm(UserCreationForm):
         user.save()
         user.groups.add(user_group)
         admin = Teachers.objects.create(account=user,
-                                          first_name=self.cleaned_data['first_name'],
-                                          surname=self.cleaned_data['surname'],
-                                          second_name=self.cleaned_data['second_name'],)
+                                        first_name=self.cleaned_data['first_name'],
+                                        surname=self.cleaned_data['surname'],
+                                        second_name=self.cleaned_data['second_name'],)
         admin.subjects.set(self.cleaned_data['subjects'])
         return user
+
+
+#class TeacherDairyForm(forms.Form):
+#    subjects = forms.ChoiceField(lable='Класс', widget=forms.Select(choices=))

@@ -135,3 +135,4 @@ dmypy.json
 .idea
 venv
 school_diary/db.sqlite3
+/school_diary/*/migrations

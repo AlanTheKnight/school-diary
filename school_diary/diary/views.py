@@ -1,8 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from .forms import StudentSignUpForm, UserLogin, AdminSignUpForm, TeacherSignUpForm
+# from .forms import StudentSignUpForm, StudentsLogin
+from .models import Students, Teachers, Subjects
+from .forms import StudentSignUpForm, UsersLogin, AdminSignUpForm, TeacherSignUpForm
 from .decorators import unauthenticated_user, admin_only
 from django.contrib.auth.decorators import login_required
 from .models import *
@@ -35,7 +38,7 @@ def user_login(request):
             return HttpResponseRedirect("/")
         else:
             messages.info(request, 'Неправильный адрес электронной почты или пароль.')
-    form = UserLogin()
+    form = UsersLogin()
     context = {'form': form}
     return render(request, 'login.html', context)
 
@@ -98,3 +101,20 @@ def teacher_register(request):
     else:
         form = TeacherSignUpForm()
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
+
+
+@login_required(login_url="/diary/login/")
+def dairy(request):
+    if request.user.account_type == 3:
+        student = Students.objects.get(account=request.user)
+        context = {'Student': student,
+                   'subjects': Subjects.objects.all(),
+                   'daylist': ['09.02', '10.02', '11.02'],
+                   'marks': student.mark_set.order_by('date')}
+        return render(request, 'student.html', context)
+    elif request.user.account_type == 2:
+        teacher = Teachers.objects.get(account=request.user)
+        context = {'Teacher': teacher}
+        return render(request, 'teacher.html', context)
+    else:
+        redirect('/')
