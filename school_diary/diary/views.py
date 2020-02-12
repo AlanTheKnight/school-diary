@@ -101,16 +101,19 @@ def teacher_register(request):
     else:
         form = TeacherSignUpForm()
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
+
+
+@login_required(login_url="/diary/login/")
+def dairy(request):
+    if request.user.account_type == 3:
         student = Students.objects.get(account=request.user)
         context = {'Student': student,
                    'subjects': Subjects.objects.all(),
                    'daylist': ['09.02', '10.02', '11.02'],
                    'marks': student.mark_set.order_by('date')}
-
         return render(request, 'student.html', context)
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
-
         context = {'Teacher': teacher}
         return render(request, 'teacher.html', context)
     else:
