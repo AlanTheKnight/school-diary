@@ -1,9 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
+from django.http import request
+
 from .models import Users, Students, Administrators, Teachers, Grades, Subjects
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+
 
 
 # class StudentRegistration(forms.Form):
@@ -41,7 +44,10 @@ from django.core.exceptions import ObjectDoesNotExist
 #         fields = ('email', 'first_name', 'surname', 'second_name', 'grade')
 
 
-class StudentsLogin(forms.Form):
+# SUBJECTS = list()
+
+
+class UsersLogin(forms.Form):
     email = forms.EmailField(label="Электронная почта: ", max_length=50)
     password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput)
 
@@ -144,8 +150,12 @@ class TeacherSignUpForm(UserCreationForm):
         user.save()
         user.groups.add(user_group)
         admin = Teachers.objects.create(account=user,
-                                          first_name=self.cleaned_data['first_name'],
-                                          surname=self.cleaned_data['surname'],
-                                          second_name=self.cleaned_data['second_name'],)
+                                        first_name=self.cleaned_data['first_name'],
+                                        surname=self.cleaned_data['surname'],
+                                        second_name=self.cleaned_data['second_name'],)
         admin.subjects.set(self.cleaned_data['subjects'])
         return user
+
+
+class TeacherDairyForm(forms.Form):
+    subjects = forms.ChoiceField(lable='Класс', widget=forms.Select(choices=))

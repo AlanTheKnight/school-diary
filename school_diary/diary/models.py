@@ -128,6 +128,11 @@ class Administrators(models.Model):
     first_name = models.CharField(verbose_name="Имя", max_length=100)
     surname = models.CharField(verbose_name="Фамилия", max_length=100)
     second_name = models.CharField(verbose_name="Отчество", max_length=100, blank=True, default="")
+
+    class Meta:
+        verbose_name = "Администратор"
+        verbose_name_plural = "Администраторы"
+
     def __str__(self):
         return '{} {} {}'.format(self.surname, self.first_name, self.second_name)
 
@@ -152,19 +157,15 @@ class Lessons(models.Model):
 
 class Mark(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
-    amount = models.DecimalField(verbose_name="Балл", decimal_places=2,max_digits=3)
+    amount = models.DecimalField(verbose_name="Балл", decimal_places=2, max_digits=3)
     date = models.DateField(verbose_name="Дата")
-
+    lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок', default='')
     class Meta:
 
         verbose_name = "Оценка"
         verbose_name_plural = "Оценки"
-        ordering = ['date','amount']
+        ordering = ['date', 'amount']
 
     def __str__(self):
-        return '"{}" {} {}'.format(self.mark, self.lesson, self.student)
+        return '"{}" {} {}'.format(self.amount, self.lesson, self.student)
 
-    class Meta:
-        ordering = ['surname', 'first_name', 'second_name']
-        verbose_name = "Администратор"
-        verbose_name_plural = "Администраторы"
