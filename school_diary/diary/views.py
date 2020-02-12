@@ -59,6 +59,7 @@ def diary(request):
         return render(request, 'student.html', context)
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
+
         context = {'Teacher': teacher}
         return render(request, 'teacher.html', context)
     else:
