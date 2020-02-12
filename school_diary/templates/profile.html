@@ -16,18 +16,140 @@
                 <img src="{% static 'user_types/roots.png' %}" alt="Суперпользователь" height=100 class="avatar">
                 <p class="text-muted">Суперадминистратор</p>
             </div>
-            <p><b>Адрес электронной почты: </b>{{ user.email }}</p>
-            <a href="/admin/" class="">Перейти на панель администратора</a>
+            <ul class="nav nav-tabs" id="accounttab" role="tablist">
+                <li class="nav-item">
+                <a class="nav-link" id="account-tab" data-toggle="tab" href="#account" role="tab" aria-controls="account" aria-selected="false">Профиль</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Настройки</a>
+                </li>
+            </ul>
+            <div class="tab-content my-3" id="accounttabcontent">
+                <div class="tab-pane fade show active" id="account" role="tabpanel" aria-labelledby="account-tab">
+                    <h4><i class="fas fa-user-circle"></i> Данные аккаунта</h4>
+                    <div class="my-3" style="line-height: 60%;">
+                    <p>Адрес электронной почты: {{ user.email }}</p>
+                    </div>
+                    
+                </div>
+                <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                    <h4><i class="fas fa-key"></i> Сбросить пароль</h4>
+                    <p>Перейдите по ссылке для сброса пароля:</p>
+                    <a href="{% url 'reset_password' %}" class="btn btn-primary btn-sm">Сбросить пароль</a>
+                </div>
+            </div>
+
 
             {% elif user.account_type == 1 %}
             <div class="text-center">
-                <img src="{% static 'user_types/roots.png' %}" alt="Администратор" height=100 class="avatar">
+                <img src="{% static 'user_types/administrators.png' %}" alt="Администратор" height=100 class="avatar">
                 <p class="text-muted">Администратор</p>
             </div>
-            <p><b>Адрес электронной почты: </b>{{ user.email }}</p>
-            <a href="/admin/" class="">Перейти на панель администратора</a>
+            <ul class="nav nav-tabs" id="accounttab" role="tablist">
+                <li class="nav-item">
+                <a class="nav-link" id="account-tab" data-toggle="tab" href="#account" role="tab" aria-controls="account" aria-selected="false">Профиль</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Настройки</a>
+                </li>
+            </ul>
+            <div class="tab-content my-3" id="accounttabcontent">
+                <div class="tab-pane fade show active" id="account" role="tabpanel" aria-labelledby="account-tab">
+                    <h4><i class="fas fa-user-circle"></i> Данные аккаунта</h4>
+                    <div class="my-3" style="line-height: 60%;">
+                    <p>Адрес электронной почты: {{ user.email }}</p>
+                    <p>Имя: {{ data.first_name }}</p>
+                    <p>Фамилия: {{ data.surname }}</p>
+                    <p>Отчество: {{ data.second_name }}</p>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                    <h4><i class="fas fa-key"></i> Сбросить пароль</h4>
+                    <p>Перейдите по ссылке для сброса пароля:</p>
+                    <a href="{% url 'reset_password' %}" class="btn btn-primary btn-sm">Сбросить пароль</a>
+                </div>
+            </div>
+
+
+
+            {% elif user.account_type == 2 %}
+                <div class="text-center">
+                    <img src="{% static 'user_types/teachers.png' %}" alt="Учитель" height=100 class="avatar">
+                    <p class="text-muted">Учитель</p>
+                </div>
+
+                <ul class="nav nav-tabs" id="accounttab" role="tablist">
+                    <li class="nav-item">
+                    <a class="nav-link" id="account-tab" data-toggle="tab" href="#account" role="tab" aria-controls="account" aria-selected="false">Профиль</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Настройки</a>
+                    </li>
+                </ul>
+                <div class="tab-content my-3" id="accounttabcontent">
+                    <div class="tab-pane fade show active" id="account" role="tabpanel" aria-labelledby="account-tab">
+                        <h4><i class="fas fa-user-circle"></i> Данные аккаунта</h4>
+                        <div class="my-3" style="line-height: 60%;">
+                        <p>Адрес электронной почты: {{ user.email }}</p>
+                        <p>Имя: {{ data.first_name }}</p>
+                        <p>Фамилия: {{ data.surname }}</p>
+                        <p>Отчество: {{ data.second_name }}</p>
+                        </div>
+                        
+                    </div>
+                    <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                        <h4><i class="fas fa-key"></i> Сбросить пароль</h4>
+                        <p>Перейдите по ссылке для сброса пароля:</p>
+                        <a href="{% url 'reset_password' %}" class="btn btn-primary btn-sm">Сбросить пароль</a>
+                        <h4 class="mt-3"><i class="fas fa-edit"></i> Изменить данные</h4>
+                        <p>Вы не можете изменять свои данные самостоятельно, но если в указанной информации есть ошибка, отправьте
+                            администратору просьбу изменить Ваши данные.</p>
+                        <a href="#" class="btn btn-primary btn-sm">Отправить</a>
+                    </div>
+                </div>
+
+
+            {% elif user.account_type == 3 %}
+                <div class="text-center">
+                    <img src="{% static 'user_types/students.png' %}" alt="Ученик" height=100 class="avatar">
+                    <p class="text-muted">Ученик</p>
+                </div>
+
+                <ul class="nav nav-tabs" id="accounttab" role="tablist">
+                    <li class="nav-item">
+                    <a class="nav-link" id="account-tab" data-toggle="tab" href="#account" role="tab" aria-controls="account" aria-selected="false">Профиль</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Настройки</a>
+                    </li>
+                </ul>
+                <div class="tab-content my-3" id="accounttabcontent">
+                    <div class="tab-pane fade show active" id="account" role="tabpanel" aria-labelledby="account-tab">
+                        <h4><i class="fas fa-user-circle"></i> Данные аккаунта</h4>
+                        <div class="my-3" style="line-height: 60%;">
+                        <p>Адрес электронной почты: {{ user.email }}</p>
+                        <p>Имя: {{ data.first_name }}</p>
+                        <p>Фамилия: {{ data.surname }}</p>
+                        <p>Отчество: {{ data.second_name }}</p>
+                        {% if data.grade == None %}
+                        <p class="text-muted">Ваш класс еще не указан. Попросите вашего классного руководителя добавить вас.</p>
+                        {% else %}
+                        <p>Класс: {{ data.grade }}</p>
+                        {% endif %}
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                        <h4><i class="fas fa-key"></i> Сбросить пароль</h4>
+                        <p>Перейдите по ссылке для сброса пароля:</p>
+                        <a href="{% url 'reset_password' %}" class="btn btn-primary btn-sm">Сбросить пароль</a>
+                        <h4 class="mt-3"><i class="fas fa-edit"></i> Изменить данные</h4>
+                        <p>Вы не можете изменять свои данные самостоятельно, но если в указанной информации есть ошибка, отправьте
+                            администратору просьбу изменить Ваши данные.</p>
+                        <a href="#" class="btn btn-primary btn-sm">Отправить</a>
+                    </div>
+                </div>
             {% endif %}
-            
         </div>
     </div>
 </div>

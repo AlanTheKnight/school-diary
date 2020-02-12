@@ -54,7 +54,7 @@ class Grades(models.Model):
 
 class Lessons(models.Model):
     connection = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name="У какого класса урок")
-    day = models.CharField(max_length=11, choices=DAYS, verbose_name="День недели")
+    day = models.CharField(max_length=11, choices=DAYS, verbose_name="День недели", blank=False)
     number = models.IntegerField(verbose_name="Номер урока", validators=[MinValueValidator(0), MaxValueValidator(8)])
     start = models.TimeField(verbose_name="Начало урока")
     end = models.TimeField(verbose_name="Конец урока")

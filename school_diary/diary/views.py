@@ -5,8 +5,13 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from .forms import StudentSignUpForm, StudentsLogin
 from .models import Students, Teachers, Subjects
+from .forms import StudentSignUpForm, UserLogin, AdminSignUpForm, TeacherSignUpForm
+from .decorators import unauthenticated_user, admin_only
+from django.contrib.auth.decorators import login_required
+from .models import *
 
 
+@unauthenticated_user
 def user_register(request):
     if request.method == 'POST':
         form = StudentSignUpForm(request.POST)
@@ -21,6 +26,7 @@ def user_register(request):
     return render(request, 'registration.html', {'form': form, 'error': 0})
 
 
+@unauthenticated_user
 def user_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -32,7 +38,7 @@ def user_login(request):
             return HttpResponseRedirect("/")
         else:
             messages.info(request, 'Неправильный адрес электронной почты или пароль.')
-    form = StudentsLogin()
+    form = UserLogin()
     context = {'form': form}
     return render(request, 'login.html', context)
 
@@ -42,14 +48,59 @@ def user_logout(request):
     return redirect('/diary/login/')
 
 
+@login_required(login_url="/diary/login/")
 def user_profile(request):
-    context = {}
-    return render(request, 'profile.html', {})
-
-
-@login_required(login_url='login')
-def diary(request):
+    if request.user.account_type == 0:
+        data = Users.objects.get(email=request.user)
+    if request.user.account_type == 1:
+        data = Administrators.objects.get(account=request.user)
+    if request.user.account_type == 2:
+        data = Teachers.objects.get(account=request.user)
     if request.user.account_type == 3:
+        data = Students.objects.get(account=request.user)
+    context = {'data':data}
+    return render(request, 'profile.html', context)
+
+
+@login_required(login_url="/diary/login/")
+def diary(request):
+    if request.user.account_type == 0 or request.user.account_type == 1:
+        return render(request, 'diary_admin_main.html')
+    else:
+        context = {}
+        return render(request, 'diary.html', context)
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def admin_register(request):
+    if request.method == 'POST':
+        form = AdminSignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Новый администратор был создан успешно.")
+            return redirect('/diary/login/')
+    if request.POST:
+        form = AdminSignUpForm(request.POST)
+    else:
+        form = AdminSignUpForm()
+    return render(request, 'registration_admin.html', {'form': form, 'error': 0})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def teacher_register(request):
+    if request.method == 'POST':
+        form = TeacherSignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Новый администратор был создан успешно.")
+            return redirect('/diary/login/')
+    if request.POST:
+        form = TeacherSignUpForm(request.POST)
+    else:
+        form = TeacherSignUpForm()
+    return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
         student = Students.objects.get(account=request.user)
         context = {'Student': student,
                    'subjects': Subjects.objects.all(),

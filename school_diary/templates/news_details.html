@@ -20,9 +20,11 @@
             <div class="card-title">
                 <h1 class="dispay-4">{{ post.title }}</h1>
                 <p class="text-muted">{{ post.publication_date }}</p>
-                {% autoescape off %}
-                <p class="text-left">{{ post.content }}</p>
-                {% endautoescape %}
+                <div class="text-left">
+                    {% autoescape off %}
+                    <p>{{ post.content }}</p>
+                    {% endautoescape %}
+                </div>
             </div>
         </div>
     </div>

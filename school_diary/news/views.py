@@ -1,25 +1,23 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Publications
-from django.db.models import Max
 from django.http import HttpResponseRedirect
+from django.core.paginator import Paginator
+from .forms import ArticleCreationForm
+from django.contrib.auth.decorators import login_required
+from .decorators import admin_only
 
 
-def redirect(request):
-    return HttpResponseRedirect('/news/1')
+def first_page(request):
+    return redirect('/news/page/1')
 
 
 def get_posts(request, page):
-    POSTS_ON_PAGE = 15
     news = Publications.objects.all()
-    amount = news.count()
-    news = news[POSTS_ON_PAGE * (page - 1):POSTS_ON_PAGE * page]
-    if amount is not None:
-        amount = int(amount)
-        amount = amount - (POSTS_ON_PAGE * page)
-    else:
-        amount = 0
-    return render(request, 'news.html', {'pub': news, 'current':page, 'prev':page-1, 'next':page+1, 'amount':amount})
+    news = Paginator(news, 15)
+    page_object = news.get_page(page)
+    return render(request, 'news.html', {'news':page_object})
+
 
 def post(request, url):
     try:
@@ -31,3 +29,56 @@ def post(request, url):
             'error': "404",
             'description': "Статьи с таким именем не существует."
         })
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def create_post(request):
+    if request.method == "POST":
+        form = ArticleCreationForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('/news/')
+    else:
+        form = ArticleCreationForm()
+        return render(request, 'news_editor.html', {'form':form})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def dashboard(request, page):
+    news = Publications.objects.all()
+    news = Paginator(news, 100)
+    news = news.get_page(page)
+    return render(request, 'news_view.html', {'news':news})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def dashboard_first(request):
+    return redirect('/news/dashboard/1')
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def news_delete(request, id):
+    article = Publications.objects.get(id=id)
+    if request.method == "POST":
+        article.delete()
+        return redirect('/news/dashboard')
+    context = {'item':article}
+    return render(request, 'news_delete.html', context)
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def news_update(request, id):
+    article = Publications.objects.get(id=id)
+    form = ArticleCreationForm(instance=article)
+    if request.method == 'POST':
+        form = ArticleCreationForm(request.POST, request.FILES, instance=article)
+        if form.is_valid():
+            form.save()
+            return redirect('news_dashboard')
+    context = {'form':form}
+    return render(request, 'news_editor.html', context)

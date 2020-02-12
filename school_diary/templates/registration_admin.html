@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-    <title>Расписание</title>
+    <title>Регистрация администратора</title>
     <style>
         .card {
         margin: 0 auto; /* Added */
@@ -17,18 +17,12 @@
 <div class="container my-5">
     {% if error %}
     <div class="alert alert-danger" role="alert">
-        Такой пользователь уже существует
+        Такой администратор уже существует
     </div>
     {% endif %}
-    <div class="card my-5 w-75">
-        <div class="card-body">
-            <h5 class="card-title">Уже зарегистрированы?</h5>
-            <a href="/diary/login/" class="btn btn-primary">Войти</a>
-        </div>
-    </div>
     <div class="card w-75">
         <div class="card-body">
-            <h3 class="card-title text-center">Регистрация нового ученика</h3>
+            <h3 class="card-title text-center">Регистрация нового администратора</h3>
             <form method="POST" class="my-5 mx-5">
                 {% csrf_token %}
                 <div class="form-group">
@@ -46,6 +40,10 @@
                 <div class="form-group">
                     {{ form.second_name.label }} (необязательно)
                     {{ form.second_name }}
+                </div>
+                <div class="form-group">
+                    {{ form.subjects.label }}
+                    {{ form.subjects }}
                 </div>
                 <div class="form-group">
                     {{ form.password1.label }}

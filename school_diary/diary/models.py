@@ -122,6 +122,12 @@ class Students(models.Model):
         verbose_name = "Ученик"
         verbose_name_plural = "Ученики"
 
+
+class Administrators(models.Model):
+    account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
+    first_name = models.CharField(verbose_name="Имя", max_length=100)
+    surname = models.CharField(verbose_name="Фамилия", max_length=100)
+    second_name = models.CharField(verbose_name="Отчество", max_length=100, blank=True, default="")
     def __str__(self):
         return '{} {} {}'.format(self.surname, self.first_name, self.second_name)
 
@@ -157,3 +163,8 @@ class Mark(models.Model):
 
     def __str__(self):
         return '"{}" {} {}'.format(self.mark, self.lesson, self.student)
+
+    class Meta:
+        ordering = ['surname', 'first_name', 'second_name']
+        verbose_name = "Администратор"
+        verbose_name_plural = "Администраторы"

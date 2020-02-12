@@ -9,10 +9,9 @@ class Publications(models.Model):
     slug = models.SlugField(max_length=100, verbose_name="Имя ссылки", unique=True)
 
     class Meta:
-        ordering = ['publication_date']
+        ordering = ['-publication_date']
         verbose_name_plural = "Новости"
         verbose_name = "Новость"
     
     def __str__(self):
-        return str(self.publication_date) + " " + self.title
-        
+        return '{} {}'.format(str(self.publication_date), self.title)

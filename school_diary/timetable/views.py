@@ -1,10 +1,12 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from urllib.parse import unquote
-from .forms import GetTimeTableForm
+from .forms import GetTimeTableForm, LessonCreateForm
 from django.http import HttpResponseRedirect
 from .models import Grades, Lessons
 import time
+from .decorators import admin_only
+from django.core.exceptions import ObjectDoesNotExist
 
 
 DAYWEEK_NAMES = {
@@ -30,7 +32,7 @@ def timetable(request):
             return HttpResponseRedirect(url)
     else:
         form = GetTimeTableForm()
-        return render(request, 'timetable.html', {'form': form})
+        return render(request, 'timetable/timetable.html', {'form': form})
 
 
 def output(request, grade, litera):
@@ -55,7 +57,7 @@ def output(request, grade, litera):
         lessons_list_thursday = Lessons.objects.filter(connection=my_grade.id, day="Четверг")
         lessons_list_friday = Lessons.objects.filter(connection=my_grade.id, day="Пятница")
         lessons_list_saturday = Lessons.objects.filter(connection=my_grade.id, day="Суббота")
-        return render(request, 'timetable_list.html', {
+        return render(request, 'timetable/list.html', {
             'current_weekday': current_day_name,
             'today': lessons_list_today,
             'tomorrow': lessons_list_tomorrow,
@@ -75,4 +77,61 @@ def output(request, grade, litera):
 
 
 def download(request):
-    return render(request, 'timetable_download.html')
+    return render(request, 'timetable/download.html')
+
+
+@login_required(login_url='/diary/login/')
+@admin_only
+def dashboard(request):
+    if request.method == "POST":
+        form = GetTimeTableForm(request.POST)
+        if form.is_valid():
+            chosen_grade = form.cleaned_data['grade']
+            chosen_litera = form.cleaned_data['litera']
+            try:
+                my_grade = Grades.objects.get(number=chosen_grade, letter=chosen_litera)
+            except ObjectDoesNotExist:
+                my_grade = Grades.objects.create(number=chosen_grade, letter=chosen_litera)
+                my_grade.save()
+            lessons = Lessons.objects.filter(connection=my_grade).order_by('day', 'number')
+            return render(request, 'timetable/dashboard.html', {'form':form, 'lessons':lessons})
+        
+    form = GetTimeTableForm()
+    return render(request, 'timetable/dashboard.html', {'form':form})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def edit_lesson(request, id):
+    lesson = Lessons.objects.get(id=id)
+    form = LessonCreateForm(instance=lesson)
+    if request.method == "POST":
+        form = LessonCreateForm(request.POST, instance=lesson)
+        if form.is_valid():
+            form.save()
+            return redirect('timetable_dashboard')
+            
+    return render(request, 'timetable/create.html', {'form':form})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def create_lesson(request):
+    if request.method == "POST":
+        form = LessonCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('timetable_dashboard')
+    form = LessonCreateForm()
+    return render(request, 'timetable/create.html', {'form':form})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def delete_lesson(request, id):
+    lesson = Lessons.objects.get(id=id)
+    if request.method == "POST":
+        lesson.delete()
+        return redirect('/timetable/dashboard')
+    context = {'item':lesson}
+    return render(request, 'timetable/lesson_delete.html', context)

@@ -12,9 +12,10 @@
 
 {% block content %}
 <div class="container my-5">
-    {% if pub %}
+
+    {% if news %}
     <div class="row my-5">
-        {% for post in pub %}
+        {% for post in news %}
         <div class="col-sm-4 my-3">
             <div class="card h-100">
                 {% if post.image %}
@@ -24,7 +25,7 @@
                     <div class="card-title">
                         <h5>{{ post.title }}</h5>
                         <p class="text-muted">{{ post.publication_date }}</p>
-                        <a class="btn btn-primary my-2" href="articles/{{ post.slug }}">Подробнее</a>
+                        <a class="btn btn-primary my-2" href="/news/articles/{{ post.slug }}">Подробнее</a>
                     </div>
                 </div>
             </div>
@@ -34,28 +35,21 @@
     {% else %}
     <p class="text-muted text-justify-center">Новостей пока что нет.</p>
     {% endif %}
+
     <nav>
         <ul class="pagination justify-content-center">
-            {% if prev > 0 %}
-            <li class="page-item">
-                <a class="page-link" href="{{ prev }}">&lt</a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <a class="page-link" href="#">&lt</a>
-            </li>
+            {% if news.has_previous %}
+                <li class="page-item"><a href="/news/page/1" class="page-link">&laquo; first</a></li>
+                <li class="page-item"></li><a href="/news/page/{{ news.previous_page_number }}" class="page-link">&lt;</a>
             {% endif %}
-            <li class="page-item active" aria-current="page">
-                <a class="page-link" href="{{ current }}">{{ current }}<span class="sr-only">(current)</span></a>
-            </li>
-            {% if amount > 0 %}
-            <li class="page-item">
-                <a class="page-link" href="{{ next }}">&gt</a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <a class="page-link" href="{{ next }}">&gt</a>
-            </li>
+
+            <span class="current">
+                <li class="page-item active"><a href="#" class="page-link">{{ news.number }}</a></li>
+            </span>
+
+            {% if news.has_next %}
+                <li class="page-item"><a href="/news/page/{{ news.next_page_number }}" class="page-link">&gt;</a></li>
+                <li class="page-item"><a href="/news/page/{{ news.paginator.num_pages }}" class="page-link">&raquo;</a></li>
             {% endif %}
         </ul>
     </nav>
