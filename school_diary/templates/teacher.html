@@ -11,4 +11,11 @@
     {% for subject in Teacher.subjects %}
         <a href="#">{{ subject }}</a>
     {% endfor %}
+    <form method="POST">
+        <select name="subject">
+            {% for subject in Teacher.subjects %}
+            <option>subject</option>
+            {% endfor %}
+        </select>
+    </form>
 {% endblock %}

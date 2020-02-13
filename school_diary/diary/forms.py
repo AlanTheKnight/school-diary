@@ -157,5 +157,4 @@ class TeacherSignUpForm(UserCreationForm):
         return user
 
 
-#class TeacherDairyForm(forms.Form):
-#    subjects = forms.ChoiceField(lable='Класс', widget=forms.Select(choices=))
+
