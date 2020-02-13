@@ -66,9 +66,39 @@ def user_profile(request):
 def diary(request):
     if request.user.account_type == 0 or request.user.account_type == 1:
         return render(request, 'diary_admin_main.html')
+
+    elif request.user.account_type == 3:
+        student = Students.objects.get(account=request.user)
+        context = {'Student': student,
+                   'subjects': Subjects.objects.all(),
+                   'daylist': ['09.02', '10.02', '11.02'],
+                   'marks': student.mark_set.order_by('date')}
+        return render(request, 'student.html', context)
+
+    elif request.user.account_type == 2:
+        teacher = Teachers.objects.get(account=request.user)
+        context = {'Teacher': teacher,
+                   'subjects': teacher.subjects.all(),
+                   'grades': Grades.objects.filter(teachers=teacher),
+                   'is_post': False
+                   }
+
+        if request.method == 'POST':
+            subject = Subjects.objects.get(name=request.POST.get('subject'))
+            number = int(request.POST.get('grade')[0])
+            letter = request.POST.get('grade')[1]
+            grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
+            lessons = Lessons.objects.filter(grade=grade, subject=subject)
+            context.update({
+                'students': Students.objects.filter(grade=grade),
+                'is_post': True,
+                'lessons': lessons,
+            })
+            return render(request, 'teacher.html', context)
+        else:
+            return render(request, 'teacher.html', context)
     else:
-        context = {}
-        return render(request, 'diary.html', context)
+        redirect('/')
 
 
 @login_required(login_url="/diary/login/")
@@ -102,19 +132,3 @@ def teacher_register(request):
         form = TeacherSignUpForm()
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
 
-
-@login_required(login_url="/diary/login/")
-def dairy(request):
-    if request.user.account_type == 3:
-        student = Students.objects.get(account=request.user)
-        context = {'Student': student,
-                   'subjects': Subjects.objects.all(),
-                   'daylist': ['09.02', '10.02', '11.02'],
-                   'marks': student.mark_set.order_by('date')}
-        return render(request, 'student.html', context)
-    elif request.user.account_type == 2:
-        teacher = Teachers.objects.get(account=request.user)
-        context = {'Teacher': teacher}
-        return render(request, 'teacher.html', context)
-    else:
-        redirect('/')

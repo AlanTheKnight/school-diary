@@ -11,6 +11,7 @@ TYPES = [
     (3, "Ученик"),
 ]
 
+
 GRADES = [
     (1, 1),
     (2, 2),
@@ -146,7 +147,6 @@ class Lessons(models.Model):
     grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
 
     class Meta:
-
         verbose_name = "Урок"
         verbose_name_plural = "Уроки"
 
@@ -160,8 +160,8 @@ class Mark(models.Model):
     amount = models.DecimalField(verbose_name="Балл", decimal_places=2, max_digits=3)
     date = models.DateField(verbose_name="Дата")
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок', default='')
-    class Meta:
 
+    class Meta:
         verbose_name = "Оценка"
         verbose_name_plural = "Оценки"
         ordering = ['date', 'amount']
