@@ -126,7 +126,10 @@ def diary(request):
             for student in students:
                 for_lesson = []
                 for lesson in lessons:
-                    for_lesson.append(Marks.objects.filter(lesson=lesson, student=student))
+                    try:
+                        for_lesson.append(student.marks_set.get(lesson=lesson))
+                    except:
+                        for_lesson.append(None)
                 mark.append(for_lesson)
             context.update({
                 'students': students,

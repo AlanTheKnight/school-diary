@@ -23,12 +23,12 @@
             <button type="submit" class="btn btn-primary">Найти</button>
         </form>
         {% if is_post %}
-        <table class="table">
+        <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th scope="col">Ученики</th>
                     {% for lesson in  lessons %}
-                    <th scope="col">{{ lesson.date }}</th>
+                    <th scope="col">{{ lesson.date.day }}.{{ lesson.date.month }}</th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -36,8 +36,12 @@
             {% for student in students %}
                 <tr>
                     <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
-                    {% for mark in 'marks[0]' %}
-                        <th>{{mark}}</th>
+                    {% for mark in marks.0 %}
+                        {% if mark %}
+                        <th>{{mark.amount}}</th>
+                        {% else %}
+                        <th> </th>
+                        {% endif %}
                     {% endfor %}
                 </tr>
             {% endfor %}
