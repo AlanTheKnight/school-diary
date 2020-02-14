@@ -36,7 +36,7 @@
             {% for student in students %}
                 <tr>
                     <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
-                    {% for mark in 'marks[0]' %}
+                    {% for mark in marks.0 %}
                         <th>{{mark}}</th>
                     {% endfor %}
                 </tr>

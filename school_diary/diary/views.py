@@ -85,7 +85,7 @@ def teacher_register(request):
         form = TeacherSignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Новый администратор был создан успешно.")
+            messages.success(request, "Новый учитель был создан успешно.")
             return redirect('/diary/login/')
     if request.POST:
         form = TeacherSignUpForm(request.POST)
