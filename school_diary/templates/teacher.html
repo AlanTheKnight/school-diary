@@ -27,12 +27,18 @@
             <thead>
                 <tr>
                     <th scope="col">Ученики</th>
+                    {% for lesson in  lessons %}
+                    <th scope="col">{{ lesson.date }}</th>
+                    {% endfor %}
                 </tr>
             </thead>
             <tbody>
             {% for student in students %}
                 <tr>
                     <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
+                    {% for mark in 'marks[0]' %}
+                        <th>{{mark}}</th>
+                    {% endfor %}
                 </tr>
             {% endfor %}
             </tbody>

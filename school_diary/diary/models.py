@@ -123,6 +123,9 @@ class Students(models.Model):
         verbose_name = "Ученик"
         verbose_name_plural = "Ученики"
 
+    def __str__(self):
+        return '{} {} {} {}'.format(self.first_name, self.second_name, self.surname, self.grade)
+
 
 class Administrators(models.Model):
     account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
@@ -155,9 +158,9 @@ class Lessons(models.Model):
 # TODO Weights system
 
 
-class Mark(models.Model):
+class Marks(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
-    amount = models.DecimalField(verbose_name="Балл", decimal_places=2, max_digits=3)
+    amount = models.IntegerField(verbose_name="Балл")
     date = models.DateField(verbose_name="Дата")
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок', default='')
 
