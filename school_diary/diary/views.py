@@ -3,11 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-# from .forms import StudentSignUpForm, StudentsLogin
-from .models import Students, Teachers, Subjects
-from .forms import StudentSignUpForm, UsersLogin, AdminSignUpForm, TeacherSignUpForm
+from .models import *
+from .forms import *
 from .decorators import unauthenticated_user, admin_only
-from django.contrib.auth.decorators import login_required
 from .models import *
 
 
@@ -140,3 +138,24 @@ def diary(request):
     else:
         redirect('/')
 
+
+def add_student_page(request):
+    if request.method == "POST":
+        form = AddStudentToGradeForm(request.POST)
+        if form.is_valid:
+            fn = request.POST.get('first_name')
+            s = request.POST.get('surname')
+            search = Students.objects.filter(first_name=fn, surname=s)
+            context = {'form':form, 'search':search}
+        return render(request, 'grades/add_student.html', context)
+    form = AddStudentToGradeForm()
+    context = {'form':form}
+    return render(request, 'grades/add_student.html', context)
+
+
+def add_student(request, id):
+    if request.method == "POST":
+        s = Subjects.objects.get(account=id)
+        s.save()
+    else:
+        pass

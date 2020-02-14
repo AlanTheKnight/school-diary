@@ -97,9 +97,9 @@ class Teachers(models.Model):
 class Grades(models.Model):
     number = models.IntegerField(choices=GRADES, verbose_name="Класс")
     letter = models.CharField(max_length=2, verbose_name="Буква")
-    teachers = models.ManyToManyField(Teachers, verbose_name="Учителя")
+    teachers = models.ManyToManyField(Teachers, verbose_name="Учителя", related_name="subjects_chosen")
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
-    # main_teacher = models.ForeignKey(Teachers, verbose_name='Классный учитель', on_delete=models.PROTECT) TODO сделаь классного учителя
+    main_teacher = models.ForeignKey(Teachers, verbose_name='Классный руководитель', on_delete=models.SET_NULL, null=True, default=None)
 
     class Meta:
         ordering = ['number', 'letter']

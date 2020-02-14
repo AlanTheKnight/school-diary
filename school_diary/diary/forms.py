@@ -116,3 +116,8 @@ class TeacherSignUpForm(UserCreationForm):
                                         second_name=self.cleaned_data['second_name'],)
         admin.subjects.set(self.cleaned_data['subjects'])
         return user
+
+
+class AddStudentToGradeForm(forms.Form):
+    first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))

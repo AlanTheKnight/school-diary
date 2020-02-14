@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Подтвердить</title>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card my-5">
+        <div class="card-body">
+            <p>Вы уверены, что хотите добавить ученика "{{ s.surname }} {{ s.first_name }}" в свой класс?</p>
+            <form action="{% url 'add_student' s.id  %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Подтвердить</button>
+                <a href="{% url 'add_student_page' %}" class="btn btn-success">Отмена</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
