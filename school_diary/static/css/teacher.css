@@ -1,0 +1,10 @@
+.inp_table{
+    border: 0px;
+    -moz-appearance: textfield;
+}
+.inp_table:focus{
+    outline:none;
+}
+.inp_table::-webkit-inner-spin-button {
+  display: none;
+}
