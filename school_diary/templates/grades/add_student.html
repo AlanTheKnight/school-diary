@@ -14,7 +14,7 @@
 
 {% block content %}
 <div class="container my-5">
-    <div class="card w-50">
+    <div class="card w-75">
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
@@ -23,40 +23,50 @@
                 </div>
                 <button class="btn btn-primary" type="submit">Найти</button>
             </form>
-            
+            {% if search %}
+                <div class="table-responsive">
+                <table class="table my-5 text-center">
+                    <thead class="thead-dark">
+                        <th>Почта</th>
+                        <th>Имя</th>
+                        <th>Фамилия</th>
+                        <th>Класс</th>
+                        <th>Добавить</th>
+                    </thead>
+                    <tbody>
+                        {% for s in search %}
+                        <tr>
+                            <td>{{ s.account.email }}</td>
+                            <td>{{ s.first_name }}</td>
+                            <td>{{ s.surname }}</td>
+                            {% if s.grade is not None %}
+                            <td>{{ s.grade }}</td>
+                            <td>-</td>
+                            {% else %}
+                            <td>Не состоит</td>
+                            <td><a href="{% url 'add_student' s.account %}" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i></a></td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mt-5">
+                    Ученики по запросу не найдены.
+                </div>
+            {% endif %}
         </div>
     </div>
-    {% if search %}
-    <table class="table my-5 text-center">
-        <thead class="thead-dark">
-            <th>Почта</th>
-            <th>Имя</th>
-            <th>Фамилия</th>
-            <th>Класс</th>
-            <th>Добавить</th>
-        </thead>
-        <tbody>
-            {% for s in search %}
-            <tr>
-                <td>{{ s.account.email }}</td>
-                <td>{{ s.first_name }}</td>
-                <td>{{ s.surname }}</td>
-                {% if grade is None %}
-                <td>Не состоит</td>
-                <td><a href="{% url 'add_student' s.account %}" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i></a></td>
-                {% else %}
-                <td>{{ s.grade }}</td>
-                <td>-</td>
-                {% endif %}
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <div class="alert alert-info mt-5">
-        Ученики по запросу не найдены.
+    <div class="card mt-5 w-75">
+        <div class="card-body">
+            {% if grade %}
+            {% else %}
+            <div class="alert alert-info">
+                Ученики еще не добавлены в класс.
+            </div>
+            {% endif %}
+        </div>
     </div>
-    {% endif %}
 </div>
 {% endblock %}
