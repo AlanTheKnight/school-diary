@@ -119,10 +119,15 @@ def diary(request):
             subject = Subjects.objects.get(name=request.POST.get('subject'))
             number = int(request.POST.get('grade')[0])
             letter = request.POST.get('grade')[1]
-            grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
+            try:
+                grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
+            except:
+                messages.error(request, 'Ошибка')
+                return render(request, 'teacher.html', context)
+
             lessons = Lessons.objects.filter(grade=grade, subject=subject)
             students = Students.objects.filter(grade=grade)
-            mark = {}
+            scope = {}
             for student in students:
                 for_lesson = []
                 for lesson in lessons:
@@ -130,11 +135,11 @@ def diary(request):
                         for_lesson.append(student.marks_set.get(lesson=lesson))
                     except:
                         for_lesson.append(None)
-                mark.update({student: for_lesson})
+                scope.update({student: for_lesson})
             context.update({
                 'is_post': True,
                 'lessons': lessons,
-                'marks': mark
+                'scope': scope
             })
             return render(request, 'teacher.html', context)
         else:

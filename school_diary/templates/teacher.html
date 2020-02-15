@@ -8,6 +8,15 @@
 {% endblock %}
 
 {% block content %}
+{#  TODO find better place for error message  #}
+{#  TODO create frontend #}
+    {% if messages %}
+			<div class="alert alert-danger">
+			{% for message in messages %}
+			{{ message }}
+			{% endfor %}
+			</div>
+			{% endif %}
         <form method="POST">
         {% csrf_token %}
             <select name="subject">
@@ -33,14 +42,14 @@
                 </tr>
             </thead>
             <tbody>
-            {% for student, marks in marks.items %}
+            {% for student, marks in scope.items %}
                 <tr>
                     <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
                     {% for mark in marks %}
                         {% if mark %}
                         <th>{{mark.amount}}</th>
                         {% else %}
-                        <th> </th>
+                        <th></th>
                         {% endif %}
                     {% endfor %}
                 </tr>
