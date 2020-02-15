@@ -14,8 +14,38 @@
 
 {% block content %}
 <div class="container my-5">
-    <div class="card w-75">
+    <div class="card my-5 w-75">
         <div class="card-body">
+            <h3 class="card-title">Ученики в классе</h3>
+            {% if students %}
+            <div class="table-responsive">
+                <table class="table my-3 text-center">
+                    <thead class="thead-dark">
+                        <th>Почта</th>
+                        <th>Имя</th>
+                        <th>Фамилия</th>
+                    </thead>
+                    <tbody>
+                        {% for s in students %}
+                        <tr>
+                            <td>{{ s.account.email }}</td>
+                            <td>{{ s.first_name }}</td>
+                            <td>{{ s.surname }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            {% else %}
+            <div class="alert alert-info">
+                Ученики еще не добавлены в класс.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card w-75 my-5">
+        <div class="card-body">
+            <h3 class="card-title">Добавление учеников</h3>
             <form method="POST">
                 {% csrf_token %}
                 <div class="form-group">
@@ -55,16 +85,6 @@
                 <div class="alert alert-info mt-5">
                     Ученики по запросу не найдены.
                 </div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="card mt-5 w-75">
-        <div class="card-body">
-            {% if grade %}
-            {% else %}
-            <div class="alert alert-info">
-                Ученики еще не добавлены в класс.
-            </div>
             {% endif %}
         </div>
     </div>

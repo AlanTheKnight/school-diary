@@ -140,24 +140,38 @@ def diary(request):
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['teachers'], message="Вы не классный руководитель.")
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 def add_student_page(request):
+    """
+    Page where teachers can add students to their grade.
+    """
+    me = Teachers.objects.get(account=request.user)
+    try:
+        grade = Grades.objects.get(main_teacher=me)
+    except ObjectDoesNotExist:
+        return render(request, 'access_denied.html', {'message':"Вы не классный руководитель."})
+    students = Students.objects.filter(grade=grade)
+
     if request.method == "POST":
         form = AddStudentToGradeForm(request.POST)
         if form.is_valid:
             fn = request.POST.get('first_name')
             s = request.POST.get('surname')
             search = Students.objects.filter(first_name=fn, surname=s)
-            context = {'form':form, 'search':search}
+            context = {'form':form, 'search':search, 'grade':grade, 'students':students}
             return render(request, 'grades/add_student.html', context)
+    
     form = AddStudentToGradeForm()
-    context = {'form':form}
+    context = {'form':form, 'grade':grade, 'students':students}
     return render(request, 'grades/add_student.html', context)
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['teachers'], message="Вы не классный руководитель.")
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 def add_student(request, i):
+    """
+    Function defining the process of adding new student to a grade and confirming it.
+    """
     u = Users.objects.get(email=i)
     s = Students.objects.get(account=u)
     if request.method == "POST":
@@ -183,7 +197,22 @@ def create_grade_page(request):
             mt = Teachers.objects.get(account=request.user)
             grade.main_teacher = mt
             grade.save()
-            return redirect('diary')
+            return redirect('my_grade')
     form = GradeCreationForm()
     context = {'form':form}
     return render(request, 'grades/add_grade.html', context)
+
+
+@login_required(login_url="login")
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+def my_grade(request):
+    """
+    Page with information about teacher's grade.
+    """
+    me = Teachers.objects.get(account=request.user)
+    try:
+        grade = Grades.objects.get(main_teacher=me)
+    except ObjectDoesNotExist:
+        grade = None
+    context = {'grade':grade}
+    return render(request, 'grades/my_grade.html', context)

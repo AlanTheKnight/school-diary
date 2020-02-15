@@ -69,7 +69,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
 
 
 class Subjects(models.Model):
-    name = models.CharField(max_length=50, verbose_name="Название")
+    name = models.CharField(max_length=50, verbose_name="Название", unique=True)
 
     class Meta:
         ordering = ['name']
