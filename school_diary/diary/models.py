@@ -162,13 +162,13 @@ class Lessons(models.Model):
 class Marks(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
     amount = models.IntegerField(verbose_name="Балл")
-    date = models.DateField(verbose_name="Дата")
+
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок', default='')
 
     class Meta:
         verbose_name = "Оценка"
         verbose_name_plural = "Оценки"
-        ordering = ['date', 'amount']
+        ordering = ['lesson']
 
     def __str__(self):
         return '"{}" {} {}'.format(self.amount, self.lesson, self.student)

@@ -33,10 +33,10 @@
                 </tr>
             </thead>
             <tbody>
-            {% for student in students %}
+            {% for student, marks in marks.items %}
                 <tr>
                     <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
-                    {% for mark in marks.0 %}
+                    {% for mark in marks %}
                         {% if mark %}
                         <th>{{mark.amount}}</th>
                         {% else %}
