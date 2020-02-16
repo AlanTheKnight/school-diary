@@ -19,7 +19,7 @@ class StudentSignUpForm(UserCreationForm):
     first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     second_name = forms.CharField(label="Отчество", max_length=100, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
-    password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password'}))
+    password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password', 'pattern':r"(?=.*\d)(?=.*[a-zA-Z]).{8,}", 'id':"password1", 'name':'password1'}))
     password2 = forms.CharField(label="Подтверждение пароля", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password'}))
 
     class Meta():
