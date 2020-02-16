@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .models import *
 from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
@@ -245,6 +246,7 @@ def delete_student(request, i):
         return render(request, 'grades/delete_student_confirm.html', {'s':s})
 
 
+@allowed_users(allowed_roles=['teachers', 'students'], message="Вы не зарегистрированы как учитель или ученик.")
 @login_required(login_url="login")
 def admin_message(request):
     if request.method == "POST":
@@ -253,6 +255,47 @@ def admin_message(request):
             m = form.save()
             m.sender = request.user
             m.save()
-            redirect('profile')
+            return redirect('profile')
     form = AdminMessageCreationForm()
     return render(request, 'admin_messages.html', {'form':form})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def students_dashboard_first_page(request):
+    return redirect('/diary/students/dashboard/1')
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def students_dashboard(request, page):
+    students = Students.objects.all()
+    students = Paginator(students, 100)
+    students = students.get_page(page)
+    return render(request, 'students/dashboard.html', {'students':students})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def students_delete(request, id):
+    u = Users.objects.get(email=id)
+    s = Students.objects.get(account=u)
+    if request.method == "POST":
+        u.delete()
+        s.delete()
+        return redirect('students_dashboard')
+    return render(request, 'students/delete.html', {'s':s})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def students_update(request, id):
+    u = Users.objects.get(email=id)
+    s = Students.objects.get(account=u)
+    if request.method == "POST":
+        form = StudentEditForm(request.POST, instance=s)
+        if form.is_valid():
+            form.save()
+            return redirect('students_dashboard')
+    form = StudentEditForm(instance=s)
+    return render(request, 'students/update.html', {'form':form})
