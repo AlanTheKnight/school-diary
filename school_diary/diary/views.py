@@ -145,9 +145,8 @@ def add_student_page(request):
     """
     Page where teachers can add students to their grade.
     """
-    me = Teachers.objects.get(account=request.user)
     try:
-        grade = Grades.objects.get(main_teacher=me)
+        grade = Grades.objects.get(main_teacher=request.user.id)
     except ObjectDoesNotExist:
         return render(request, 'access_denied.html', {'message':"Вы не классный руководитель."})
     students = Students.objects.filter(grade=grade)
@@ -216,3 +215,37 @@ def my_grade(request):
         grade = None
     context = {'grade':grade}
     return render(request, 'grades/my_grade.html', context)
+
+
+@login_required(login_url="login")
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+def delete_student(request, i):
+    """
+    Function defining the process of deleting a student from a grade and confirming it.
+    """
+    u = Users.objects.get(email=i)
+    s = Students.objects.get(account=u)
+    if request.method == "POST":
+        try:
+            grade = Grades.objects.get(main_teacher=request.user.id)
+            s.grade = None
+            s.save()
+            return redirect('add_student_page')
+        except ObjectDoesNotExist:
+            context = {'message':"Вы не классный руководитель."}
+            return render(request, 'access_denied.html', context)
+    else:
+        return render(request, 'grades/delete_student_confirm.html', {'s':s})
+
+
+@login_required(login_url="login")
+def admin_message(request):
+    if request.method == "POST":
+        form = AdminMessageCreationForm(request.POST)
+        if form.is_valid():
+            m = form.save()
+            m.sender = request.user
+            m.save()
+            redirect('profile')
+    form = AdminMessageCreationForm()
+    return render(request, 'admin_messages.html', {'form':form})
