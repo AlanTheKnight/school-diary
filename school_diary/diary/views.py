@@ -115,33 +115,53 @@ def diary(request):
                    }
 
         if request.method == 'POST':
-            print()
-            subject = Subjects.objects.get(name=request.POST.get('subject'))
-            number = int(request.POST.get('grade')[0])
-            letter = request.POST.get('grade')[1]
-            try:
-                grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
-            except:
-                messages.error(request, 'Ошибка')
-                return render(request, 'teacher.html', context)
+            if request.POST.get('subject'):
+                subject = Subjects.objects.get(name=request.POST.get('subject'))
+                number = int(request.POST.get('grade')[0])
+                letter = request.POST.get('grade')[1]
+                try:
+                    grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
+                except ObjectDoesNotExist:
+                    messages.error(request, 'Ошибка')
+                    return render(request, 'teacher.html', context)
 
-            lessons = Lessons.objects.filter(grade=grade, subject=subject)
-            students = Students.objects.filter(grade=grade)
-            scope = {}
-            for student in students:
-                stu = {}
-                for lesson in lessons:
-                    try:
-                        stu.update({lesson: student.marks_set.get(lesson=lesson)})
-                    except:
-                        stu.append({lesson: None})
-                scope.update({student: stu})
-            context.update({
-                'is_post': True,
-                'lessons': lessons,
-                'scope': scope
-            })
-            return render(request, 'teacher.html', context)
+                lessons = Lessons.objects.filter(grade=grade, subject=subject)
+                students = Students.objects.filter(grade=grade)
+                scope = {}
+                for student in students:
+                    stu = {}
+                    for lesson in lessons:
+                        try:
+                            stu.update({lesson: student.marks_set.get(lesson=lesson)})
+                        except ObjectDoesNotExist:
+                            stu.update({lesson: None})
+                    scope.update({student: stu})
+                print(scope)
+                context.update({
+                    'is_post': True,
+                    'lessons': lessons,
+                    'scope': scope
+                })
+                return render(request, 'teacher.html', context)
+            else:
+                for i in dict(request.POST):
+                    if i == 'csrfmiddlewaretoken':
+                        continue
+                    print(i.split('|'))
+                    account, id = i.split('|')
+                    student = Students.objects.get(account=account)
+                    lesson = Lessons.objects.get(pk=id)
+                    amount = str(request.POST[i])
+                    if amount:
+                        mark = Marks.objects.get(lesson=lesson, student=student)
+                        mark.amount = amount
+                        mark.save()
+                    else:
+                        Marks.objects.create(lesson=lesson,
+                                             student=student,
+                                             amount=amount)
+
+                return render(request, 'teacher.html', context)
         else:
             return render(request, 'teacher.html', context)
     else:

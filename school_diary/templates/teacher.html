@@ -37,6 +37,8 @@
         </form>
         {% if is_post %}
         <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Найти</button>
             <table class="table table-bordered ">
                 <thead>
                     <tr>
@@ -47,15 +49,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% for student, marks in scope.items %}
+                {% for student, small_scope in scope.items %}
                     <tr>
                         <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
-{#                        {% for mark in marks %}#}
-                        {% for lesson in  lessons %}
+                        {% for lesson, mark in  small_scope.items %}
                             {% if mark %}
-                            <th><input class="inp_table" name="{{ student }}" type="number" value="{{mark.amount}}" min="1" max="5"></th>
+                            <th><input class="inp_table" name="{{ student.account }}|{{ lesson.id }}" type="number" value="{{mark.amount}}" min="1" max="5"></th>
                             {% else %}
-                            <th><input class="inp_table" name="{{ student }}" type="number" value="" min="1" max="5"></th>
+                            <th><input class="inp_table" name="{{ student.account }}|{{ lesson.id }}" type="number" value="" min="1" max="5"></th>
                             {% endif %}
                         {% endfor %}
                     </tr>
