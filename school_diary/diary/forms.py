@@ -7,13 +7,15 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 
 
-
 class UsersLogin(forms.Form):
     email = forms.EmailField(label="Электронная почта: ", max_length=50, widget=forms.EmailInput(attrs={'class':'form-control'}))
     password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput(attrs={'class':'form-control'}))
 
 
 class StudentSignUpForm(UserCreationForm):
+    """
+    Form for student sign up. When saved, set user account type to 3 and add user to students group.
+    """
     first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     second_name = forms.CharField(label="Отчество", max_length=100, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
@@ -116,3 +118,20 @@ class TeacherSignUpForm(UserCreationForm):
                                         second_name=self.cleaned_data['second_name'],)
         admin.subjects.set(self.cleaned_data['subjects'])
         return user
+
+
+class AddStudentToGradeForm(forms.Form):
+    first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+
+class GradeCreationForm(forms.ModelForm):
+    class Meta():
+        model = Grades
+        fields = ('number', 'letter', 'subjects', 'teachers')
+        widgets = {
+            'number':forms.Select(attrs={'class': 'form-control'}),
+            'letter':forms.Select(attrs={'class': 'form-control'}),
+            'subjects':forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'teachers':forms.SelectMultiple(attrs={'class': 'form-control'}),
+        }
