@@ -1,5 +1,5 @@
 from django import forms
-
+from .models import Documents
 
 class GetMinimumForm(forms.Form):
     subject = forms.ChoiceField(label="Предмет:", choices=[
@@ -26,3 +26,15 @@ class GetMinimumForm(forms.Form):
         (2, "II"),
         (3, "III"),
         (4, "IV")])
+
+
+class MinimumCreationForm(forms.ModelForm):
+    class Meta:
+        fields = ('subject', 'grade', 'term', 'file')
+        model = Documents
+        widgets = {
+            'subject':forms.Select(attrs={'class':'form-control'}),
+            'grade':forms.Select(attrs={'class':'form-control'}),
+            'term':forms.Select(attrs={'class':'form-control'}),
+            'file':forms.FileInput(attrs={'class':'form-control-file'}),
+        }

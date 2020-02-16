@@ -39,7 +39,7 @@ def output(request, grade, litera):
     """Shows the timetable depending on the url."""
     CURRENT_DAY = time.localtime().tm_wday + 1
     # If current day isn't sunday, users will see timetable for today.
-    if CURRENT_DAY != 7: current_day_name = DAYWEEK_NAMES[CURRENT_DAY]
+    current_day_name = DAYWEEK_NAMES[CURRENT_DAY]
     # If surrent day isn't friday, users will see timetable for tomorrow.
     if CURRENT_DAY != 6: next_day_name = DAYWEEK_NAMES[(CURRENT_DAY + 1) % 7]
     try:
@@ -72,7 +72,7 @@ def output(request, grade, litera):
         return render(request, 'error.html', {
             'error': "404", 
             'title': "Расписание не найдено", 
-            "description": "Класс отсутствует а базе данных. Попросите администратора добавить ваш класс."
+            "description": error
         })
 
 

@@ -99,6 +99,9 @@ def diary(request):
         return render(request, 'diary_admin_main.html')
 
     elif request.user.account_type == 3:
+        messages.error(request, 'Пока не готово')
+        return redirect('/')
+        
         student = Students.objects.get(account=request.user)
         context = {'Student': student,
                    'subjects': Subjects.objects.all(),
@@ -320,3 +323,44 @@ def students_update(request, id):
             return redirect('students_dashboard')
     form = StudentEditForm(instance=s)
     return render(request, 'students/update.html', {'form':form})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def admins_dashboard_first_page(request):
+    return redirect('/diary/admins/dashboard/1')
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def admins_dashboard(request, page):
+    u = Administrators.objects.all()
+    u = Paginator(u, 100)
+    u = u.get_page(page)
+    return render(request, 'admins/dashboard.html', {'users':u})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def admins_delete(request, id):
+    u = Users.objects.get(email=id)
+    s = Administrators.objects.get(account=u)
+    if request.method == "POST":
+        u.delete()
+        s.delete()
+        return redirect('admins_dashboard')
+    return render(request, 'admins/delete.html', {'s':s})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def admins_update(request, id):
+    u = Users.objects.get(email=id)
+    s = Administrators.objects.get(account=u)
+    if request.method == "POST":
+        form = AdminsEditForm(request.POST, instance=s)
+        if form.is_valid():
+            form.save()
+            return redirect('admins_dashboard')
+    form = AdminsEditForm(instance=s)
+    return render(request, 'admins/update.html', {'form':form})

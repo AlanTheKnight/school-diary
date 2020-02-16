@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block css %}{% endblock %}
     {% block title %}{% endblock %}
-
-
     <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
@@ -44,8 +42,8 @@
           </li>
         </ul>
           {% if user.is_authenticated %}
-            <a href="{% url 'profile' %}" class="profile"><img src="{% static 'user.png' %}" alt="Профиль" width="40"></a>
-            <a href="{% url 'logout' %}" class="nav-link logout">Выйти</a>
+            <a href="{% url 'profile' %}" class="profile navbar-text">Мой профиль<img src="{% static 'user.png' %}" alt="Профиль" width="40" style="margin-left: 10px;"></a>
+            <a href="{% url 'logout' %}" class="nav-link navbar-text logout">Выйти</a>
           {% else %}
               <a href="/diary/login/" class="btn btn-outline-success mx-1">Войти</a>
               <a href="/diary/register/" class="btn btn-success">Зарегистрироваться</a>
@@ -104,7 +102,7 @@
     </div>
   </div>
   <div style="background-color: #16191b; height: 40px; text-align: center; color: rgba(255, 255, 255, 0.582);">
-    &#127279; IdeaSoft, 2020
+    IdeaSoft, 2020
   </div>
 </footer>
 </html>

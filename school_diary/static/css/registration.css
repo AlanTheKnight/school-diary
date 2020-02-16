@@ -1,0 +1,24 @@
+.card {
+    margin: 0 auto; /* Added */
+    float: none; /* Added */
+    margin-bottom: 10px; /* Added */
+    }
+    
+#message {
+    display: none;
+    color: #000;
+    position: relative;
+}
+
+#message p {
+    font-size: 15px;
+}
+
+.valid {
+    color: green;
+}
+
+
+.invalid {
+    color: red;
+}

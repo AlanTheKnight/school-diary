@@ -11,6 +11,7 @@
         margin-bottom: 10px; /* Added */
         }
     </style>
+    <link rel="stylesheet" href="{% static 'css/registration.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -48,12 +49,11 @@
                 <div class="form-group">
                     {{ form.password1.label }}
                     {{ form.password1 }}
-                    <ul style="line-height: 100%;">
-                        <li class="text-muted"><small>Пароль не должен совпадать с вашей персональной информацией</small></li>
-                        <li class="text-muted"><small>Длина пароля должна быть не менее 8 символов</small></li>
-                        <li class="text-muted"><small>Не рекомендовано использовать очень легкие пароли</small></li>
-                        <li class="text-muted"><small>Пароль не может состоять полностью из цифр</small></li>
-                    </ul>
+                    <div id="message" class="mx-5 my-3">
+                        <p id="letter" class="invalid">Содержит <b>буквы</b></p>
+                        <p id="number" class="invalid">Содержит минимум <b>1 число</b></p>
+                        <p id="length" class="invalid">Содержит минимум <b>8 символов</b></p>
+                    </div>
                 </div>
                 <div class="form-group">
                     {{ form.password2.label }}
@@ -65,4 +65,5 @@
         </div>
     </div>
 </div>
+<script src="{% static 'js/registration.js' %}"></script>
 {% endblock %}

@@ -11,27 +11,17 @@
     <div class="row">
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
-                <a href="{% url 'admin_register' %}"><img src="{% static '/admin_gui/add_admin.png' %}" class="card-img-top" alt="Добавить администратора" title="Добавить администратора"></a>
+                <a href="{% url 'admins_dashboard' %}"><img src="{% static '/admin_gui/admins.png' %}" class="card-img-top" alt="Просмотр администраторов" title="Просмотр администраторов"></a>
             </div>
         </div>
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
-                <a href="{% url 'teacher_register' %}"><img src="{% static '/admin_gui/add_teacher.png' %}" class="card-img-top" alt="Добавить учителя" title="Добавить учителя"></a>
+                <a href="#"><img src="{% static '/admin_gui/teachers.png' %}" class="card-img-top" alt="Просмотр учителей" title="Просмотр учителей"></a>
             </div>
         </div>
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
-                <a href="#"><img src="{% static '/admin_gui/view_admins.png' %}" class="card-img-top" alt="Просмотреть администраторов" title="Просмотреть администраторов"></a>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 my-3">
-            <div class="card h-100">
-                <a href="#"><img src="{% static '/admin_gui/view_teachers.png' %}" class="card-img-top" alt="Просмотреть учителей" title="Просмотреть учителей"></a>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 my-3">
-            <div class="card h-100">
-                <a href="{% url 'students_dashboard' %}"><img src="{% static 'students.png' %}" class="card-img-top" alt="Просмотреть учеников" title="Просмотр учеников"></a>
+                <a href="{% url 'students_dashboard' %}"><img src="{% static 'admin_gui/students.png' %}" class="card-img-top" alt="Просмотр учеников" title="Просмотр учеников"></a>
             </div>
         </div>
     </div>
@@ -50,6 +40,11 @@
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
                 <a href="{% url 'timetable_dashboard' %}"><img src="{% static 'timetable.png' %}" class="card-img-top" alt="Панель расписания" title="Панель расписания"></a>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 my-3">
+            <div class="card h-100">
+                <a href="{% url 'minimum_dashboard' %}"><img src="{% static 'minimum.png' %}" class="card-img-top" alt="Панель минимумов" title="Панель минимумов"></a>
             </div>
         </div>
 </div>

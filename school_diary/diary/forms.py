@@ -19,7 +19,7 @@ class StudentSignUpForm(UserCreationForm):
     first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     second_name = forms.CharField(label="Отчество", max_length=100, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
-    password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password'}))
+    password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password', 'pattern':r"(?=.*\d)(?=.*[a-zA-Z]).{8,}", 'id':"password1", 'name':'password1'}))
     password2 = forms.CharField(label="Подтверждение пароля", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password'}))
 
     class Meta():
@@ -54,7 +54,7 @@ class AdminSignUpForm(UserCreationForm):
     first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     second_name = forms.CharField(label="Отчество", max_length=100, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
-    password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password'}))
+    password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password', 'pattern':r"(?=.*\d)(?=.*[a-zA-Z]).{8,}", 'id':"password1", 'name':'password1'}))
     password2 = forms.CharField(label="Подтверждение пароля", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password'}))
 
     class Meta():
@@ -89,7 +89,7 @@ class TeacherSignUpForm(UserCreationForm):
     surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     second_name = forms.CharField(label="Отчество", max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
     subjects = forms.ModelMultipleChoiceField(queryset=Subjects.objects.all(), widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
-    password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password'}))
+    password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password', 'pattern':r"(?=.*\d)(?=.*[a-zA-Z]).{8,}", 'id':"password1", 'name':'password1'}))
     password2 = forms.CharField(label="Подтверждение пароля", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password'}))
 
     class Meta():
@@ -157,4 +157,25 @@ class StudentEditForm(forms.ModelForm):
             'second_name':forms.TextInput(attrs={'class': 'form-control'}),
             'grade':forms.Select(attrs={'class': 'form-control'}),
         }
-        
+
+
+class AdminsEditForm(forms.ModelForm):
+    class Meta:
+        model = Administrators
+        fields = ('first_name', 'surname', 'second_name')
+        widgets = {
+            'first_name':forms.TextInput(attrs={'class': 'form-control'}),
+            'surname':forms.TextInput(attrs={'class': 'form-control'}),
+            'second_name':forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class TeachersEditForm(forms.ModelForm):
+    class Meta:
+        model = Teachers
+        fields = ('first_name', 'surname', 'second_name', 'subjects')
+        widgets = {
+            'first_name':forms.TextInput(attrs={'class': 'form-control'}),
+            'surname':forms.TextInput(attrs={'class': 'form-control'}),
+            'second_name':forms.TextInput(attrs={'class': 'form-control'}),
+            'subjects':forms.SelectMultiple(attrs={'class': 'form-control'}),
+        }

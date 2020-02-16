@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+<title>Администраторы</title>
+<style>
+	.card {
+	margin: 0 auto;
+	float: none;
+	margin-bottom: 10px;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {% if users %}
+    <div class="table-responsive">
+        <table class="table text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Почта</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Фамилия</th>
+                    <th scope="col">Отчество</th>
+                    <th scope="col">Изменить</th>
+                    <th scope="col">Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in users %}
+                    <tr>
+                        <td>{{ s.account.email }}</td>
+                        <td>{{ s.first_name }}</td>
+                        <td>{{ s.surname }}</td>
+                        <td>{{ s.second_name }}</td>
+                        <td><a class="btn btn-sm btn-primary text-" href="{% url 'admins_update' s.account %}"><i class="fas fa-edit"></i></a></td>
+                        <td><a class="btn btn-sm btn-danger" href="{% url 'admins_delete' s.account %}"><i class="fas fa-trash-alt"></i></a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p>Администраторы еще не были добавлены.</p>
+    </div>
+    {% endif %}
+    <div class="text-center">
+        <a href="{% url 'admins_create' %}" class="btn btn-success"><i class="fas fa-plus"></i></a>
+    </div>
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if users.has_previous %}
+                <li class="page-item"><a href="/diary/admins/dashboard/1" class="page-link">&laquo;</a></li>
+                <li class="page-item"></li><a href="/diary/admins/dashboard/{{ users.previous_page_number }}" class="page-link">&lt;</a>
+            {% endif %}
+
+            <span class="current">
+                <li class="page-item active"><a href="#" class="page-link">{{ users.number }}</a></li>
+            </span>
+
+            {% if users.has_next %}
+                <li class="page-item"><a href="/diary/admins/dashboard/{{ users.next_page_number }}" class="page-link">&gt;</a></li>
+                <li class="page-item"><a href="/diary/admins/dashboard/{{ users.paginator.num_pages }}" class="page-link">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

@@ -24,12 +24,24 @@ footer.footer a:visited{
     color: white;
 }
 
+a:visited{
+    color: white;
+}
+
 footer.footer a:hover, footer.footer a:active footer.footer a:focus {
     color: white;
 }
 
 footer.footer a {
     color: #ffffff9f;
+}
+
+.profile a {
+    color: #ffffff9f;
+}
+
+.profile a:hover .profile a:active .profile a:focus {
+    color: white;
 }
 
 a:hover {

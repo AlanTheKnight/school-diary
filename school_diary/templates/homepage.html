@@ -7,6 +7,11 @@
 
 {% block content %}
 <div class="container">
+    {% for m in messages %}
+    <div class="alert my-5 alert-info">
+        {{ m }}
+    </div>
+    {% endfor %}
     <div class="row my-5">
         {% if user.account_type == 0 or user.account_type == 1 %}
         <div class="col-md-4 col-sm-6 my-3">
