@@ -10,10 +10,20 @@ urlpatterns = [
     path('registeradmin', views.admin_register, name='admin_register'),
     path('registerteacher', views.teacher_register, name="teacher_register"),
     path('', views.diary, name='diary'),
+
     path('add-student/', views.add_student_page, name="add_student_page"),
     path('add-student/<str:i>/', views.add_student, name="add_student"),
     path('add-grade/', views.create_grade_page, name='create_grade'),
     path('my-grade/', views.my_grade, name='my_grade'),
+    path('delete-student/<str:i>', views.delete_student, name='delete_student'),
+
+    
+    path('students/dashboard/', views.students_dashboard_first_page, name='students_dashboard'),
+    path('students/dashboard/<int:page>', views.students_dashboard),
+    path('students/delete/<str:id>', views.students_delete, name='students_delete'),
+    path('students/update/<str:id>', views.students_update, name='students_update'),
+
+    path('send-message-to-admin/', views.admin_message, name="message_to_admin"),
     
     # URLs for password reset system
     path('reset_password/', auth_views.PasswordResetView.as_view(template_name="password_reset/reset.html"), name="reset_password"),

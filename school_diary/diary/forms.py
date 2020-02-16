@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.http import request
-from .models import Users, Students, Administrators, Teachers, Grades, Subjects
+from .models import *
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -126,7 +126,7 @@ class AddStudentToGradeForm(forms.Form):
 
 
 class GradeCreationForm(forms.ModelForm):
-    class Meta():
+    class Meta:
         model = Grades
         fields = ('number', 'letter', 'subjects', 'teachers')
         widgets = {
@@ -135,3 +135,26 @@ class GradeCreationForm(forms.ModelForm):
             'subjects':forms.SelectMultiple(attrs={'class': 'form-control'}),
             'teachers':forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
+
+
+class AdminMessageCreationForm(forms.ModelForm):
+    class Meta:
+        model = AdminMessages
+        fields = ('subject', 'content')
+        widgets = {
+            'subject':forms.TextInput(attrs={'class': 'form-control'}),
+            'content':forms.Textarea(attrs={'class':'form-control', 'rows':10}),
+        }
+
+
+class StudentEditForm(forms.ModelForm):
+    class Meta:
+        model = Students
+        fields = ('first_name', 'surname', 'second_name', 'grade')
+        widgets = {
+            'first_name':forms.TextInput(attrs={'class': 'form-control'}),
+            'surname':forms.TextInput(attrs={'class': 'form-control'}),
+            'second_name':forms.TextInput(attrs={'class': 'form-control'}),
+            'grade':forms.Select(attrs={'class': 'form-control'}),
+        }
+        

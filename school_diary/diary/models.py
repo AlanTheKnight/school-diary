@@ -173,3 +173,18 @@ class Marks(models.Model):
     def __str__(self):
         return '"{}" {} {}'.format(self.amount, self.lesson, self.student)
 
+
+class AdminMessages(models.Model):
+    date = models.DateTimeField(verbose_name="Время отправки", auto_now_add=True)
+    subject = models.CharField(verbose_name="Тема сообщения", max_length=100)
+    content = models.TextField(verbose_name="Текст сообщения", max_length=4000)
+    sender = models.ForeignKey(Users, on_delete=models.CASCADE, verbose_name="Отправитель", null=True, default=None)
+    
+    class Meta:
+        verbose_name = "Сообщение администратору"
+        verbose_name_plural = "Сообщения администратору"
+        ordering = ['date', 'subject']
+
+    def __str__(self):
+        return self.subject
+        

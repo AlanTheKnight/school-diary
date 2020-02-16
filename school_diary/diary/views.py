@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .models import *
 from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
@@ -152,9 +153,8 @@ def add_student_page(request):
     """
     Page where teachers can add students to their grade.
     """
-    me = Teachers.objects.get(account=request.user)
     try:
-        grade = Grades.objects.get(main_teacher=me)
+        grade = Grades.objects.get(main_teacher=request.user.id)
     except ObjectDoesNotExist:
         return render(request, 'access_denied.html', {'message':"Вы не классный руководитель."})
     students = Students.objects.filter(grade=grade)
@@ -223,3 +223,79 @@ def my_grade(request):
         grade = None
     context = {'grade':grade}
     return render(request, 'grades/my_grade.html', context)
+
+
+@login_required(login_url="login")
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+def delete_student(request, i):
+    """
+    Function defining the process of deleting a student from a grade and confirming it.
+    """
+    u = Users.objects.get(email=i)
+    s = Students.objects.get(account=u)
+    if request.method == "POST":
+        try:
+            grade = Grades.objects.get(main_teacher=request.user.id)
+            s.grade = None
+            s.save()
+            return redirect('add_student_page')
+        except ObjectDoesNotExist:
+            context = {'message':"Вы не классный руководитель."}
+            return render(request, 'access_denied.html', context)
+    else:
+        return render(request, 'grades/delete_student_confirm.html', {'s':s})
+
+
+@allowed_users(allowed_roles=['teachers', 'students'], message="Вы не зарегистрированы как учитель или ученик.")
+@login_required(login_url="login")
+def admin_message(request):
+    if request.method == "POST":
+        form = AdminMessageCreationForm(request.POST)
+        if form.is_valid():
+            m = form.save()
+            m.sender = request.user
+            m.save()
+            return redirect('profile')
+    form = AdminMessageCreationForm()
+    return render(request, 'admin_messages.html', {'form':form})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def students_dashboard_first_page(request):
+    return redirect('/diary/students/dashboard/1')
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def students_dashboard(request, page):
+    students = Students.objects.all()
+    students = Paginator(students, 100)
+    students = students.get_page(page)
+    return render(request, 'students/dashboard.html', {'students':students})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def students_delete(request, id):
+    u = Users.objects.get(email=id)
+    s = Students.objects.get(account=u)
+    if request.method == "POST":
+        u.delete()
+        s.delete()
+        return redirect('students_dashboard')
+    return render(request, 'students/delete.html', {'s':s})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def students_update(request, id):
+    u = Users.objects.get(email=id)
+    s = Students.objects.get(account=u)
+    if request.method == "POST":
+        form = StudentEditForm(request.POST, instance=s)
+        if form.is_valid():
+            form.save()
+            return redirect('students_dashboard')
+    form = StudentEditForm(instance=s)
+    return render(request, 'students/update.html', {'form':form})

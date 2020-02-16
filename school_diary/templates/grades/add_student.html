@@ -24,6 +24,7 @@
                         <th>Почта</th>
                         <th>Имя</th>
                         <th>Фамилия</th>
+                        <th>Удаление</th>
                     </thead>
                     <tbody>
                         {% for s in students %}
@@ -31,6 +32,7 @@
                             <td>{{ s.account.email }}</td>
                             <td>{{ s.first_name }}</td>
                             <td>{{ s.surname }}</td>
+                            <td><a href="{%  url 'delete_student' s.account %}" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
