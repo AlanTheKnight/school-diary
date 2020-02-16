@@ -115,6 +115,7 @@ def diary(request):
                    }
 
         if request.method == 'POST':
+            print()
             subject = Subjects.objects.get(name=request.POST.get('subject'))
             number = int(request.POST.get('grade')[0])
             letter = request.POST.get('grade')[1]
@@ -128,13 +129,13 @@ def diary(request):
             students = Students.objects.filter(grade=grade)
             scope = {}
             for student in students:
-                for_lesson = []
+                stu = {}
                 for lesson in lessons:
                     try:
-                        for_lesson.append(student.marks_set.get(lesson=lesson))
+                        stu.update({lesson: student.marks_set.get(lesson=lesson)})
                     except:
-                        for_lesson.append(None)
-                scope.update({student: for_lesson})
+                        stu.append({lesson: None})
+                scope.update({student: stu})
             context.update({
                 'is_post': True,
                 'lessons': lessons,

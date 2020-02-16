@@ -21,7 +21,7 @@
 			{% endfor %}
 			</div>
 			{% endif %}
-        <form method="POST">
+        <form method="POST" >
         {% csrf_token %}
             <select name="subject">
                 {% for subject in subjects %}
@@ -50,7 +50,8 @@
                 {% for student, marks in scope.items %}
                     <tr>
                         <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
-                        {% for mark in marks %}
+{#                        {% for mark in marks %}#}
+                        {% for lesson in  lessons %}
                             {% if mark %}
                             <th><input class="inp_table" name="{{ student }}" type="number" value="{{mark.amount}}" min="1" max="5"></th>
                             {% else %}
