@@ -7,7 +7,20 @@
     </title>
 {% endblock %}
 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/teacher.css' %}">
+{% endblock %}
+
 {% block content %}
+{#  TODO find better place for error message  #}
+{#  TODO create frontend #}
+    {% if messages %}
+			<div class="alert alert-danger">
+			{% for message in messages %}
+			{{ message }}
+			{% endfor %}
+			</div>
+			{% endif %}
         <form method="POST">
         {% csrf_token %}
             <select name="subject">
@@ -23,26 +36,32 @@
             <button type="submit" class="btn btn-primary">Найти</button>
         </form>
         {% if is_post %}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Ученики</th>
-                    {% for lesson in  lessons %}
-                    <th scope="col">{{ lesson.date }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-            {% for student in students %}
-                <tr>
-                    <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
-                    {% for mark in marks.0 %}
-                        <th>{{mark}}</th>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <form method="POST">
+            <table class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th scope="col">Ученики</th>
+                        {% for lesson in  lessons %}
+                        <th scope="col">{{ lesson.date.day }}.{{ lesson.date.month }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for student, marks in scope.items %}
+                    <tr>
+                        <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
+                        {% for mark in marks %}
+                            {% if mark %}
+                            <th><input class="inp_table" type="number" value="{{mark.amount}}" min="1" max="5"></th>
+                            {% else %}
+                            <th><input class="inp_table" type="number" value="" min="1" max="5"></th>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </form>
         {% endif %}
 
 {% endblock %}
