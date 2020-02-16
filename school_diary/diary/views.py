@@ -99,6 +99,9 @@ def diary(request):
         return render(request, 'diary_admin_main.html')
 
     elif request.user.account_type == 3:
+        messages.error(request, 'Пока не готово')
+        return redirect('/')
+        
         student = Students.objects.get(account=request.user)
         context = {'Student': student,
                    'subjects': Subjects.objects.all(),
