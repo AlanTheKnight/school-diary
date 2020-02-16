@@ -2,57 +2,20 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.http import request
-
-from .models import Users, Students, Administrators, Teachers, Grades, Subjects
+from .models import *
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 
 
-
-# class StudentRegistration(forms.Form):
-#     email = forms.EmailField(label="Электронная почта: ", max_length=50)
-#     first_name = forms.CharField(label="Имя: ", max_length=50)
-#     surname = forms.CharField(label="Фамилия: ", max_length=50)
-#     password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput)
-#     conform_password = forms.CharField(label="Подтверждение пароля: ", widget=forms.PasswordInput)
-#     grade = forms.ChoiceField(label="Класс:", choices=[
-#         (1, 1),
-#         (2, 2),
-#         (3, 3),
-#         (4, 4),
-#         (5, 5),
-#         (6, 6),
-#         (7, 7),
-#         (8, 8),
-#         (9, 9),
-#         (10, 10),
-#         (11, 11)])
-#     litera = forms.ChoiceField(label="Литера:", choices=[
-#         ("А", "А"),
-#         ("Б", "Б"),
-#         ("В", "В"),
-#         ("Г", "Г"),
-#         ("Д", "Д"),
-#         ("Е", "Е"),
-#         ("Ж", "Ж"),
-#         ("З", "З")])
-
-
-# class StudentCreationForm(UserCreationForm):
-#     class Meta(UserCreationForm):
-#         model = Students
-#         fields = ('email', 'first_name', 'surname', 'second_name', 'grade')
-
-
-# SUBJECTS = list()
-
-
 class UsersLogin(forms.Form):
-    email = forms.EmailField(label="Электронная почта: ", max_length=50)
-    password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput)
+    email = forms.EmailField(label="Электронная почта: ", max_length=50, widget=forms.EmailInput(attrs={'class':'form-control'}))
+    password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput(attrs={'class':'form-control'}))
 
 
 class StudentSignUpForm(UserCreationForm):
+    """
+    Form for student sign up. When saved, set user account type to 3 and add user to students group.
+    """
     first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
     second_name = forms.CharField(label="Отчество", max_length=100, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
@@ -122,10 +85,10 @@ class AdminSignUpForm(UserCreationForm):
 
 
 class TeacherSignUpForm(UserCreationForm):
-    first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
-    surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class':'form-control'}))
-    second_name = forms.CharField(label="Отчество", max_length=100, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
-    subjects = forms.ModelMultipleChoiceField(queryset=Subjects.objects.all(), widget=forms.SelectMultiple(attrs={'class':'form-control'}))
+    first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    second_name = forms.CharField(label="Отчество", max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    subjects = forms.ModelMultipleChoiceField(queryset=Subjects.objects.all(), widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
     password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password'}))
     password2 = forms.CharField(label="Подтверждение пароля", widget=forms.PasswordInput(attrs={'class':'form-control', 'autocomplete': 'new-password'}))
 
@@ -133,7 +96,7 @@ class TeacherSignUpForm(UserCreationForm):
         model = Users
         fields = ('email', 'first_name', 'surname', 'second_name', 'subjects', 'password1', 'password2')
         widgets = {
-            'email': forms.EmailInput(attrs={'class':'form-control', 'placeholder':'myemail@example.com'}),
+            'email': forms.EmailInput(attrs={'class':'form-control', 'placeholder': 'myemail@example.com'}),
         }
 
     @transaction.atomic
@@ -157,5 +120,28 @@ class TeacherSignUpForm(UserCreationForm):
         return user
 
 
-#class TeacherDairyForm(forms.Form):
-#    subjects = forms.ChoiceField(lable='Класс', widget=forms.Select(choices=))
+class AddStudentToGradeForm(forms.Form):
+    first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+
+class GradeCreationForm(forms.ModelForm):
+    class Meta:
+        model = Grades
+        fields = ('number', 'letter', 'subjects', 'teachers')
+        widgets = {
+            'number':forms.Select(attrs={'class': 'form-control'}),
+            'letter':forms.Select(attrs={'class': 'form-control'}),
+            'subjects':forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'teachers':forms.SelectMultiple(attrs={'class': 'form-control'}),
+        }
+
+
+class AdminMessageCreationForm(forms.ModelForm):
+    class Meta:
+        model = AdminMessages
+        fields = ('subject', 'content')
+        widgets = {
+            'subject':forms.TextInput(attrs={'class': 'form-control'}),
+            'content':forms.Textarea(attrs={'class':'form-control', 'rows':10}),
+        }

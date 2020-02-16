@@ -8,7 +8,41 @@
 {% endblock %}
 
 {% block content %}
-    {% for subject in Teacher.subjects %}
-        <a href="#">{{ subject }}</a>
-    {% endfor %}
+        <form method="POST">
+        {% csrf_token %}
+            <select name="subject">
+                {% for subject in subjects %}
+                    <option>{{ subject }}</option>
+                {% endfor %}
+            </select>
+            <select name="grade">
+                {% for grade in grades %}
+                    <option>{{ grade }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Найти</button>
+        </form>
+        {% if is_post %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Ученики</th>
+                    {% for lesson in  lessons %}
+                    <th scope="col">{{ lesson.date }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for student in students %}
+                <tr>
+                    <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
+                    {% for mark in marks.0 %}
+                        <th>{{mark}}</th>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
 {% endblock %}

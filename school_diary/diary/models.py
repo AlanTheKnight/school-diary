@@ -11,6 +11,7 @@ TYPES = [
     (3, "Ученик"),
 ]
 
+
 GRADES = [
     (1, 1),
     (2, 2),
@@ -33,7 +34,9 @@ LITERAS = [
     ("Д", "Д"),
     ("Е", "Е"),
     ("Ж", "Ж"),
-    ("З", "З")
+    ("З", "З"),
+    ("И", "И"),
+    ("К", "К")
 ]
 
 
@@ -66,7 +69,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
 
 
 class Subjects(models.Model):
-    name = models.CharField(max_length=50, verbose_name="Название")
+    name = models.CharField(max_length=50, verbose_name="Название", unique=True)
 
     class Meta:
         ordering = ['name']
@@ -95,10 +98,10 @@ class Teachers(models.Model):
 
 class Grades(models.Model):
     number = models.IntegerField(choices=GRADES, verbose_name="Класс")
-    letter = models.CharField(max_length=2, verbose_name="Буква")
-    teachers = models.ManyToManyField(Teachers, verbose_name="Учителя")
+    letter = models.CharField(max_length=2, choices=LITERAS, verbose_name="Буква")
+    teachers = models.ManyToManyField(Teachers, verbose_name="Учителя", related_name="subjects_chosen")
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
-    # main_teacher = models.ForeignKey(Teachers, verbose_name='Классный учитель', on_delete=models.PROTECT) TODO сделаь классного учителя
+    main_teacher = models.ForeignKey(Teachers, verbose_name='Классный руководитель', on_delete=models.SET_NULL, null=True, default=None)
 
     class Meta:
         ordering = ['number', 'letter']
@@ -121,6 +124,9 @@ class Students(models.Model):
         ordering = ['grade', 'surname', 'first_name', 'second_name']
         verbose_name = "Ученик"
         verbose_name_plural = "Ученики"
+
+    def __str__(self):
+        return '{} {} {} {}'.format(self.first_name, self.second_name, self.surname, self.grade)
 
 
 class Administrators(models.Model):
@@ -146,7 +152,6 @@ class Lessons(models.Model):
     grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
 
     class Meta:
-
         verbose_name = "Урок"
         verbose_name_plural = "Уроки"
 
@@ -155,13 +160,13 @@ class Lessons(models.Model):
 # TODO Weights system
 
 
-class Mark(models.Model):
+class Marks(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
-    amount = models.DecimalField(verbose_name="Балл", decimal_places=2, max_digits=3)
+    amount = models.IntegerField(verbose_name="Балл")
     date = models.DateField(verbose_name="Дата")
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок', default='')
-    class Meta:
 
+    class Meta:
         verbose_name = "Оценка"
         verbose_name_plural = "Оценки"
         ordering = ['date', 'amount']
@@ -169,3 +174,18 @@ class Mark(models.Model):
     def __str__(self):
         return '"{}" {} {}'.format(self.amount, self.lesson, self.student)
 
+
+class AdminMessages(models.Model):
+    date = models.DateTimeField(verbose_name="Время отправки", auto_now_add=True)
+    subject = models.CharField(verbose_name="Тема сообщения", max_length=100)
+    content = models.TextField(verbose_name="Текст сообщения", max_length=4000)
+    sender = models.ForeignKey(Users, on_delete=models.CASCADE, verbose_name="Отправитель", null=True, default=None)
+    
+    class Meta:
+        verbose_name = "Сообщение администратору"
+        verbose_name_plural = "Сообщения администратору"
+        ordering = ['date', 'subject']
+
+    def __str__(self):
+        return self.subject
+        
