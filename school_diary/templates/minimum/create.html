@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-<title>Изменить минимум</title>
+<title>Добавить минимум</title>
 <style>
     .card {
     margin: 0 auto;
@@ -17,8 +17,8 @@
 <div class="container">
     <div class="card my-5">
         <div class="card-body">
-            <h2 class="card-title">Изменить минимум</h2>
-            <form method="POST">
+            <h2 class="card-title">Создать минимум</h2>
+            <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group">
                     {{ form.grade.label }}
@@ -36,7 +36,7 @@
                     {{ form.file.label }}
                     {{ form.file }}
                 </div>
-                <button type="submit" class="btn btn-primary">Изменить</button>
+                <button type="submit" class="btn btn-primary">Создать</button>
             </form>
         </div>
     </div>

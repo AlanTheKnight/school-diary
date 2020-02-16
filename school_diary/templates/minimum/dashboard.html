@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-<title>Ученики</title>
+<title>Минимумы</title>
 <style>
 	.card {
 	margin: 0 auto;
@@ -15,34 +15,26 @@
 
 {% block content %}
 <div class="container my-5">
-    {% if students %}
+    {% if minimums %}
     <div class="table-responsive">
         <table class="table text-center">
             <thead class="thead-dark">
                 <tr>
-                    <th scope="col">Почта</th>
-                    <th scope="col">Имя</th>
-                    <th scope="col">Фамилия</th>
-                    <th scope="col">Отчество</th>
                     <th scope="col">Класс</th>
+                    <th scope="col">Предмет</th>
+                    <th scope="col">Четверть</th>
                     <th scope="col">Изменить</th>
                     <th scope="col">Удалить</th>
                 </tr>
             </thead>
             <tbody>
-                {% for s in students %}
+                {% for m in minimums %}
                     <tr>
-                        <td>{{ s.account.email }}</td>
-                        <td>{{ s.first_name }}</td>
-                        <td>{{ s.surname }}</td>
-                        <td>{{ s.second_name }}</td>
-                        {% if s.grade is not None %}
-                        <td>{{ s.grade }}</td>
-                        {% else %}
-                        <td>-</td>
-                        {% endif %}
-                        <td><a class="btn btn-sm btn-primary text-" href="{% url 'students_update' s.account %}"><i class="fas fa-edit"></i></a></td>
-                        <td><a class="btn btn-sm btn-danger" href="{% url 'students_delete' s.account %}"><i class="fas fa-trash-alt"></i></a></td>
+                        <td>{{ m.grade }}</td>
+                        <td>{{ m.subject }}</td>
+                        <td>{{ m.term }}</td>
+                        <td><a class="btn btn-sm btn-primary text-" href="{% url 'minimum_update' m.id %}"><i class="fas fa-edit"></i></a></td>
+                        <td><a class="btn btn-sm btn-danger" href="{% url 'minimum_delete' m.id %}"><i class="fas fa-trash-alt"></i></a></td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -51,23 +43,26 @@
     </div>
     {% else %}
     <div class="alert alert-info">
-        <p>Ученики еще не были добавлены.</p>
+        <p>Минимумы не были добавлены.</p>
     </div>
     {% endif %}
+    <div class="text-center">
+        <a href="{% url 'minimum_create' %}" class="btn btn-success"><i class="fas fa-plus"></i></a>
+    </div>
     <nav class="mt-5">
         <ul class="pagination justify-content-center">
-            {% if students.has_previous %}
-                <li class="page-item"><a href="/diary/students/dashboard/1" class="page-link">&laquo;</a></li>
-                <li class="page-item"></li><a href="/diary/students/dashboard/{{ students.previous_page_number }}" class="page-link">&lt;</a>
+            {% if minimums.has_previous %}
+                <li class="page-item"><a href="/minumum/dashboard/1" class="page-link">&laquo;</a></li>
+                <li class="page-item"></li><a href="/minimum/dashboard/{{ minimums.previous_page_number }}" class="page-link">&lt;</a>
             {% endif %}
 
             <span class="current">
-                <li class="page-item active"><a href="#" class="page-link">{{ students.number }}</a></li>
+                <li class="page-item active"><a href="#" class="page-link">{{ minimums.number }}</a></li>
             </span>
 
-            {% if students.has_next %}
-                <li class="page-item"><a href="/diary/students/dashboard/{{ students.next_page_number }}" class="page-link">&gt;</a></li>
-                <li class="page-item"><a href="/diary/students/dashboard/{{ students.paginator.num_pages }}" class="page-link">&raquo;</a></li>
+            {% if minimums.has_next %}
+                <li class="page-item"><a href="/diary/minimum/dashboard/{{ minimums.next_page_number }}" class="page-link">&gt;</a></li>
+                <li class="page-item"><a href="/diary/minimum/dashboard/{{ minimums.paginator.num_pages }}" class="page-link">&raquo;</a></li>
             {% endif %}
         </ul>
     </nav>
