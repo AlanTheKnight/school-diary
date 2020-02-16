@@ -17,6 +17,10 @@ def get_help(request):
     return render(request, 'help.html')
 
 
+def docs(request):
+    return render(request, 'docs.html')
+
+
 def error404(request):
     return render(request, 'error.html', {
         'error': "404", 

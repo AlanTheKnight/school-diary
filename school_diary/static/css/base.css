@@ -14,7 +14,7 @@ body {
 }
 
 .footer{
-    line-height: 40px;
+    line-height: 45px;
     position: absolute;
     left: 0px;
     bottom: 0px;
@@ -24,11 +24,9 @@ footer.footer a:visited{
     color: white;
 }
 
-a:visited{
-    color: white;
-}
 
-footer.footer a:hover, footer.footer a:active footer.footer a:focus {
+
+footer.footer a:hover, footer.footer a:active, footer.footer a:focus {
     color: white;
 }
 
@@ -36,14 +34,12 @@ footer.footer a {
     color: #ffffff9f;
 }
 
-.profile a {
-    color: #ffffff9f;
-}
-
-.profile a:hover .profile a:active .profile a:focus {
-    color: white;
-}
-
 a:hover {
     text-decoration: none;
+}
+
+@media (min-width: 979px) {
+.dropdown:hover > .dropdown-menu {
+    display: block;    
+}
 }
