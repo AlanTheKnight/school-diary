@@ -26,3 +26,7 @@ class GetMinimumForm(forms.Form):
         (2, "II"),
         (3, "III"),
         (4, "IV")])
+
+
+class MinimumCreationForm(forms.ModelForm):
+    pass
