@@ -145,3 +145,16 @@ class AdminMessageCreationForm(forms.ModelForm):
             'subject':forms.TextInput(attrs={'class': 'form-control'}),
             'content':forms.Textarea(attrs={'class':'form-control', 'rows':10}),
         }
+
+
+class StudentEditForm(forms.ModelForm):
+    class Meta:
+        model = Students
+        fields = ('first_name', 'surname', 'second_name', 'grade')
+        widgets = {
+            'first_name':forms.TextInput(attrs={'class': 'form-control'}),
+            'surname':forms.TextInput(attrs={'class': 'form-control'}),
+            'second_name':forms.TextInput(attrs={'class': 'form-control'}),
+            'grade':forms.Select(attrs={'class': 'form-control'}),
+        }
+        

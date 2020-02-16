@@ -17,6 +17,12 @@ urlpatterns = [
     path('my-grade/', views.my_grade, name='my_grade'),
     path('delete-student/<str:i>', views.delete_student, name='delete_student'),
 
+    
+    path('students/dashboard/', views.students_dashboard_first_page, name='students_dashboard'),
+    path('students/dashboard/<int:page>', views.students_dashboard),
+    path('students/delete/<str:id>', views.students_delete, name='students_delete'),
+    path('students/update/<str:id>', views.students_update, name='students_update'),
+
     path('send-message-to-admin/', views.admin_message, name="message_to_admin"),
     
     # URLs for password reset system
