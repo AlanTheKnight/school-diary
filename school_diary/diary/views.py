@@ -93,6 +93,18 @@ def teacher_register(request):
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
 
 
+def create_table(lessons, students):
+    scope = {}
+    for student in students:
+        stu = {}
+        for lesson in lessons:
+            try:
+                stu.update({lesson: student.marks_set.get(lesson=lesson)})
+            except ObjectDoesNotExist:
+                stu.update({lesson: None})
+        scope.update({student: stu})
+    return scope
+
 @login_required(login_url="/diary/login/")
 def diary(request):
     if request.user.account_type == 0 or request.user.account_type == 1:
@@ -130,15 +142,7 @@ def diary(request):
 
                 lessons = Lessons.objects.filter(grade=grade, subject=subject)
                 students = Students.objects.filter(grade=grade)
-                scope = {}
-                for student in students:
-                    stu = {}
-                    for lesson in lessons:
-                        try:
-                            stu.update({lesson: student.marks_set.get(lesson=lesson)})
-                        except ObjectDoesNotExist:
-                            stu.update({lesson: None})
-                    scope.update({student: stu})
+                scope = create_table(lessons, students)
                 print(scope)
                 context.update({
                     'is_post': True,
@@ -151,19 +155,27 @@ def diary(request):
                     if i == 'csrfmiddlewaretoken':
                         continue
                     print(i.split('|'))
-                    account, id = i.split('|')
-                    student = Students.objects.get(account=account)
-                    lesson = Lessons.objects.get(pk=id)
+                    li = i.split('|')
+                    account = li[0]
+                    id_les = li[1]
+                    print(account, id_les)
+                    student = Students.objects.get(account=Users.objects.get(email=account))
+                    lesson = Lessons.objects.get(pk=id_les)
                     amount = str(request.POST[i])
-                    if amount:
+                    try:
                         mark = Marks.objects.get(lesson=lesson, student=student)
-                        mark.amount = amount
-                        mark.save()
-                    else:
-                        Marks.objects.create(lesson=lesson,
-                                             student=student,
-                                             amount=amount)
-
+                        if amount:
+                            mark.amount = amount
+                            mark.save()
+                        else:
+                            mark.delete()
+                    except ObjectDoesNotExist:
+                        if amount:
+                            Marks.objects.create(lesson=lesson,
+                                                 student=student,
+                                                 amount=amount)
+                        else:
+                            pass
                 return render(request, 'teacher.html', context)
         else:
             return render(request, 'teacher.html', context)

@@ -1,6 +1,7 @@
 from django import forms
 from .models import Lessons
 
+
 class GetTimeTableForm(forms.Form):
     grade = forms.ChoiceField(label="Класс:", choices=[
         (1, 1),
