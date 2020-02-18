@@ -8,7 +8,6 @@ urlpatterns = [
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('profile/', views.user_profile, name='profile'),
-    path('registerteacher', views.teacher_register, name="teacher_register"),
     path('', views.diary, name='diary'),
 
     # Students and grades
@@ -19,10 +18,19 @@ urlpatterns = [
     path('delete-student/<str:i>', views.delete_student, name='delete_student'),
 
     # Students
+    path('students/', views.students_dashboard_first_page, name='students_dashboard'),
     path('students/dashboard/', views.students_dashboard_first_page, name='students_dashboard'),
     path('students/dashboard/<int:page>', views.students_dashboard),
     path('students/delete/<str:id>', views.students_delete, name='students_delete'),
     path('students/update/<str:id>', views.students_update, name='students_update'),
+
+    #Teachers
+    path('teachers/create/', views.teacher_register, name='teachers_create'),
+    path('teachers/', views.teachers_dashboard_first_page, name='teachers_dashboard'),
+    path('teachers/dashboard/', views.teachers_dashboard_first_page, name='teachers_dashboard'),
+    path('teachers/dashboard/<int:page>', views.teachers_dashboard),
+    path('teachers/delete/<str:id>', views.teachers_delete, name='teachers_delete'),
+    path('teachers/update/<str:id>', views.teachers_update, name='teachers_update'),
 
     #Admins
     path('admins/create', views.admin_register, name='admins_create'),

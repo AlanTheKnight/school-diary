@@ -40,6 +40,6 @@ a:hover {
 
 @media (min-width: 979px) {
 .dropdown:hover > .dropdown-menu {
-    display: block;    
+    display: block;
 }
 }

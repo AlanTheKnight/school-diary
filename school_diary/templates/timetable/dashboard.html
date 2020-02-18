@@ -32,6 +32,7 @@
                     <th scope="col" class="text-center">День недели</th>
                     <th scope="col" class="text-center">Номер</th>
                     <th scope="col" class="text-center">Предмет</th>
+                    <th scope="col" class="text-center">Кабинет</th>
                     <th scope="col" class="text-center">Изменить</th>
                     <th scope="col" class="text-center">Удалить</th>
                 </tr>
@@ -42,6 +43,7 @@
                         <td class="text-center">{{ lesson.day }}</td>
                         <td class="text-center">{{ lesson.number }}</td>
                         <td class="text-center">{{ lesson.subject }}</td>
+                        <td class="text-center">{{ lesson.classroom }}</td>
                         <td class="text-center"><a class="btn btn-sm btn-primary text-" href="{% url 'timetable_update' lesson.id %}"><i class="fas fa-edit"></i></a></td>
                         <td class="text-center"><a class="btn btn-sm btn-danger" href="{% url 'timetable_delete' lesson.id %}"><i class="fas fa-trash-alt"></i></a></td>
                     </tr>

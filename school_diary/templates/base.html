@@ -18,7 +18,7 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <a class="navbar-brand" href="/">
+      <a class="navbar-brand" href="/" title="Главная страница">
         <img src="{% static 'bober.png' %}" width="40" height="40" class="d-inline-block align-center" alt="">
         Гимназия 56
       </a>
@@ -42,8 +42,8 @@
         </ul>
           {% if user.is_authenticated %}
           <div class="btn-group dropdown">
-            <img class="dropdown-toggle" src="{% static 'user.png' %}" alt="" width="40" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown"></button>
-            <div class="dropdown-menu dropdown-menu-right">
+            <img class="dropdown-toggle" src="{% static 'user.png' %}" alt="" width="45" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" title="Аккаунт"></button>
+            <div class="dropdown-menu dropdown-menu-right" style="margin-top: 0px;">
               <a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Аккаунт</a>
               <a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Выйти</a>
             </div>
@@ -55,6 +55,7 @@
         </div>
     </div>
     </nav>
+    
   {% block content %}
   {% endblock %}
   

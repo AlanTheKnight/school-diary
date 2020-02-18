@@ -361,3 +361,52 @@ def admins_update(request, id):
             return redirect('admins_dashboard')
     form = AdminsEditForm(instance=s)
     return render(request, 'admins/update.html', {'form':form})
+
+
+# TEACHERS SECTION
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def teachers_dashboard_first_page(request):
+    return redirect('/diary/teachers/dashboard/1')
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def teachers_dashboard(request, page):
+    u = Teachers.objects.all()
+    u = Paginator(u, 50)
+    u = u.get_page(page)
+    return render(request, 'teachers/dashboard.html', {'users':u})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def teachers_delete(request, id):
+    """
+    Delete a teacher.
+    """
+    u = Users.objects.get(email=id)
+    s = Teachers.objects.get(account=u)
+    if request.method == "POST":
+        u.delete()
+        s.delete()
+        return redirect('teachers_dashboard')
+    return render(request, 'teachers/delete.html', {'s':s})
+
+
+@login_required(login_url="/diary/login/")
+@admin_only
+def teachers_update(request, id):
+    """
+    Edit teachers's account info.
+    """
+    u = Users.objects.get(email=id)
+    s = Teachers.objects.get(account=u)
+    if request.method == "POST":
+        form = TeacherEditForm(request.POST, instance=s)
+        if form.is_valid():
+            form.save()
+            return redirect('teachers_dashboard')
+    form = TeacherEditForm(instance=s)
+    return render(request, 'teachers/update.html', {'form':form})

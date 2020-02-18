@@ -14,18 +14,20 @@
     {% if today %}
     <div class="card my-5">
         <div class="card-body">
-            <div class="card-title">
-                <h5>Расписание на сегодня</h5>
+            <div class="card-title text-center">
+                <h4>Расписание на сегодня</h4>
             </div>
             <div class="table-responsive-md">
                 <table class="table">
-                    <tr>
-                        <th>Номер</th>
-                        <th>Предмет</th>
-                        <th>Кабинет</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                    </tr>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Номер</th>
+                            <th>Предмет</th>
+                            <th>Кабинет</th>
+                            <th>Начало</th>
+                            <th>Конец</th>
+                        </tr>
+                    </thead>
                     {% for lesson in today %}
                     <tr>
                         <td>{{ lesson.number }}</td>
@@ -44,18 +46,20 @@
     {% if tomorrow %}
     <div class="card my-5">
         <div class="card-body">
-            <div class="card-title">
-                <h5>Расписание на завтра</h5>
+            <div class="card-title text-center">
+                <h4>Расписание на завтра</h4>
             </div>
             <div class="table-responsive-md">
                 <table class="table">
-                    <tr>
-                        <th>Номер</th>
-                        <th>Предмет</th>
-                        <th>Кабинет</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                    </tr>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Номер</th>
+                            <th>Предмет</th>
+                            <th>Кабинет</th>
+                            <th>Начало</th>
+                            <th>Конец</th>
+                        </tr>
+                    </thead>
                     {% for lesson in tomorrow %}
                     <tr>
                         <td>{{ lesson.number }}</td>
@@ -73,19 +77,21 @@
 
     <div class="card my-5">
         <div class="card-body">
-            <div class="card-title">
-                <h5>Понедельник</h5>
+            <div class="card-title text-center">
+                <h4>Понедельник</h4>
             </div>
             {% if monday %}
             <div class="table-responsive-md">
                 <table class="table">
-                    <tr>
-                        <th>Номер</th>
-                        <th>Предмет</th>
-                        <th>Кабинет</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                    </tr>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Номер</th>
+                            <th>Предмет</th>
+                            <th>Кабинет</th>
+                            <th>Начало</th>
+                            <th>Конец</th>
+                        </tr>
+                    </thead>
                     {% for lesson in monday %}
                     <tr>
                         <td>{{ lesson.number }}</td>
@@ -105,19 +111,21 @@
 
     <div class="card my-5">
         <div class="card-body">
-            <div class="card-title">
-                <h5>Вторник</h5>
+            <div class="card-title text-center">
+                <h4>Вторник</h4>
             </div>
             {% if tuesday %}
             <div class="table-responsive-md">
                 <table class="table">
-                    <tr>
-                        <th>Номер</th>
-                        <th>Предмет</th>
-                        <th>Кабинет</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                    </tr>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Номер</th>
+                            <th>Предмет</th>
+                            <th>Кабинет</th>
+                            <th>Начало</th>
+                            <th>Конец</th>
+                        </tr>
+                    </thead>
                     {% for lesson in tuesday %}
                     <tr>
                         <td>{{ lesson.number }}</td>
@@ -137,19 +145,21 @@
     
     <div class="card my-5">
         <div class="card-body">
-            <div class="card-title">
-                <h5>Среда</h5>
+            <div class="card-title text-center">
+                <h4>Среда</h4>
             </div>
             {% if wednesday %}
             <div class="table-responsive-md">
                 <table class="table">
-                    <tr>
-                        <th>Номер</th>
-                        <th>Предмет</th>
-                        <th>Кабинет</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                    </tr>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Номер</th>
+                            <th>Предмет</th>
+                            <th>Кабинет</th>
+                            <th>Начало</th>
+                            <th>Конец</th>
+                        </tr>
+                    </thead>
                     {% for lesson in wednesday %}
                     <tr>
                         <td>{{ lesson.number }}</td>
@@ -169,19 +179,21 @@
     
     <div class="card my-5">
         <div class="card-body">
-            <div class="card-title">
-                <h5>Четверг</h5>
+            <div class="card-title text-center">
+                <h4>Четверг</h4>
             </div>
             {% if thursday %}
             <div class="table-responsive-md">
                 <table class="table">
-                    <tr>
-                        <th>Номер</th>
-                        <th>Предмет</th>
-                        <th>Кабинет</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                    </tr>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Номер</th>
+                            <th>Предмет</th>
+                            <th>Кабинет</th>
+                            <th>Начало</th>
+                            <th>Конец</th>
+                        </tr>
+                    </thead>
                     {% for lesson in thursday %}
                     <tr>
                         <td>{{ lesson.number }}</td>
@@ -201,19 +213,21 @@
 
     <div class="card my-5">
         <div class="card-body">
-            <div class="card-title">
-                <h5>Пятница</h5>
+            <div class="card-title text-center">
+                <h4>Пятница</h4>
             </div>
             {% if friday %}
             <div class="table-responsive-md">
                 <table class="table">
-                    <tr>
-                        <th>Номер</th>
-                        <th>Предмет</th>
-                        <th>Кабинет</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                    </tr>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Номер</th>
+                            <th>Предмет</th>
+                            <th>Кабинет</th>
+                            <th>Начало</th>
+                            <th>Конец</th>
+                        </tr>
+                    </thead>
                     {% for lesson in friday %}
                     <tr>
                         <td>{{ lesson.number }}</td>
@@ -233,19 +247,21 @@
 
     <div class="card my-5">
         <div class="card-body">
-            <div class="card-title">
-                <h5>Суббота</h5>
+            <div class="card-title text-center">
+                <h4>Суббота</h4>
             </div>
             {% if saturday %}
             <div class="table-responsive-md">
                 <table class="table">
-                    <tr>
-                        <th>Номер</th>
-                        <th>Предмет</th>
-                        <th>Кабинет</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                    </tr>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Номер</th>
+                            <th>Предмет</th>
+                            <th>Кабинет</th>
+                            <th>Начало</th>
+                            <th>Конец</th>
+                        </tr>
+                    </thead>
                     {% for lesson in saturday %}
                     <tr>
                         <td>{{ lesson.number }}</td>
