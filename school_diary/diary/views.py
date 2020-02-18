@@ -105,6 +105,7 @@ def create_table(lessons, students):
         scope.update({student: stu})
     return scope
 
+
 @login_required(login_url="/diary/login/")
 def diary(request):
     if request.user.account_type == 0 or request.user.account_type == 1:
@@ -208,6 +209,11 @@ def add_student_page(request):
     context = {'form':form, 'grade':grade, 'students':students}
     return render(request, 'grades/add_student.html', context)
 
+
+def create_lesson(request):
+    form = LessonCreationForm()
+    context = {'form': form}
+    return render(request, 'create_lesson.html', context)
 
 @login_required(login_url="login")
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")

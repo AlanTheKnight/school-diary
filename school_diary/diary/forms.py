@@ -179,3 +179,14 @@ class TeachersEditForm(forms.ModelForm):
             'second_name':forms.TextInput(attrs={'class': 'form-control'}),
             'subjects':forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
+
+
+class LessonCreationForm(forms.ModelForm):
+    class Meta:
+        model = Lessons
+        fields = ('subject', 'grade', 'date', 'number', 'Theme', 'homework')
+        widgets = {
+            'date': forms.DateField(),
+            'number': forms.IntegerField(),
+
+        }

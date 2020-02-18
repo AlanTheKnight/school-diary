@@ -9,7 +9,6 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     path('profile/', views.user_profile, name='profile'),
     path('registerteacher', views.teacher_register, name="teacher_register"),
-    path('', views.diary, name='diary'),
 
     # Students and grades
     path('add-student/', views.add_student_page, name="add_student_page"),
@@ -40,6 +39,10 @@ urlpatterns = [
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(template_name="password_reset/done.html"), name="password_reset_done"),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name="password_reset/confirm.html"), name="password_reset_confirm"),
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(template_name="password_reset/complete.html"), name="password_reset_complete"),
+
+    # Main dairy
+    path('', views.diary, name='diary'),
+    path('create-lesson', views.create_lesson)
 ]
 
 """
