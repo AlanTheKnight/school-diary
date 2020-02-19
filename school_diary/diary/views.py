@@ -112,6 +112,7 @@ def create_lesson(request):
         form = LessonCreationForm(request.POST)
         if form.is_valid():
             form.save()
+            return redirect('dairy')
     form = LessonCreationForm()
     context = {'form': form}
     return render(request, 'create_lesson.html', context)

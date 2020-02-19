@@ -1,6 +1,8 @@
 .inp_table{
     border: 0px;
     -moz-appearance: textfield;
+    height: 100%;
+    width: 100%;
 }
 .inp_table:focus{
     outline:none;
