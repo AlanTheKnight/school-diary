@@ -122,8 +122,9 @@ def create_lesson(request):
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 @login_required(login_url="/diary/login/")  # TODO fix bug
 def lesson_page(request):
-    pk = request.get('pk', '')
-    context = {'lesson': Lessons.objects.get(pk=pk)}
+    pk = request.GET.get('pk')
+    context = {'lesson': Lessons.objects.get(pk=pk),
+               'control': Controls.objects.all()}
     return render(request, 'lesson_page.html', context)
 
 
