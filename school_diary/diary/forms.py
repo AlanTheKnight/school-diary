@@ -169,7 +169,8 @@ class AdminsEditForm(forms.ModelForm):
             'second_name':forms.TextInput(attrs={'class': 'form-control'}),
         }
 
-class TeachersEditForm(forms.ModelForm):
+
+class TeacherEditForm(forms.ModelForm):
     class Meta:
         model = Teachers
         fields = ('first_name', 'surname', 'second_name', 'subjects')

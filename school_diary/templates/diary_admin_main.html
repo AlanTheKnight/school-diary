@@ -6,46 +6,57 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <h3 class="mt-5 text-center">Пользователи</h3>
+<div class="container my-5">
+    <h1>Панель администратора</h1>
     <div class="row">
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
-                <a href="{% url 'admins_dashboard' %}"><img src="{% static '/admin_gui/admins.png' %}" class="card-img-top" alt="Просмотр администраторов" title="Просмотр администраторов"></a>
+                <a href="{% url 'admins_dashboard' %}"><img src="{% static '/admin_gui/admins.png' %}" class="card-img-top" alt="Просмотр администраторов"></a>
+                <div class="card-body">
+                    <p class="text-muted">Создание, изменение и удаление администраторов.</p>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
-                <a href="#"><img src="{% static '/admin_gui/teachers.png' %}" class="card-img-top" alt="Просмотр учителей" title="Просмотр учителей"></a>
+                <a href="{% url 'teachers_dashboard' %}"><img src="{% static '/admin_gui/teachers.png' %}" class="card-img-top" alt="Просмотр учителей" title="Просмотр учителей"></a>
+                <div class="card-body">
+                    <p class="text-muted">Создание, изменение и удаление учителей.</p>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
-                <a href="{% url 'students_dashboard' %}"><img src="{% static 'admin_gui/students.png' %}" class="card-img-top" alt="Просмотр учеников" title="Просмотр учеников"></a>
-            </div>
-        </div>
-    </div>
-    <h3 class="mt-3 text-center">Панели администраторов</h3>
-    <div class="row">
-        <div class="col-md-3 col-sm-6 my-3">
-            <div class="card h-100">
-                <a href="/admin/"><img src="{% static '/admin_gui/admin_panel.png' %}" class="card-img-top" alt="Панель администратора" title="Панель администратора"></a>
+                <a href="{% url 'students_dashboard' %}"><img src="{% static 'admin_gui/students.png' %}" class="card-img-top" alt="Просмотр учеников"></a>
+                <div class="card-body">
+                    <p class="text-muted">Создание, изменение и удаление учеников.</p>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
                 <a href="{% url 'news_dashboard' %}"><img src="{% static 'news.png' %}" class="card-img-top" alt="Панель новостей" title="Панель новостей"></a>
+                <div class="card-body">
+                    <p class="text-muted">Редактирование новостного блока сайта.</p>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
                 <a href="{% url 'timetable_dashboard' %}"><img src="{% static 'timetable.png' %}" class="card-img-top" alt="Панель расписания" title="Панель расписания"></a>
+                <div class="card-body">
+                    <p class="text-muted">Редактирование расписания.</p>
+                </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6 my-3">
             <div class="card h-100">
                 <a href="{% url 'minimum_dashboard' %}"><img src="{% static 'minimum.png' %}" class="card-img-top" alt="Панель минимумов" title="Панель минимумов"></a>
+                <div class="card-body">
+                    <p class="text-muted">Редактирование минимумов.</p>
+                </div>
             </div>
         </div>
+    </div>
 </div>
 {% endblock %}

@@ -59,7 +59,7 @@ class Lessons(models.Model):
     start = models.TimeField(verbose_name="Начало урока")
     end = models.TimeField(verbose_name="Конец урока")
     subject = models.CharField(max_length=50, verbose_name="Предмет")
-    classroom = models.IntegerField(verbose_name="Кабинет")
+    classroom = models.CharField(max_length=50 ,verbose_name="Кабинет")
     
     
     class Meta:

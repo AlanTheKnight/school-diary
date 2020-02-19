@@ -12,9 +12,8 @@ myInput.onblur = function() {
 }
 
 myInput.onkeyup = function() {
-  var lowerCaseLetters = /[a-z]/g;
-  var upperCaseLetters = /[A-Z]/g;
-  if(myInput.value.match(lowerCaseLetters) || myInput.value.match(upperCaseLetters)) {
+  var Letters = /[A-Za-z]+/g;
+  if(myInput.value.match(Letters)) {
     letter.classList.remove("invalid");
     letter.classList.add("valid");
   } else {
