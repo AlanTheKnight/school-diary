@@ -27,5 +27,6 @@
 - timetable_update
 - timetable_delete
 - timetable_create
+- dairy
 
 Remember using {% url '<url-name>' %} to access urls.
