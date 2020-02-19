@@ -187,7 +187,6 @@ class LessonCreationForm(forms.ModelForm):
         model = Lessons
         fields = ('subject', 'grade', 'date', 'number', 'Theme', 'homework')
         widgets = {
-            'date': forms.DateField(),
-            'number': forms.IntegerField(),
-
+            'date': forms.DateInput(attrs={'type': 'date', }),
+            'number': forms.TextInput(attrs={'type': 'number', 'min': '0' }),
         }

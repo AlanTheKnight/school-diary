@@ -35,6 +35,7 @@
             </select>
             <button type="submit" class="btn btn-primary">Найти</button>
         </form>
+    <a href="{% url 'create-lessons' %}"><button class="btn btn-primary">Создать урок</button></a>
         {% if is_post %}
         <form method="POST">
         {% csrf_token %}

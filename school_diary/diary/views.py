@@ -108,6 +108,10 @@ def create_table(lessons, students):
 
 @login_required(login_url="/diary/login/")
 def create_lesson(request):
+    if request.method == 'POST':
+        form = LessonCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
     form = LessonCreationForm()
     context = {'form': form}
     return render(request, 'create_lesson.html', context)

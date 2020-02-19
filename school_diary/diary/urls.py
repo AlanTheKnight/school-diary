@@ -52,7 +52,7 @@ urlpatterns = [
 
     # Main dairy
     path('', views.diary, name='diary'),
-    path('create-lesson', views.create_lesson)
+    path('create-lesson', views.create_lesson, name='create-lessons')
 ]
 
 """
