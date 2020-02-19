@@ -45,7 +45,12 @@
                     <tr>
                         <th scope="col">Ученики</th>
                         {% for lesson in  lessons %}
-                        <th scope="col">{{ lesson.date.day }}.{{ lesson.date.month }}</th>
+                            <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}">
+                            <th scope="col">
+                                <p>{{ lesson.date.day }}.{{ lesson.date.month }}</p>
+                                <p>{{ lesson.control }}</p>
+                            </th>
+                            </a>
                         {% endfor %}
                     </tr>
                 </thead>

@@ -52,7 +52,8 @@ urlpatterns = [
 
     # Main dairy
     path('', views.diary, name='diary'),
-    path('create-lesson', views.create_lesson, name='create-lessons')
+    path('create-lesson', views.create_lesson, name='create-lessons'),
+    path('lesson-page', views.lesson_page, name='lesson-page')
 ]
 
 """

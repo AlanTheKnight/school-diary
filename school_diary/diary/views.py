@@ -106,16 +106,25 @@ def create_table(lessons, students):
     return scope
 
 
-@login_required(login_url="/diary/login/")
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@login_required(login_url="/diary/login/")  # TODO fix bug
 def create_lesson(request):
     if request.method == 'POST':
         form = LessonCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('dairy')
+            return redirect('diary')
     form = LessonCreationForm()
     context = {'form': form}
     return render(request, 'create_lesson.html', context)
+
+
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@login_required(login_url="/diary/login/")  # TODO fix bug
+def lesson_page(request):
+    pk = request.get('pk', '')
+    context = {'lesson': Lessons.objects.get(pk=pk)}
+    return render(request, 'lesson_page.html', context)
 
 
 @login_required(login_url="/diary/login/")

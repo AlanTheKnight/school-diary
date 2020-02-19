@@ -175,10 +175,10 @@ class TeacherEditForm(forms.ModelForm):
         model = Teachers
         fields = ('first_name', 'surname', 'second_name', 'subjects')
         widgets = {
-            'first_name':forms.TextInput(attrs={'class': 'form-control'}),
-            'surname':forms.TextInput(attrs={'class': 'form-control'}),
-            'second_name':forms.TextInput(attrs={'class': 'form-control'}),
-            'subjects':forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'surname': forms.TextInput(attrs={'class': 'form-control'}),
+            'second_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'subjects': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
 
 

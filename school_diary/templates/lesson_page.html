@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+{% csrf_token %}
+    <div class="container">
+<form method="POST">
+    {% csrf_token %}
+    <div class="container">
+        <form method="POST" class="form">
+            <select disabled>
+                <option>{{ lesson.grade }}</option>
+            </select>
+         <select disabled>
+                <option>{{ lesson.subject }}</option>
+            </select>
+        <input type="text" value="{{ lesson.theme }}">
+        <input type="text" value="{{ lesson.homework }}">
+        <input type="number" value="{{ lesson.number }}">{{ lesson.number }}
+            <select>
+                {% for i in lesson.control_set %}
+                <option>i</option>
+                {% endfor %}
+            </select>
+        </form>
+        
+    </div>
+    <button type="submit" class="btn btn-primary">Изменить</button>
+</form>
+    </div>
+{% endblock %}

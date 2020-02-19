@@ -143,6 +143,18 @@ class Administrators(models.Model):
         return '{} {} {}'.format(self.surname, self.first_name, self.second_name)
 
 
+class Controls(models.Model):
+    name = models.CharField(max_length=120, verbose_name=' Контроль')
+    # weight = models.DecimalField(verbose_name=' Коэфицент')
+
+    class Meta:
+        verbose_name = "Вид контороля"
+        verbose_name_plural = "Виды контороля"
+
+    def __str__(self):
+        return '{} '.format(self.name)
+
+
 class Lessons(models.Model):
     date = models.DateField(verbose_name='Дата')
     number = models.IntegerField(verbose_name='Номер урока')
@@ -150,6 +162,7 @@ class Lessons(models.Model):
     Theme = models.CharField(max_length=120, verbose_name='Тема')
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name='Предмет')
     grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
+    control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль', default=1)  # As homework or test
 
     class Meta:
         verbose_name = "Урок"
@@ -158,7 +171,6 @@ class Lessons(models.Model):
 
     def __str__(self):
         return '{} {} {}'.format(self.subject, self.grade, self.date)
-# TODO Weights system
 
 
 class Marks(models.Model):
