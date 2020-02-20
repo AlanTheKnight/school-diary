@@ -93,6 +93,30 @@ def teacher_register(request):
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
 
 
+def create_table(lessons, students):
+    scope = {}
+    for student in students:
+        stu = {}
+        for lesson in lessons:
+            try:
+                stu.update({lesson: student.marks_set.get(lesson=lesson)})
+            except ObjectDoesNotExist:
+                stu.update({lesson: None})
+        scope.update({student: stu})
+    return scope
+
+
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@login_required(login_url="/diary/login/")  # TODO fix bug
+def lesson_page(request):
+    if request.method == 'POST':
+        lesson = Lessons.objects.get(request.POST['grade'])
+    pk = request.GET.get('pk')
+    context = {'lesson': Lessons.objects.get(pk=pk),
+               'control': Controls.objects.all()}
+    return render(request, 'lesson_page.html', context)
+
+
 @login_required(login_url="/diary/login/")
 def diary(request):
     if request.user.account_type == 0 or request.user.account_type == 1:
@@ -101,49 +125,66 @@ def diary(request):
     elif request.user.account_type == 3:
         messages.error(request, 'Пока не готово')
         return redirect('/')
-        
-        student = Students.objects.get(account=request.user)
-        context = {'Student': student,
-                   'subjects': Subjects.objects.all(),
-                   'daylist': ['09.02', '10.02', '11.02'],
-                   'marks': student.mark_set.order_by('date')}
-        return render(request, 'student.html', context)
 
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
+        form = LessonCreationForm()
         context = {'Teacher': teacher,
                    'subjects': teacher.subjects.all(),
                    'grades': Grades.objects.filter(teachers=teacher),
-                   'is_post': False
+                   'createlessonform':form
                    }
 
         if request.method == 'POST':
-            subject = Subjects.objects.get(name=request.POST.get('subject'))
-            number = int(request.POST.get('grade')[0])
-            letter = request.POST.get('grade')[1]
-            try:
-                grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
-            except:
-                messages.error(request, 'Ошибка')
+            if 'getgrade' in request.POST:
+                subject = Subjects.objects.get(name=request.POST.get('subject'))
+                grade = request.POST.get('grade')
+                if len(grade) == 3: number = int(grade[0:2])
+                else: number = int(grade[0])
+                letter = grade[-1]
+                try:
+                    grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
+                except ObjectDoesNotExist:
+                    messages.error(request, 'Ошибка')
+                    return render(request, 'teacher.html', context)
+                lessons = Lessons.objects.filter(grade=grade, subject=subject)
+                students = Students.objects.filter(grade=grade)
+                scope = create_table(lessons, students)
+                print(scope)
+                context.update({
+                    'is_post': True,
+                    'lessons': lessons,
+                    'scope': scope
+                })
                 return render(request, 'teacher.html', context)
-
-            lessons = Lessons.objects.filter(grade=grade, subject=subject)
-            students = Students.objects.filter(grade=grade)
-            scope = {}
-            for student in students:
-                for_lesson = []
-                for lesson in lessons:
+            elif 'createlesson' in request.POST:
+                form = LessonCreationForm(request.POST)
+                if form.is_valid():
+                    form.save()
+                    return redirect('diary')
+            else:
+                for i in dict(request.POST):
+                    if i == 'csrfmiddlewaretoken':
+                        continue
+                    li = i.split('|')
+                    account = li[0]
+                    id_les = li[1]
+                    student = Students.objects.get(account=Users.objects.get(email=account))
+                    lesson = Lessons.objects.get(pk=id_les)
+                    amount = str(request.POST[i])
                     try:
-                        for_lesson.append(student.marks_set.get(lesson=lesson))
-                    except:
-                        for_lesson.append(None)
-                scope.update({student: for_lesson})
-            context.update({
-                'is_post': True,
-                'lessons': lessons,
-                'scope': scope
-            })
-            return render(request, 'teacher.html', context)
+                        mark = Marks.objects.get(lesson=lesson, student=student)
+                        if amount:
+                            mark.amount = amount
+                            mark.save()
+                        else:
+                            mark.delete()
+                    except ObjectDoesNotExist:
+                        if amount:
+                            Marks.objects.create(lesson=lesson,
+                                                 student=student,
+                                                 amount=amount)
+                return redirect(diary)
         else:
             return render(request, 'teacher.html', context)
     else:
@@ -174,6 +215,8 @@ def add_student_page(request):
     form = AddStudentToGradeForm()
     context = {'form':form, 'grade':grade, 'students':students}
     return render(request, 'grades/add_student.html', context)
+
+
 
 
 @login_required(login_url="login")

@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
-{%  block title %}
-    <title>
-        Subjects
-    </title>
+{% block title %}
+    <title>Оценки</title>
 {% endblock %}
 
 {% block css %}
@@ -12,56 +11,112 @@
 {% endblock %}
 
 {% block content %}
-{#  TODO find better place for error message  #}
-{#  TODO create frontend #}
+<div class="container my-5">
+
     {% if messages %}
-			<div class="alert alert-danger">
-			{% for message in messages %}
-			{{ message }}
-			{% endfor %}
-			</div>
-			{% endif %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="card my-3">
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="subject">Предмет</label>
+                    <select name="subject" id="subject" class="form-control">
+                        {% for subject in subjects %}
+                            <option>{{ subject }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="grade">Класс</label>
+                    <select name="grade" id="grade" class="form-control">
+                        {% for grade in grades %}
+                            <option>{{ grade }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" name="getgrade">Найти</button>
+            </form>
+        </div>
+    </div>
+    
+        {% if request.method == 'POST' %}
         <form method="POST">
         {% csrf_token %}
-            <select name="subject">
-                {% for subject in subjects %}
-                    <option>{{ subject }}</option>
-                {% endfor %}
-            </select>
-            <select name="grade">
-                {% for grade in grades %}
-                    <option>{{ grade }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn btn-primary">Найти</button>
-        </form>
-        {% if is_post %}
-        <form method="POST">
-            <table class="table table-bordered ">
-                <thead>
+        
+        {% if lessons and scope %}
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm ">
+                
+                <thead class="thead-light">
                     <tr>
                         <th scope="col">Ученики</th>
-                        {% for lesson in  lessons %}
-                        <th scope="col">{{ lesson.date.day }}.{{ lesson.date.month }}</th>
+                        {% for lesson in lessons %}
+                            
+                            <th scope="col">
+                                <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}">
+                                    <p>{{ lesson.date.day }}.{{ lesson.date.month }}</p>
+                                    <p></p>{{ lesson.control }}
+                                </a>
+                            </th>
                         {% endfor %}
                     </tr>
                 </thead>
+                
                 <tbody>
-                {% for student, marks in scope.items %}
+                {% for student, small_scope in scope.items %}
                     <tr>
-                        <th scope="row">{{ student.first_name }} {{ student.surname }}</th>
-                        {% for mark in marks %}
+                        <th scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</th>
+                        {% for lesson, mark in  small_scope.items %}
                             {% if mark %}
-                            <th><input class="inp_table" type="number" value="{{mark.amount}}" min="1" max="5" name="{{ student.account }}"></th>
+                            <th><input class="inp_table" name="{{ student.account }}|{{ lesson.id }}" type="number" value="{{mark.amount}}" min="1" max="5"></th>
                             {% else %}
-                            <th><input class="inp_table" type="number" value="" min="1" max="5" name="{{ student.account }}"></th>
+                            <th><input class="inp_table" name="{{ student.account }}|{{ lesson.id }}" type="number" value="" min="1" max="5"></th>
                             {% endif %}
                         {% endfor %}
                     </tr>
                 {% endfor %}
                 </tbody>
-            </table>
+             </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info mt-5">
+            Уроки еще не были добавлены.
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
         </form>
         {% endif %}
 
+        <div class="modal fade" id="lessonmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="lessonmodalLabel">Создать новый урок</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                {{ createlessonform|crispy }}
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                            <button type="submit" class="btn btn-primary" name="createlesson">Создать</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
 {% endblock %}

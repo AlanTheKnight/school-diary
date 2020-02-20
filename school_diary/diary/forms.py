@@ -175,8 +175,18 @@ class TeacherEditForm(forms.ModelForm):
         model = Teachers
         fields = ('first_name', 'surname', 'second_name', 'subjects')
         widgets = {
-            'first_name':forms.TextInput(attrs={'class': 'form-control'}),
-            'surname':forms.TextInput(attrs={'class': 'form-control'}),
-            'second_name':forms.TextInput(attrs={'class': 'form-control'}),
-            'subjects':forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'surname': forms.TextInput(attrs={'class': 'form-control'}),
+            'second_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'subjects': forms.SelectMultiple(attrs={'class': 'form-control'}),
+        }
+
+
+class LessonCreationForm(forms.ModelForm):
+    class Meta:
+        model = Lessons
+        fields = ('subject', 'grade', 'date', 'number', 'theme', 'homework', 'control')
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date', }),
+            'number': forms.TextInput(attrs={'type': 'number', 'min': '0' }),
         }
