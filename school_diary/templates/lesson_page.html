@@ -9,16 +9,25 @@
     {% csrf_token %}
     <div class="container">
         <form method="POST" class="form">
-            <select disabled class="form-control">
+
+        <label>Класс</label>
+            <select name="grade"disabled class="form-control">
                 <option>{{ lesson.grade }}</option>
             </select>
-         <select disabled class="form-control">
+        <label>Предмет</label>
+         <select name="subject" disabled class="form-control">
                 <option>{{ lesson.subject }}</option>
             </select>
-        <input type="text" value="{{ lesson.theme }}" class="form-control">
-            <textarea class="form-control">{{ lesson.homework }}</textarea>
-        <input type="number" value="{{ lesson.number }}" class="form-control">
-            <select class="form-control">
+            <label>Дата</label>
+                <input type="date" class="form-control" value="{{ lesson.date }}">
+        <label>Тема</label>
+        <input name="Theme" type="text" value="{{ lesson.Theme }}" class="form-control">
+        <label>ДЗ</label>
+         <textarea name="homework" class="form-control">{{ lesson.homework }}</textarea>
+        <label>Номер</label>
+        <input name="number" type="number" value="{{ lesson.number }}" class="form-control">
+        <label>Вид контроля</label>
+            <select name="control" class="form-control">
                 {% for i in control %}
                 <option>{{ i }}</option>
                 {% endfor %}
