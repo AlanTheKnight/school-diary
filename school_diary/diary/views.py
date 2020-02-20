@@ -108,19 +108,6 @@ def create_table(lessons, students):
 
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 @login_required(login_url="/diary/login/")  # TODO fix bug
-def create_lesson(request):
-    if request.method == 'POST':
-        form = LessonCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('diary')
-    form = LessonCreationForm()
-    context = {'form': form}
-    return render(request, 'create_lesson.html', context)
-
-
-@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
-@login_required(login_url="/diary/login/")  # TODO fix bug
 def lesson_page(request):
     if request.method == 'POST':
         lesson = Lessons.objects.get(request.POST['grade'])
@@ -138,33 +125,28 @@ def diary(request):
     elif request.user.account_type == 3:
         messages.error(request, 'Пока не готово')
         return redirect('/')
-        
-        student = Students.objects.get(account=request.user)
-        context = {'Student': student,
-                   'subjects': Subjects.objects.all(),
-                   'daylist': ['09.02', '10.02', '11.02'],
-                   'marks': student.mark_set.order_by('date')}
-        return render(request, 'student.html', context)
 
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
+        form = LessonCreationForm()
         context = {'Teacher': teacher,
                    'subjects': teacher.subjects.all(),
                    'grades': Grades.objects.filter(teachers=teacher),
-                   'is_post': False
+                   'createlessonform':form
                    }
 
         if request.method == 'POST':
-            if request.POST.get('subject'):
+            if 'getgrade' in request.POST:
                 subject = Subjects.objects.get(name=request.POST.get('subject'))
-                number = int(request.POST.get('grade')[0])
-                letter = request.POST.get('grade')[1]
+                grade = request.POST.get('grade')
+                if len(grade) == 3: number = int(grade[0:2])
+                else: number = int(grade[0])
+                letter = grade[-1]
                 try:
                     grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
-
                 lessons = Lessons.objects.filter(grade=grade, subject=subject)
                 students = Students.objects.filter(grade=grade)
                 scope = create_table(lessons, students)
@@ -175,15 +157,18 @@ def diary(request):
                     'scope': scope
                 })
                 return render(request, 'teacher.html', context)
+            elif 'createlesson' in request.POST:
+                form = LessonCreationForm(request.POST)
+                if form.is_valid():
+                    form.save()
+                    return redirect('diary')
             else:
                 for i in dict(request.POST):
                     if i == 'csrfmiddlewaretoken':
                         continue
-                    print(i.split('|'))
                     li = i.split('|')
                     account = li[0]
                     id_les = li[1]
-                    print(account, id_les)
                     student = Students.objects.get(account=Users.objects.get(email=account))
                     lesson = Lessons.objects.get(pk=id_les)
                     amount = str(request.POST[i])
@@ -199,9 +184,7 @@ def diary(request):
                             Marks.objects.create(lesson=lesson,
                                                  student=student,
                                                  amount=amount)
-                        else:
-                            pass
-                return render(request, 'teacher.html', context)
+                return redirect(diary)
         else:
             return render(request, 'teacher.html', context)
     else:

@@ -3,14 +3,13 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-{% csrf_token %}
     <div class="container">
-<form method="POST">
-    {% csrf_token %}
-    <div class="container">
-        {{ form|crispy }}
-    </div>
-    <button type="submit" class="btn btn-primary">Создать</button>
-</form>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="container">
+            {{ form|crispy }}
+        </div>
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </form>
     </div>
 {% endblock %}

@@ -1,41 +1,32 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
+
+
+{% block title %}
+<title>Редактировать</title>
+{% endblock %}
 
 {% block content %}
-{% csrf_token %}
-    <div class="container">
-<form method="POST">
-    {% csrf_token %}
-    <div class="container">
-        <form method="POST" class="form">
-
-        <label>Класс</label>
-            <select name="grade"disabled class="form-control">
-                <option>{{ lesson.grade }}</option>
-            </select>
-        <label>Предмет</label>
-         <select name="subject" disabled class="form-control">
-                <option>{{ lesson.subject }}</option>
-            </select>
-            <label>Дата</label>
-                <input type="date" class="form-control" value="{{ lesson.date }}">
-        <label>Тема</label>
-        <input name="Theme" type="text" value="{{ lesson.Theme }}" class="form-control">
-        <label>ДЗ</label>
-         <textarea name="homework" class="form-control">{{ lesson.homework }}</textarea>
-        <label>Номер</label>
-        <input name="number" type="number" value="{{ lesson.number }}" class="form-control">
-        <label>Вид контроля</label>
-            <select name="control" class="form-control">
-                {% for i in control %}
-                <option>{{ i }}</option>
-                {% endfor %}
-            </select>
-        </form>
-        
+<div class="container my-5">
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" value="{{ lesson.theme }}" class="form-control">
+                    </div>
+                    
+                    <textarea class="form-control">{{ lesson.homework }}</textarea>
+                    <input type="number" value="{{ lesson.number }}" class="form-control">
+                    <select class="form-control">
+                    {% for i in control %}
+                    <option>{{ i }}</option>
+                    {% endfor %}
+                    </select>
+                    <a href="{% url 'diary' %}" class="btn btn-secondary">Назад</a>
+                    <button type="submit" class="btn btn-primary">Изменить</button>
+            </form>
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary">Изменить</button>
-</form>
-    </div>
+</div>
 {% endblock %}
