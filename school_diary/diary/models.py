@@ -157,7 +157,6 @@ class Controls(models.Model):
 
 class Lessons(models.Model):
     date = models.DateField(verbose_name='Дата')
-    number = models.IntegerField(verbose_name='Номер урока')
     homework = models.TextField(blank=True, verbose_name='ДЗ')
     theme = models.CharField(max_length=120, verbose_name='Тема')
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name='Предмет')

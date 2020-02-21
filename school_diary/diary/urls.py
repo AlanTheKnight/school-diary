@@ -52,5 +52,5 @@ urlpatterns = [
 
     # Main diary
     path('', views.diary, name='diary'),
-    path('lesson-page', views.lesson_page, name='lesson-page')
+    path('lesson-page', views.lesson_page, name='lesson-page'),
 ]

@@ -106,6 +106,17 @@ def create_table(lessons, students):
     return scope
 
 
+def create_table_of_results(subjects, student, grade):
+    table = {}
+    for subject in subjects:
+        s = {}
+        lessons = Lessons.objects.filter(subject=subject, grade=grade)
+        for lesson in lessons:
+            s.update({lesson: Marks.objects.get(lesson=lesson, student=student)})
+        table.update({subject: s})
+    return table
+
+
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 @login_required(login_url="/diary/login/")  # TODO fix bug
 def lesson_page(request):
@@ -117,14 +128,46 @@ def lesson_page(request):
     return render(request, 'lesson_page.html', context)
 
 
+def get_averange(list):
+    return round(sum(list) / len(list), 2)
+
+
 @login_required(login_url="/diary/login/")
 def diary(request):
     if request.user.account_type == 0 or request.user.account_type == 1:
         return render(request, 'diary_admin_main.html')
 
     elif request.user.account_type == 3:
-        messages.error(request, 'Пока не готово')
-        return redirect('/')
+        student = Students.objects.get(account=request.user)
+        grade = student.grade
+        if request.method == "POST":
+            subject = request.POST['subject']
+            term = request.POST['term']
+            subject = Subjects.objects.get(id=subject)
+            lessons = Lessons.objects.filter(grade=grade, subject=subject)
+            marks = []
+            for i in lessons:
+                try: marks.append(Marks.objects.get(student=student, lesson=i))
+                except: pass
+            if marks:
+                marks_list = []
+                for i in marks: marks_list.append(i.amount)
+                avg = get_averange(marks_list) # GET AVERANGE OF MARKS
+                data = []
+                for i in range(5, 1, -1): data.append(marks_list.count(i))
+                data.append(marks_list.count('Н'))
+                context = {
+                    'lessons':lessons, 
+                    'marks':marks,
+                    'subject':subject,
+                    'data':data,
+                    'avg':avg,
+                    'term':term}
+                return render(request, 'results.html', context)
+            return render(request, 'no_marks.html')
+        subjects = grade.subjects.all()
+        context = {'subjects':subjects}
+        return render(request, 'diary_student.html', context)
 
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)

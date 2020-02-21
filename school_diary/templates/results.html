@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title></title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center">{{ subject.name }}</h1>
+    <p class="lead">Ваши оценки за {{ term }} четверть:</p>
+    <div class="table-responsive">
+    <table class="table table-sm text-center">
+        <thead>
+            <th scope="col" class="text-left">Дата</th>
+            {% for lesson in lessons %}
+                <th scope="col"><span data-toggle="tooltip" data-placement="top" title="{{ lesson.control }}">{{ lesson.date.month }}.{{ lesson.date.day }}</span></th>
+            {% endfor %}
+        </thead>
+        <tbody>
+            <tr>
+                <th style="width: 15%;" class="text-left">Оценка</th>
+                {% for mark in marks %}
+                    {% if mark.amount == 2 %}
+                        <td class="text-danger"><span><b>{{ mark.amount }}</b></span></td>
+                    {% elif mark.amount == 3 %}
+                        <td style="color: orangered;"><b>{{ mark.amount }}</b></td>
+                    {% elif mark.amount == 4 %}
+                        <td style="color:darkorange"><b>{{ mark.amount }}</b></td>
+                    {% elif mark.amount == 5 %}
+                        <td class="text-success"><b>{{ mark.amount }}</b></td>
+                    {% else %}
+                        <td><b>{{ mark.amount }}</b></td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+    </div>
+    <p class="lead mt-3">Статистика:</p>
+    <div class="container w-75">
+        <p>Оценки за эту четверть:</p>
+        <canvas id="MyChart"></canvas>
+        <p>Средний балл: {{ avg }}</p>
+        <p class="text-muted" style="margin-top: -20px;"><small>
+            Получен из среднего арифметического оценок.
+        </small></p>
+    </div>
+    <script>
+        let ctx = document.getElementById('MyChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['5', '4', '3', '2', 'H'],
+                datasets: [{
+                    data: {{ data|safe }},
+                    backgroundColor: [
+                        '#27ae60',
+                        '#f1c40f',
+                        '#e67e22',
+                        '#e74c3c',
+                        '#95a5a6',
+                    ],
+                    borderWidth: 2,
+                    hoverBorderColor: 'black',
+                }]
+            },
+            options: {
+                legend: {
+                    display: true,
+                    position: 'right',
+                },
+                responsive: true,
+            }
+        });
+
+    </script>
+</div>
+<script>
+    $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+{% endblock %}

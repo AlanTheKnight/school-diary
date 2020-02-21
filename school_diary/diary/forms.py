@@ -185,8 +185,7 @@ class TeacherEditForm(forms.ModelForm):
 class LessonCreationForm(forms.ModelForm):
     class Meta:
         model = Lessons
-        fields = ('subject', 'grade', 'date', 'number', 'theme', 'homework', 'control')
+        fields = ('subject', 'grade', 'date', 'theme', 'homework', 'control')
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', }),
-            'number': forms.TextInput(attrs={'type': 'number', 'min': '0' }),
         }
