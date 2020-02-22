@@ -138,14 +138,24 @@ def lesson_page(request):
 
 
 def get_averange(list):
+    """
+    In: list of marks (integers)
+    Out: averange value
+    """
     return round(sum(list) / len(list), 2)
 
 
 @login_required(login_url="/diary/login/")
 def diary(request):
+    """
+    Main function for displaying diary pages to admins/teachers/students.
+    """
+
+    # If user is admin
     if request.user.account_type == 0 or request.user.account_type == 1:
         return render(request, 'diary_admin_main.html')
 
+    # If user is student
     elif request.user.account_type == 3:
         student = Students.objects.get(account=request.user)
         grade = student.grade
@@ -158,6 +168,9 @@ def diary(request):
             for i in lessons:
                 try: marks.append(Marks.objects.get(student=student, lesson=i))
                 except: pass
+
+            # If student has no marks than send him a page with info.
+            # Otherwise, student will get a page with statistics and his results.
             if marks:
                 n_amount = 0
                 marks_list = []
@@ -167,7 +180,7 @@ def diary(request):
                         n_amount += 1
                     else:
                         marks_list.append(m)
-                avg = get_averange(marks_list) # GET AVERANGE OF MARKS
+                avg = get_averange(marks_list) # Get averange of marks
                 data = []
                 for i in range(5, 1, -1): data.append(marks_list.count(i))
                 data.append(n_amount)
@@ -184,6 +197,7 @@ def diary(request):
         context = {'subjects':subjects}
         return render(request, 'diary_student.html', context)
 
+    # If user is teacher
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
         controls = Controls.objects.all()
@@ -194,6 +208,8 @@ def diary(request):
                    }
 
         if request.method == 'POST':
+            # If teacher filled in a form with name = 'getgrade' then
+            # build a table with marks for all students and render it.
             if 'getgrade' in request.POST:
                 subject = Subjects.objects.get(name=request.POST.get('subject'))
                 grade = request.POST.get('grade')
@@ -209,13 +225,14 @@ def diary(request):
                     return render(request, 'teacher.html', context)
                 lessons = Lessons.objects.filter(grade=grade, subject=subject)
                 students = Students.objects.filter(grade=grade)
-                scope = create_table(lessons, students)
+                scope = create_table(lessons, students) # Create a table
                 context.update({
                     'is_post': True,
                     'lessons': lessons,
                     'scope': scope
                 })
                 return render(request, 'teacher.html', context)
+
             elif 'createlesson' in request.POST:
                 date = request.POST.get('date')
                 theme = request.POST.get('theme')
@@ -228,16 +245,30 @@ def diary(request):
                 )
                 lesson.save()
                 return HttpResponseRedirect('/diary/')
+
+            # GETTING MARKS FROM FORM AND SAVE THEM
+            # TODO: Optimize this algorithm, because it's slow
             else:
+                # We make a dictionary from all data we send
                 for i in dict(request.POST):
+                    # Missing a csrf token
                     if i == 'csrfmiddlewaretoken':
                         continue
+                    
+                    # Split them. We get a student (li[0]) and id of
+                    # lesson (li[1])
                     li = i.split('|')
                     account = li[0]
                     id_les = li[1]
+                    
+                    # Get a student by his/her email
                     student = Students.objects.get(account=Users.objects.get(email=account))
+                    
+                    # Get a lesson by it's id
                     lesson = Lessons.objects.get(pk=id_les)
                     amount = str(request.POST[i])
+                    
+                    # If we can get a mark then change it, otherwise create a new one
                     try:
                         mark = Marks.objects.get(lesson=lesson, student=student)
                         if amount:
