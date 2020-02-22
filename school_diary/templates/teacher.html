@@ -65,7 +65,7 @@
                         {% for lesson in lessons %}
                             
                             <th scope="col">
-                                <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}" target="_blank">
+                                <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}">
                                     <p>{{ lesson.date.day }}.{{ lesson.date.month }}</p>
                                     <p></p>{{ lesson.control }}
                                 </a>
@@ -115,6 +115,7 @@
                                     <option value="-1" selected>Н</option>
                                     {% endif %}
                                 </select>
+                                <a href="#" class="edit">+</a>
                             </th>
                             {% else %}
                             <td>

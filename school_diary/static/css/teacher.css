@@ -2,7 +2,7 @@
     border: 0px;
     -webkit-appearance: none;
     height: 100%;
-    width: 100%;
+    width: 80%;
     background-color: white;
     
 }
@@ -11,4 +11,8 @@
 }
 .inp_table::-webkit-inner-spin-button {
   display: none;
+}
+
+.edit {
+  display: inline-block;
 }
