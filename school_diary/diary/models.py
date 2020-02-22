@@ -84,7 +84,7 @@ class Teachers(models.Model):
     account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     surname = models.CharField(max_length=100, verbose_name="Фамилия")
-    second_name = models.CharField(max_length=100, verbose_name="Отчество", blank=True)
+    second_name = models.CharField(max_length=100, verbose_name="Отчество", blank=True, default='')
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
 
     class Meta:
@@ -175,7 +175,8 @@ class Lessons(models.Model):
 class Marks(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
     amount = models.IntegerField(verbose_name="Балл")
-    lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок', default='')
+    lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок')
+    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name='Предмет', null=True, default=None)
     class Meta:
         verbose_name = "Оценка"
         verbose_name_plural = "Оценки"

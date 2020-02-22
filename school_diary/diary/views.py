@@ -120,11 +120,20 @@ def create_table_of_results(subjects, student, grade):
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 @login_required(login_url="/diary/login/")  # TODO fix bug
 def lesson_page(request):
-    if request.method == 'POST':
-        lesson = Lessons.objects.get(request.POST['grade'])
     pk = request.GET.get('pk')
-    context = {'lesson': Lessons.objects.get(pk=pk),
-               'control': Controls.objects.all()}
+    lesson = Lessons.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = LessonEditForm(request.POST, instance=lesson)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/diary/')
+        else:
+            print('Not Valid, dude')
+    form = LessonEditForm(instance=lesson)
+    context = {
+        'lesson': lesson,
+        'form':form
+        }
     return render(request, 'lesson_page.html', context)
 
 
@@ -150,12 +159,18 @@ def diary(request):
                 try: marks.append(Marks.objects.get(student=student, lesson=i))
                 except: pass
             if marks:
+                n_amount = 0
                 marks_list = []
-                for i in marks: marks_list.append(i.amount)
+                for i in marks:
+                    m = i.amount
+                    if m == -1:
+                        n_amount += 1
+                    else:
+                        marks_list.append(m)
                 avg = get_averange(marks_list) # GET AVERANGE OF MARKS
                 data = []
                 for i in range(5, 1, -1): data.append(marks_list.count(i))
-                data.append(marks_list.count('Н'))
+                data.append(n_amount)
                 context = {
                     'lessons':lessons, 
                     'marks':marks,
@@ -171,29 +186,30 @@ def diary(request):
 
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
-        form = LessonCreationForm()
+        controls = Controls.objects.all()
         context = {'Teacher': teacher,
                    'subjects': teacher.subjects.all(),
                    'grades': Grades.objects.filter(teachers=teacher),
-                   'createlessonform':form
+                   'controls':controls
                    }
 
         if request.method == 'POST':
             if 'getgrade' in request.POST:
                 subject = Subjects.objects.get(name=request.POST.get('subject'))
                 grade = request.POST.get('grade')
+                request.session['subject'] = subject.id
                 if len(grade) == 3: number = int(grade[0:2])
                 else: number = int(grade[0])
                 letter = grade[-1]
                 try:
                     grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
+                    request.session['grade'] = grade.id
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
                 lessons = Lessons.objects.filter(grade=grade, subject=subject)
                 students = Students.objects.filter(grade=grade)
                 scope = create_table(lessons, students)
-                print(scope)
                 context.update({
                     'is_post': True,
                     'lessons': lessons,
@@ -201,10 +217,17 @@ def diary(request):
                 })
                 return render(request, 'teacher.html', context)
             elif 'createlesson' in request.POST:
-                form = LessonCreationForm(request.POST)
-                if form.is_valid():
-                    form.save()
-                    return redirect('diary')
+                date = request.POST.get('date')
+                theme = request.POST.get('theme')
+                homework = request.POST.get('homework')
+                control = Controls.objects.get(id=request.POST.get('control'))
+                grade = Grades.objects.get(id=request.session['grade'])
+                subject = Subjects.objects.get(id=request.session['subject'])
+                lesson = Lessons.objects.create(
+                    date=date, theme=theme, homework=homework, control=control, grade=grade, subject=subject
+                )
+                lesson.save()
+                return HttpResponseRedirect('/diary/')
             else:
                 for i in dict(request.POST):
                     if i == 'csrfmiddlewaretoken':
@@ -226,7 +249,8 @@ def diary(request):
                         if amount:
                             Marks.objects.create(lesson=lesson,
                                                  student=student,
-                                                 amount=amount)
+                                                 amount=amount
+                                                 )
                 return redirect(diary)
         else:
             return render(request, 'teacher.html', context)

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 
 {% block title %}
@@ -12,19 +13,9 @@
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
-                    <div class="form-group">
-                        <input type="text" value="{{ lesson.theme }}" class="form-control">
-                    </div>
-                    
-                    <textarea class="form-control">{{ lesson.homework }}</textarea>
-                    <input type="number" value="{{ lesson.number }}" class="form-control">
-                    <select class="form-control">
-                    {% for i in control %}
-                    <option>{{ i }}</option>
-                    {% endfor %}
-                    </select>
-                    <a href="{% url 'diary' %}" class="btn btn-secondary">Назад</a>
-                    <button type="submit" class="btn btn-primary">Изменить</button>
+                {{ form|crispy }}
+                <a href="{% url 'diary' %}" class="btn btn-secondary">Назад</a>
+                <button type="submit" class="btn btn-primary">Изменить</button>
             </form>
         </div>
     </div>

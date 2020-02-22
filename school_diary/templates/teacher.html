@@ -21,7 +21,7 @@
         </div>
     {% endif %}
 
-    <div class="card my-3">
+    <div class="card my-3 w-25">
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
@@ -49,6 +49,10 @@
         {% if request.method == 'POST' %}
         <form method="POST">
         {% csrf_token %}
+        <div class="my-3">
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
+        </div>
         
         {% if lessons and scope %}
 
@@ -61,7 +65,7 @@
                         {% for lesson in lessons %}
                             
                             <th scope="col">
-                                <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}">
+                                <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}" target="_blank">
                                     <p>{{ lesson.date.day }}.{{ lesson.date.month }}</p>
                                     <p></p>{{ lesson.control }}
                                 </a>
@@ -76,9 +80,53 @@
                         <th scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</th>
                         {% for lesson, mark in  small_scope.items %}
                             {% if mark %}
-                            <th><input class="inp_table" name="{{ student.account }}|{{ lesson.id }}" type="number" value="{{mark.amount}}" min="1" max="5"></th>
+                            <th>
+
+                                <select name="{{ student.account }}|{{ lesson.id }}" id="" class="inp_table select">
+                                    {% if mark.amount == 5 %}
+                                    <option value="5" selected>5</option>
+                                    <option value="4">4</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="-1">Н</option>
+                                    {% elif mark.amount == 4 %}
+                                    <option value="5">5</option>
+                                    <option value="4" selected>4</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="-1">Н</option>
+                                    {% elif mark.amount == 3 %}
+                                    <option value="5">5</option>
+                                    <option value="4">4</option>
+                                    <option value="3" selected>3</option>
+                                    <option value="2">2</option>
+                                    <option value="-1">Н</option>
+                                    {% elif mark.amount == 2 %}
+                                    <option value="5">5</option>
+                                    <option value="4">4</option>
+                                    <option value="3">3</option>
+                                    <option value="2" selected>2</option>
+                                    <option value="-1">Н</option>
+                                    {% elif mark.amount == -1 %}
+                                    <option value="5">5</option>
+                                    <option value="4">4</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="-1" selected>Н</option>
+                                    {% endif %}
+                                </select>
+                            </th>
                             {% else %}
-                            <th><input class="inp_table" name="{{ student.account }}|{{ lesson.id }}" type="number" value="" min="1" max="5"></th>
+                            <td>
+                                <select name="{{ student.account }}|{{ lesson.id }}" id="" class="inp_table select">
+                                    <option value="" selected></option>
+                                    <option value="5">5</option>
+                                    <option value="4">4</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="-1">Н</option>
+                                </select>
+                            </td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -91,8 +139,7 @@
             Уроки еще не были добавлены.
         </div>
         {% endif %}
-        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
+        
         </form>
         {% endif %}
 
@@ -104,16 +151,38 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        </div>
+                    </div>
+                    <div class="modal-body">
                         <form method="POST">
                             {% csrf_token %}
-                            <div class="modal-body">
-                                {{ createlessonform|crispy }}
+                            <div class="form-group">
+                                <label for="date">Дата</label>
+                                <input type="date" name="date" id="date" class="form-control">
                             </div>
+                            <div class="form-group">
+                                <label for="theme">Тема урока</label>
+                                <input type="text" name="theme" id="theme" maxlenght="120" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="homework">Домашнее задание <small class="text-muted">(не обязательно)</small></label>
+                                <textarea name="homework" id="homework" rows="10" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="control">Вид работы</label>
+                                <select name="control" id="control" class="form-control">
+                                    {% for control in controls %}
+                                    <option value="{{ control.id }}">{{ control.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                        
                             <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
                             <button type="submit" class="btn btn-primary" name="createlesson">Создать</button>
-                        </form>
+                            </div>
+                        </form> 
+                    </div>
                     </div>
                 </div>
             </div>
