@@ -80,7 +80,7 @@ def download(request):
     return render(request, 'timetable/download.html')
 
 
-@login_required(login_url='/diary/login/')
+@login_required(login_url='/login/')
 @admin_only
 def dashboard(request):
     if request.method == "POST":
@@ -100,7 +100,7 @@ def dashboard(request):
     return render(request, 'timetable/dashboard.html', {'form':form})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def edit_lesson(request, id):
     lesson = Lessons.objects.get(id=id)
@@ -114,7 +114,7 @@ def edit_lesson(request, id):
     return render(request, 'timetable/create.html', {'form':form})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def create_lesson(request):
     if request.method == "POST":
@@ -126,7 +126,7 @@ def create_lesson(request):
     return render(request, 'timetable/create.html', {'form':form})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def delete_lesson(request, id):
     lesson = Lessons.objects.get(id=id)
