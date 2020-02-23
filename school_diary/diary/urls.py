@@ -1,6 +1,7 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from . import views
+from django.conf import settings
 
 urlpatterns = [
     # Authorization and login
@@ -54,3 +55,14 @@ urlpatterns = [
     path('', views.diary, name='diary'),
     path('lesson-page', views.lesson_page, name='lesson-page'),
 ]
+
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+                      path('__debug__/', include(debug_toolbar.urls)),
+
+                      # For django versions before 2.0:
+                      # url(r'^__debug__/', include(debug_toolbar.urls)),
+
+                  ] + urlpatterns

@@ -93,19 +93,6 @@ def teacher_register(request):
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
 
 
-def create_table(lessons, students):
-    scope = {}
-    for student in students:
-        stu = {}
-        for lesson in lessons:
-            try:
-                stu.update({lesson: student.marks_set.get(lesson=lesson)})
-            except ObjectDoesNotExist:
-                stu.update({lesson: None})
-        scope.update({student: stu})
-    return scope
-
-
 def create_table_of_results(subjects, student, grade):
     table = {}
     for subject in subjects:
@@ -223,12 +210,30 @@ def diary(request):
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
-                lessons = Lessons.objects.filter(grade=grade, subject=subject)
-                students = Students.objects.filter(grade=grade)
-                scope = create_table(lessons, students) # Create a table
+                lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
+                lessons = { lesson.id: lesson for lesson in lessons_list }
+                students = { student.account_id: student for student in Students.objects.filter(grade=grade) }
+                # Делаем запрос 1 раз
+                marks = Marks.objects.raw("""
+                    SELECT
+                        diary_marks.*
+                    FROM diary_marks, diary_lessons, diary_students
+                    WHERE diary_marks.student_id = diary_students.account_id AND diary_marks.lesson_id = diary_lessons.id
+                            AND diary_lessons.grade_id = %s
+                            AND diary_students.grade_id = %s
+                            AND diary_lessons.subject_id = %s
+                """,params=[grade.id, grade.id, subject.id])
+
+                scope = {}
+                # Ошибка - student.marks_set.get(lesson=lesson) делает 1 запрос. Получется n*m запросов, хотя все marks можно вытащить за 1 запрос
+                for mark in marks:
+                    if students[mark.student_id] not in scope:
+                        scope[students[mark.student_id]] = {}
+                    lesson = lessons[mark.lesson_id]
+                    scope[students[mark.student_id]].update({lesson: mark})
                 context.update({
                     'is_post': True,
-                    'lessons': lessons,
+                    'lessons': lessons_list,
                     'scope': scope
                 })
                 return render(request, 'teacher.html', context)
