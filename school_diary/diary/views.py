@@ -315,8 +315,6 @@ def add_student_page(request):
     return render(request, 'grades/add_student.html', context)
 
 
-
-
 @login_required(login_url="login")
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 def add_student(request, i):
@@ -393,6 +391,9 @@ def delete_student(request, i):
 @allowed_users(allowed_roles=['teachers', 'students'], message="Вы не зарегистрированы как учитель или ученик.")
 @login_required(login_url="login")
 def admin_message(request):
+    """
+    Send a message to an admin.
+    """
     if request.method == "POST":
         form = AdminMessageCreationForm(request.POST)
         if form.is_valid():
@@ -413,6 +414,10 @@ def students_dashboard_first_page(request):
 @login_required(login_url="/login/")
 @admin_only
 def students_dashboard(request, page):
+    """
+    Send a dashboard with up to 100 students.
+    TODO: Test a pagination.
+    """
     students = Students.objects.all()
     students = Paginator(students, 100)
     students = students.get_page(page)
@@ -554,19 +559,25 @@ def teachers_update(request, id):
 
 
 def homepage(request):
+    """
+    Return a homepage.
+    """
     return render(request, 'homepage.html')
 
 
 def social(request):
+    """
+    Return a page with link to gymnasium's social pages.
+    """
     return render(request, 'social.html')
 
 
 def get_help(request):
+    """
+    Return a page with help information.
+    TODO: Change this page to documentation page: docs.html
+    """
     return render(request, 'help.html')
-
-
-def docs(request):
-    return render(request, 'docs.html')
 
 
 def error404(request):
