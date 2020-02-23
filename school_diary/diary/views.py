@@ -210,7 +210,7 @@ def diary(request):
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
-                lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
+                lessons_list = Lessons.objects.filter(grade=grade, subject=subject).select_related("control")
                 lessons = { lesson.id: lesson for lesson in lessons_list }
                 students = { student.account_id: student for student in Students.objects.filter(grade=grade) }
                 # Делаем запрос 1 раз
@@ -225,12 +225,19 @@ def diary(request):
                 """,params=[grade.id, grade.id, subject.id])
 
                 scope = {}
-                # Ошибка - student.marks_set.get(lesson=lesson) делает 1 запрос. Получется n*m запросов, хотя все marks можно вытащить за 1 запрос
                 for mark in marks:
                     if students[mark.student_id] not in scope:
                         scope[students[mark.student_id]] = {}
                     lesson = lessons[mark.lesson_id]
                     scope[students[mark.student_id]].update({lesson: mark})
+                # Add missing marks
+                for sk,student in students.items():
+                    for lk,lesson in lessons.items():
+                        if student not in scope:
+                            scope[student] = {}
+                        if lesson not in scope[student]:
+                            scope[student].update({lesson: None})
+
                 context.update({
                     'is_post': True,
                     'lessons': lessons_list,
@@ -263,11 +270,11 @@ def diary(request):
                     # Split them. We get a student (li[0]) and id of
                     # lesson (li[1])
                     li = i.split('|')
-                    account = li[0]
+                    account_id = li[0]
                     id_les = li[1]
                     
                     # Get a student by his/her email
-                    student = Students.objects.get(account=Users.objects.get(email=account))
+                    student = Students.objects.get(account=account_id)
                     
                     # Get a lesson by it's id
                     lesson = Lessons.objects.get(pk=id_les)

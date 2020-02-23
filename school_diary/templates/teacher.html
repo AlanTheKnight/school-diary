@@ -81,7 +81,7 @@
                         {% for lesson, mark in small_scope.items %}
                                 {% if mark %}
                                     <th>
-                                    <select name="{{ student.account }}|{{ lesson.id }}" id="" class="inp_table select">
+                                    <select name="{{ student.account_id }}|{{ lesson.id }}" id="" class="inp_table select">
                                         <option value="5" {% if mark.amount == 5 %}selected{% endif %}>5</option>
                                         <option value="4" {% if mark.amount == 4 %}selected{% endif %}>4</option>
                                         <option value="3" {% if mark.amount == 3 %}selected{% endif %}>3</option>
@@ -92,7 +92,7 @@
                                 </th>
                                 {% else %}
                                 <td>
-                                    <select name="{{ student.account }}|{{ lesson.id }}" id="" class="inp_table select">
+                                    <select name="{{ student.account_id }}|{{ lesson.id }}" id="" class="inp_table select">
                                         <option value="" selected></option>
                                         <option value="5">5</option>
                                         <option value="4">4</option>
