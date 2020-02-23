@@ -53,8 +53,8 @@
     <nav class="mt-5">
         <ul class="pagination justify-content-center">
             {% if users.has_previous %}
-                <li class="page-item"><a href="/diary/admins/dashboard/1" class="page-link">&laquo;</a></li>
-                <li class="page-item"></li><a href="/diary/admins/dashboard/{{ users.previous_page_number }}" class="page-link">&lt;</a>
+                <li class="page-item"><a href="/admins/dashboard/1" class="page-link">&laquo;</a></li>
+                <li class="page-item"></li><a href="/admins/dashboard/{{ users.previous_page_number }}" class="page-link">&lt;</a>
             {% endif %}
 
             <span class="current">
@@ -62,8 +62,8 @@
             </span>
 
             {% if users.has_next %}
-                <li class="page-item"><a href="/diary/admins/dashboard/{{ users.next_page_number }}" class="page-link">&gt;</a></li>
-                <li class="page-item"><a href="/diary/admins/dashboard/{{ users.paginator.num_pages }}" class="page-link">&raquo;</a></li>
+                <li class="page-item"><a href="/admins/dashboard/{{ users.next_page_number }}" class="page-link">&gt;</a></li>
+                <li class="page-item"><a href="/admins/dashboard/{{ users.paginator.num_pages }}" class="page-link">&raquo;</a></li>
             {% endif %}
         </ul>
     </nav>

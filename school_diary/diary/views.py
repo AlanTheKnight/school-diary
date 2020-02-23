@@ -17,7 +17,7 @@ def user_register(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Учётная запись была создана успешно.")
-            return redirect('/diary/login')
+            return redirect('/login')
     if request.POST:
         form = StudentSignUpForm(request.POST)
     else:
@@ -44,10 +44,10 @@ def user_login(request):
 
 def user_logout(request):
     logout(request)
-    return redirect('/diary/login/')
+    return redirect('/login/')
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 def user_profile(request):
     if request.user.account_type == 0:
         data = Users.objects.get(email=request.user)
@@ -61,7 +61,7 @@ def user_profile(request):
     return render(request, 'profile.html', context)
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def admin_register(request):
     if request.method == 'POST':
@@ -69,7 +69,7 @@ def admin_register(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Новый администратор был создан успешно.")
-            return redirect('/diary/login/')
+            return redirect('/login/')
     if request.POST:
         form = AdminSignUpForm(request.POST)
     else:
@@ -77,7 +77,7 @@ def admin_register(request):
     return render(request, 'registration_admin.html', {'form': form, 'error': 0})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def teacher_register(request):
     if request.method == 'POST':
@@ -85,7 +85,7 @@ def teacher_register(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Новый учитель был создан успешно.")
-            return redirect('/diary/login/')
+            return redirect('/login/')
     if request.POST:
         form = TeacherSignUpForm(request.POST)
     else:
@@ -105,7 +105,7 @@ def create_table_of_results(subjects, student, grade):
 
 
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
-@login_required(login_url="/diary/login/")  # TODO fix bug
+@login_required(login_url="/login/")  # TODO fix bug
 def lesson_page(request):
     pk = request.GET.get('pk')
     lesson = Lessons.objects.get(pk=pk)
@@ -113,7 +113,7 @@ def lesson_page(request):
         form = LessonEditForm(request.POST, instance=lesson)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect('/diary/')
+            return HttpResponseRedirect('/')
         else:
             print('Not Valid, dude')
     form = LessonEditForm(instance=lesson)
@@ -132,7 +132,7 @@ def get_averange(list):
     return round(sum(list) / len(list), 2)
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 def diary(request):
     """
     Main function for displaying diary pages to admins/teachers/students.
@@ -249,7 +249,7 @@ def diary(request):
                     date=date, theme=theme, homework=homework, control=control, grade=grade, subject=subject
                 )
                 lesson.save()
-                return HttpResponseRedirect('/diary/')
+                return HttpResponseRedirect('/')
 
             # GETTING MARKS FROM FORM AND SAVE THEM
             # TODO: Optimize this algorithm, because it's slow
@@ -318,8 +318,6 @@ def add_student_page(request):
     form = AddStudentToGradeForm()
     context = {'form':form, 'grade':grade, 'students':students}
     return render(request, 'grades/add_student.html', context)
-
-
 
 
 @login_required(login_url="login")
@@ -398,6 +396,9 @@ def delete_student(request, i):
 @allowed_users(allowed_roles=['teachers', 'students'], message="Вы не зарегистрированы как учитель или ученик.")
 @login_required(login_url="login")
 def admin_message(request):
+    """
+    Send a message to an admin.
+    """
     if request.method == "POST":
         form = AdminMessageCreationForm(request.POST)
         if form.is_valid():
@@ -409,22 +410,26 @@ def admin_message(request):
     return render(request, 'admin_messages.html', {'form':form})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def students_dashboard_first_page(request):
-    return redirect('/diary/students/dashboard/1')
+    return redirect('/students/dashboard/1')
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def students_dashboard(request, page):
+    """
+    Send a dashboard with up to 100 students.
+    TODO: Test a pagination.
+    """
     students = Students.objects.all()
     students = Paginator(students, 100)
     students = students.get_page(page)
     return render(request, 'students/dashboard.html', {'students':students})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def students_delete(request, id):
     """
@@ -439,7 +444,7 @@ def students_delete(request, id):
     return render(request, 'students/delete.html', {'s':s})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def students_update(request, id):
     """
@@ -456,16 +461,16 @@ def students_update(request, id):
     return render(request, 'students/update.html', {'form':form})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def admins_dashboard_first_page(request):
     """
     Redirect user to the first page of admin dashboard.
     """
-    return redirect('/diary/admins/dashboard/1')
+    return redirect('/admins/dashboard/1')
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def admins_dashboard(request, page):
     """
@@ -477,7 +482,7 @@ def admins_dashboard(request, page):
     return render(request, 'admins/dashboard.html', {'users':u})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def admins_delete(request, id):
     """
@@ -492,7 +497,7 @@ def admins_delete(request, id):
     return render(request, 'admins/delete.html', {'s':s})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def admins_update(request, id):
     """
@@ -511,13 +516,13 @@ def admins_update(request, id):
 
 # TEACHERS SECTION
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def teachers_dashboard_first_page(request):
-    return redirect('/diary/teachers/dashboard/1')
+    return redirect('/teachers/dashboard/1')
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def teachers_dashboard(request, page):
     u = Teachers.objects.all()
@@ -526,7 +531,7 @@ def teachers_dashboard(request, page):
     return render(request, 'teachers/dashboard.html', {'users':u})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def teachers_delete(request, id):
     """
@@ -541,7 +546,7 @@ def teachers_delete(request, id):
     return render(request, 'teachers/delete.html', {'s':s})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def teachers_update(request, id):
     """
@@ -556,3 +561,41 @@ def teachers_update(request, id):
             return redirect('teachers_dashboard')
     form = TeacherEditForm(instance=s)
     return render(request, 'teachers/update.html', {'form':form})
+
+
+def homepage(request):
+    """
+    Return a homepage.
+    """
+    return render(request, 'homepage.html')
+
+
+def social(request):
+    """
+    Return a page with link to gymnasium's social pages.
+    """
+    return render(request, 'social.html')
+
+
+def get_help(request):
+    """
+    Return a page with help information.
+    TODO: Change this page to documentation page: docs.html
+    """
+    return render(request, 'help.html')
+
+
+def error404(request):
+    return render(request, 'error.html', {
+        'error': "404", 
+        'title': "Страница не найдена.", 
+        "description": "Мы не можем найти страницу, которую вы ищите."
+        })
+
+
+def error500(request):
+    return render(request, 'error.html', {
+        'error': "500", 
+        'title': "Что-то пошло не так", 
+        "description": "Мы работаем над этим."
+        })

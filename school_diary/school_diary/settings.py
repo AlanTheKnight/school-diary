@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',
     'timetable.apps.TimetableConfig',
     'crispy_forms',
     'minimum.apps.MinimumConfig',
