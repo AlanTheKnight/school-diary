@@ -113,7 +113,7 @@ def lesson_page(request):
         form = LessonEditForm(request.POST, instance=lesson)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/diary/')
         else:
             print('Not Valid, dude')
     form = LessonEditForm(instance=lesson)
@@ -249,7 +249,7 @@ def diary(request):
                     date=date, theme=theme, homework=homework, control=control, grade=grade, subject=subject
                 )
                 lesson.save()
-                return HttpResponseRedirect('/')
+                return HttpResponseRedirect('/diary/')
 
             # GETTING MARKS FROM FORM AND SAVE THEM
             # TODO: Optimize this algorithm, because it's slow
