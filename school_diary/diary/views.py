@@ -152,6 +152,32 @@ def diary(request):
     elif request.user.account_type == 3:
         student = Students.objects.get(account=request.user)
         grade = student.grade
+        subjects = grade.subjects.all()
+        d = {}
+        ml = 0
+        for s in subjects:
+            m = Marks.objects.filter(student=student, subject=s)
+            if len(m)>ml:
+                ml = len(m)
+            a = 0
+            for item in m:
+                a += item.amount
+            d.update({s.name:[round(a/len(m),2),m]})
+
+        for subject, marks in d.items():
+            d.update({subject:[marks[0],marks[1],range(ml-len(marks[1]))]})
+        context = {
+            'student': student,
+            'd': d,
+            'daylist':range(ml),
+
+        }
+        return render(request,'marklist.html',context)
+
+
+    elif request.user.account_type == 33:
+        student = Students.objects.get(account=request.user)
+        grade = student.grade
         if request.method == "POST":
             subject = request.POST['subject']
             term = request.POST['term']
