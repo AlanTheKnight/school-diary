@@ -1,10 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.core.paginator import Paginator
-from .models import *
 from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
@@ -625,9 +624,8 @@ def social(request):
 def get_help(request):
     """
     Return a page with help information.
-    TODO: Change this page to documentation page: docs.html
     """
-    return render(request, 'help.html')
+    return render(request, 'docs.html')
 
 
 def error404(request):
