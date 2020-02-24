@@ -13,6 +13,7 @@
         that.style.backgroundColor = "#d6d6d6";
     }
 </script>
+
 {% endblock %}
 
 {% block content %}
@@ -52,7 +53,7 @@
     </div>
 
         {% if request.method == 'POST' %}
-        <form method="POST">
+        <form method="POST" >
         {% csrf_token %}
         <div class="my-3">
             <button type="submit" class="btn btn-primary">Сохранить изменения</button>
