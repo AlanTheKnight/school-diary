@@ -169,7 +169,10 @@ def diary(request):
             a = 0
             for item in m:
                 a += item.amount
-            d.update({s.name:[round(a/len(m),2),m]})
+            if len(m)!=0:
+                d.update({s.name:[round(a/len(m),2),m]})
+            else:
+                d.update({s.name:['-',[]]})
 
         for subject, marks in d.items():
             d.update({subject:[marks[0],marks[1],range(ml-len(marks[1]))]})
