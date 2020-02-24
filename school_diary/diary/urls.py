@@ -53,6 +53,7 @@ urlpatterns = [
 
     # Main diary part
     path('diary/lesson-page', views.lesson_page, name='lesson-page'),
+    path('diary/delete', views.delete_lesson, name='delete-lesson'),
     path('diary/', views.diary, name='diary'),
 
     # Main part of a website

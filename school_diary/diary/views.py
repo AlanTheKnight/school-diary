@@ -56,7 +56,7 @@ def user_profile(request):
         data = Teachers.objects.get(account=request.user)
     if request.user.account_type == 3:
         data = Students.objects.get(account=request.user)
-    context = {'data':data}
+    context = {'data': data}
     return render(request, 'profile.html', context)
 
 
@@ -118,8 +118,8 @@ def lesson_page(request):
     form = LessonEditForm(instance=lesson)
     context = {
         'lesson': lesson,
-        'form':form
-        }
+        'form': form
+    }
     return render(request, 'lesson_page.html', context)
 
 
@@ -129,6 +129,13 @@ def get_averange(list):
     Out: averange value
     """
     return round(sum(list) / len(list), 2)
+
+
+def delete_lesson(request):
+    pk = request.GET.get('pk')
+    l = Lessons.objects.get(pk=pk)
+    l.delete()
+    return redirect('diary')
 
 
 @login_required(login_url="/login/")
@@ -152,8 +159,10 @@ def diary(request):
             lessons = Lessons.objects.filter(grade=grade, subject=subject)
             marks = []
             for i in lessons:
-                try: marks.append(Marks.objects.get(student=student, lesson=i))
-                except: pass
+                try:
+                    marks.append(Marks.objects.get(student=student, lesson=i))
+                except:
+                    pass
 
             # If student has no marks than send him a page with info.
             # Otherwise, student will get a page with statistics and his results.
@@ -166,21 +175,21 @@ def diary(request):
                         n_amount += 1
                     else:
                         marks_list.append(m)
-                avg = get_averange(marks_list) # Get averange of marks
+                avg = get_averange(marks_list)  # Get averange of marks
                 data = []
                 for i in range(5, 1, -1): data.append(marks_list.count(i))
                 data.append(n_amount)
                 context = {
-                    'lessons':lessons, 
-                    'marks':marks,
-                    'subject':subject,
-                    'data':data,
-                    'avg':avg,
-                    'term':term}
+                    'lessons': lessons,
+                    'marks': marks,
+                    'subject': subject,
+                    'data': data,
+                    'avg': avg,
+                    'term': term}
                 return render(request, 'results.html', context)
             return render(request, 'no_marks.html')
         subjects = grade.subjects.all()
-        context = {'subjects':subjects}
+        context = {'subjects': subjects}
         return render(request, 'diary_student.html', context)
 
     # If user is teacher
@@ -190,7 +199,7 @@ def diary(request):
         context = {'Teacher': teacher,
                    'subjects': teacher.subjects.all(),
                    'grades': Grades.objects.filter(teachers=teacher),
-                   'controls':controls
+                   'controls': controls
                    }
 
         if request.method == 'POST':
@@ -200,8 +209,10 @@ def diary(request):
                 subject = Subjects.objects.get(name=request.POST.get('subject'))
                 grade = request.POST.get('grade')
                 request.session['subject'] = subject.id
-                if len(grade) == 3: number = int(grade[0:2])
-                else: number = int(grade[0])
+                if len(grade) == 3:
+                    number = int(grade[0:2])
+                else:
+                    number = int(grade[0])
                 letter = grade[-1]
                 try:
                     grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
@@ -209,10 +220,10 @@ def diary(request):
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
-                #lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
+                # lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
                 lessons_list = Lessons.objects.filter(grade=grade, subject=subject).select_related("control").all()
-                lessons = { lesson.id: lesson for lesson in lessons_list }
-                students = { student.account_id: student for student in Students.objects.filter(grade=grade) }
+                lessons = {lesson.id: lesson for lesson in lessons_list}
+                students = {student.account_id: student for student in Students.objects.filter(grade=grade)}
                 # Делаем запрос 1 раз
                 marks = Marks.objects.raw("""
                     SELECT
@@ -222,7 +233,7 @@ def diary(request):
                             AND diary_lessons.grade_id = %s
                             AND diary_students.grade_id = %s
                             AND diary_lessons.subject_id = %s
-                """,params=[grade.id, grade.id, subject.id])
+                """, params=[grade.id, grade.id, subject.id])
 
                 scope = {}
                 # Ошибка - student.marks_set.get(lesson=lesson) делает 1 запрос. Получется n*m запросов, хотя все marks можно вытащить за 1 запрос
@@ -232,8 +243,8 @@ def diary(request):
                     lesson = lessons[mark.lesson_id]
                     scope[students[mark.student_id]].update({lesson: mark})
 
-                for sk,student in students.items():
-                    for lk,lesson in lessons.items():
+                for sk, student in students.items():
+                    for lk, lesson in lessons.items():
                         if student not in scope:
                             scope[student] = {}
                         if lesson not in scope[student]:
@@ -267,20 +278,20 @@ def diary(request):
                     # Missing a csrf token
                     if i == 'csrfmiddlewaretoken':
                         continue
-                    
+
                     # Split them. We get a student (li[0]) and id of
                     # lesson (li[1])
                     li = i.split('|')
                     account_id = li[0]
                     id_les = li[1]
-                    
+
                     # Get a student by his/her email
                     student = Students.objects.get(account=account_id)
-                    
+
                     # Get a lesson by it's id
                     lesson = Lessons.objects.get(pk=id_les)
                     amount = str(request.POST[i])
-                    
+
                     # If we can get a mark then change it, otherwise create a new one
                     try:
                         mark = Marks.objects.get(lesson=lesson, student=student)
@@ -311,7 +322,7 @@ def add_student_page(request):
     try:
         grade = Grades.objects.get(main_teacher=request.user.id)
     except ObjectDoesNotExist:
-        return render(request, 'access_denied.html', {'message':"Вы не классный руководитель."})
+        return render(request, 'access_denied.html', {'message': "Вы не классный руководитель."})
     students = Students.objects.filter(grade=grade)
 
     if request.method == "POST":
@@ -320,11 +331,11 @@ def add_student_page(request):
             fn = request.POST.get('first_name')
             s = request.POST.get('surname')
             search = Students.objects.filter(first_name=fn, surname=s)
-            context = {'form':form, 'search':search, 'grade':grade, 'students':students}
+            context = {'form': form, 'search': search, 'grade': grade, 'students': students}
             return render(request, 'grades/add_student.html', context)
-    
+
     form = AddStudentToGradeForm()
-    context = {'form':form, 'grade':grade, 'students':students}
+    context = {'form': form, 'grade': grade, 'students': students}
     return render(request, 'grades/add_student.html', context)
 
 
@@ -343,10 +354,10 @@ def add_student(request, i):
             s.save()
             return redirect('add_student_page')
         except ObjectDoesNotExist:
-            context = {'message':"Вы не классный руководитель."}
+            context = {'message': "Вы не классный руководитель."}
             return render(request, 'access_denied.html', context)
     else:
-        return render(request, 'grades/add_student_confirm.html', {'s':s})
+        return render(request, 'grades/add_student_confirm.html', {'s': s})
 
 
 @login_required(login_url="login")
@@ -361,7 +372,7 @@ def create_grade_page(request):
             grade.save()
             return redirect('my_grade')
     form = GradeCreationForm()
-    context = {'form':form}
+    context = {'form': form}
     return render(request, 'grades/add_grade.html', context)
 
 
@@ -376,7 +387,7 @@ def my_grade(request):
         grade = Grades.objects.get(main_teacher=me)
     except ObjectDoesNotExist:
         grade = None
-    context = {'grade':grade}
+    context = {'grade': grade}
     return render(request, 'grades/my_grade.html', context)
 
 
@@ -395,10 +406,10 @@ def delete_student(request, i):
             s.save()
             return redirect('add_student_page')
         except ObjectDoesNotExist:
-            context = {'message':"Вы не классный руководитель."}
+            context = {'message': "Вы не классный руководитель."}
             return render(request, 'access_denied.html', context)
     else:
-        return render(request, 'grades/delete_student_confirm.html', {'s':s})
+        return render(request, 'grades/delete_student_confirm.html', {'s': s})
 
 
 @allowed_users(allowed_roles=['teachers', 'students'], message="Вы не зарегистрированы как учитель или ученик.")
@@ -415,7 +426,7 @@ def admin_message(request):
             m.save()
             return redirect('profile')
     form = AdminMessageCreationForm()
-    return render(request, 'admin_messages.html', {'form':form})
+    return render(request, 'admin_messages.html', {'form': form})
 
 
 @login_required(login_url="/login/")
@@ -434,7 +445,7 @@ def students_dashboard(request, page):
     students = Students.objects.all()
     students = Paginator(students, 100)
     students = students.get_page(page)
-    return render(request, 'students/dashboard.html', {'students':students})
+    return render(request, 'students/dashboard.html', {'students': students})
 
 
 @login_required(login_url="/login/")
@@ -449,7 +460,7 @@ def students_delete(request, id):
         u.delete()
         s.delete()
         return redirect('students_dashboard')
-    return render(request, 'students/delete.html', {'s':s})
+    return render(request, 'students/delete.html', {'s': s})
 
 
 @login_required(login_url="/login/")
@@ -466,7 +477,7 @@ def students_update(request, id):
             form.save()
             return redirect('students_dashboard')
     form = StudentEditForm(instance=s)
-    return render(request, 'students/update.html', {'form':form})
+    return render(request, 'students/update.html', {'form': form})
 
 
 @login_required(login_url="/login/")
@@ -487,7 +498,7 @@ def admins_dashboard(request, page):
     u = Administrators.objects.all()
     u = Paginator(u, 100)
     u = u.get_page(page)
-    return render(request, 'admins/dashboard.html', {'users':u})
+    return render(request, 'admins/dashboard.html', {'users': u})
 
 
 @login_required(login_url="/login/")
@@ -502,7 +513,7 @@ def admins_delete(request, id):
         u.delete()
         s.delete()
         return redirect('admins_dashboard')
-    return render(request, 'admins/delete.html', {'s':s})
+    return render(request, 'admins/delete.html', {'s': s})
 
 
 @login_required(login_url="/login/")
@@ -519,7 +530,7 @@ def admins_update(request, id):
             form.save()
             return redirect('admins_dashboard')
     form = AdminsEditForm(instance=s)
-    return render(request, 'admins/update.html', {'form':form})
+    return render(request, 'admins/update.html', {'form': form})
 
 
 # TEACHERS SECTION
@@ -536,7 +547,7 @@ def teachers_dashboard(request, page):
     u = Teachers.objects.all()
     u = Paginator(u, 50)
     u = u.get_page(page)
-    return render(request, 'teachers/dashboard.html', {'users':u})
+    return render(request, 'teachers/dashboard.html', {'users': u})
 
 
 @login_required(login_url="/login/")
@@ -551,7 +562,7 @@ def teachers_delete(request, id):
         u.delete()
         s.delete()
         return redirect('teachers_dashboard')
-    return render(request, 'teachers/delete.html', {'s':s})
+    return render(request, 'teachers/delete.html', {'s': s})
 
 
 @login_required(login_url="/login/")
@@ -568,7 +579,7 @@ def teachers_update(request, id):
             form.save()
             return redirect('teachers_dashboard')
     form = TeacherEditForm(instance=s)
-    return render(request, 'teachers/update.html', {'form':form})
+    return render(request, 'teachers/update.html', {'form': form})
 
 
 def homepage(request):
@@ -595,15 +606,15 @@ def get_help(request):
 
 def error404(request):
     return render(request, 'error.html', {
-        'error': "404", 
-        'title': "Страница не найдена.", 
+        'error': "404",
+        'title': "Страница не найдена.",
         "description": "Мы не можем найти страницу, которую вы ищите."
-        })
+    })
 
 
 def error500(request):
     return render(request, 'error.html', {
-        'error': "500", 
-        'title': "Что-то пошло не так", 
+        'error': "500",
+        'title': "Что-то пошло не так",
         "description": "Мы работаем над этим."
-        })
+    })

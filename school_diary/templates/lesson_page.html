@@ -16,7 +16,9 @@
                 {{ form|crispy }}
                 <a href="{% url 'diary' %}" class="btn btn-secondary">Назад</a>
                 <button type="submit" class="btn btn-primary">Изменить</button>
+
             </form>
+            <a href="{% url 'delete-lesson' %}?pk={{ lesson.pk }}"><button class="btn btn-danger">Удалить</button></a>
         </div>
     </div>
 </div>
