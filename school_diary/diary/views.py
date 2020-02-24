@@ -163,7 +163,8 @@ def diary(request):
         d = {}
         ml = 0
         for s in subjects:
-            m = Marks.objects.filter(student=student, subject=s)
+            #m = Marks.objects.filter(student=student, subject=s)
+            m = student.marks_set.filter(subject=s)
             if len(m)>ml:
                 ml = len(m)
             a = 0
