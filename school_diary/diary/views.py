@@ -31,7 +31,6 @@ def user_login(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(request, email=email, password=password)
-        print(user)
         if user is not None:
             login(request, user)
             return HttpResponseRedirect("/")
@@ -115,7 +114,7 @@ def lesson_page(request):
             form.save()
             return HttpResponseRedirect('/diary/')
         else:
-            print('Not Valid, dude')
+            pass
     form = LessonEditForm(instance=lesson)
     context = {
         'lesson': lesson,
@@ -210,7 +209,8 @@ def diary(request):
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
-                lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
+                #lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
+                lessons_list = Lessons.objects.filter(grade=grade, subject=subject).select_related("control").all()
                 lessons = { lesson.id: lesson for lesson in lessons_list }
                 students = { student.account_id: student for student in Students.objects.filter(grade=grade) }
                 # Делаем запрос 1 раз
@@ -231,6 +231,14 @@ def diary(request):
                         scope[students[mark.student_id]] = {}
                     lesson = lessons[mark.lesson_id]
                     scope[students[mark.student_id]].update({lesson: mark})
+
+                for sk,student in students.items():
+                    for lk,lesson in lessons.items():
+                        if student not in scope:
+                            scope[student] = {}
+                        if lesson not in scope[student]:
+                            scope[student].update({lesson: None})
+
                 context.update({
                     'is_post': True,
                     'lessons': lessons_list,
@@ -263,11 +271,11 @@ def diary(request):
                     # Split them. We get a student (li[0]) and id of
                     # lesson (li[1])
                     li = i.split('|')
-                    account = li[0]
+                    account_id = li[0]
                     id_les = li[1]
                     
                     # Get a student by his/her email
-                    student = Students.objects.get(account=Users.objects.get(email=account))
+                    student = Students.objects.get(account=account_id)
                     
                     # Get a lesson by it's id
                     lesson = Lessons.objects.get(pk=id_les)

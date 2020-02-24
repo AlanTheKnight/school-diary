@@ -3,11 +3,16 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-    <title>Оценки</title>
+<title>Оценки</title>
 {% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/teacher.css' %}">
+<script>
+    function myfunction(that){
+        that.style.backgroundColor = "#d6d6d6";
+    }
+</script>
 {% endblock %}
 
 {% block content %}
@@ -74,6 +79,7 @@
                     </tr>
                 </thead>
 
+                
                 <tbody>
                 {% for student, small_scope in scope.items %}
                     <tr>
@@ -81,7 +87,7 @@
                         {% for lesson, mark in small_scope.items %}
                                 {% if mark %}
                                     <th>
-                                    <select name="{{ student.account }}|{{ lesson.id }}" id="" class="inp_table select">
+                                    <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
                                         <option value="5" {% if mark.amount == 5 %}selected{% endif %}>5</option>
                                         <option value="4" {% if mark.amount == 4 %}selected{% endif %}>4</option>
                                         <option value="3" {% if mark.amount == 3 %}selected{% endif %}>3</option>
@@ -89,10 +95,11 @@
                                         <option value="-1" {% if mark.amount == -1 %}selected{% endif %}>Н</option>
                                     </select>
                                     <a href="#" class="edit">+</a>
+                                    
                                 </th>
                                 {% else %}
                                 <td>
-                                    <select name="{{ student.account }}|{{ lesson.id }}" id="" class="inp_table select">
+                                    <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
                                         <option value="" selected></option>
                                         <option value="5">5</option>
                                         <option value="4">4</option>
