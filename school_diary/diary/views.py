@@ -152,41 +152,12 @@ def diary(request):
     elif request.user.account_type == 3:
         student = Students.objects.get(account=request.user)
         grade = student.grade
-        if 'selected' in request.POST:  
-            if request.method == "POST":
-                subject = request.POST['subject']
-                term = request.POST['term']
-                subject = Subjects.objects.get(id=subject)
-                lessons = Lessons.objects.filter(grade=grade, subject=subject)
-                marks = []
-                for i in lessons:
-                    try: marks.append(Marks.objects.get(student=student, lesson=i))
-                    except: pass
-
-                # If student has no marks than send him a page with info.
-                # Otherwise, student will get a page with statistics and his results.
-                if marks:
-                    n_amount = 0
-                    marks_list = []
-                    for i in marks:
-                        m = i.amount
-                        if m == -1:
-                            n_amount += 1
-                        else:
-                            marks_list.append(m)
-                    avg = get_averange(marks_list) # Get averange of marks
-                    data = []
-                    for i in range(5, 1, -1): data.append(marks_list.count(i))
-                    data.append(n_amount)
-                    context = {
-                        'lessons':lessons, 
-                        'marks':marks,
-                        'subject':subject,
-                        'data':data,
-                        'avg':avg,
-                        'term':term}
-                    return render(request, 'results.html', context)
-                return render(request, 'no_marks.html')
+        if grade is None:
+            return render(request, 'access_denied.html', {'message':"Вы не состоите в классе.\
+            Попросите Вашего классного руководителя добавить вас в класс."})
+        if 'selected' in request.POST:
+            subject = request.POST.get('subject')
+            return redirect('/diary/{}'.format(subject))
         elif 'all' in request.POST:
             subjects = grade.subjects.all()
             d = {}
@@ -343,6 +314,54 @@ def diary(request):
             return render(request, 'teacher.html', context)
     else:
         redirect('/')
+
+
+@login_required(login_url="login")
+@allowed_users(allowed_roles=['students'], message="Доступом к своей статистике по предметам имеют только ученики.")
+def stats(request, id):
+    student = Students.objects.get(account=request.user)
+    grade = student.grade
+    try:
+        subject = Subjects.objects.get(id=id)
+    except ObjectDoesNotExist:
+        return render(request,'error.html', context={'title':'Мы не можем найти то, что Вы ищите.',
+                                                     'error':'404',
+                                                     'description':'Данный предмет отстуствует.'})
+    #return HttpResponse(subject.name)
+    lessons = Lessons.objects.filter(grade=grade, subject=subject)
+    #return HttpResponse(len(lessons))
+    marks = []
+    #for i in lessons:
+        #try: marks.append(Marks.objects.get(student=student, lesson=i))
+        #except: pass
+    marks = student.marks_set.filter(subject=subject)
+
+    # If student has no marks than send him a page with info.
+    # Otherwise, student will get a page with statistics and his results.
+    if marks:
+        n_amount = 0
+        marks_list = []
+        for i in marks:
+            m = i.amount
+            if m == -1:
+                 n_amount += 1
+            else:
+                marks_list.append(m)
+        avg = get_averange(marks_list) # Get averange of marks
+        data = []
+        for i in range(5, 1, -1): data.append(marks_list.count(i))
+        data.append(n_amount)
+        context = {
+            'lessons':lessons,
+            'marks':marks,
+            'subject':subject,
+            'data':data,
+            'avg':avg}
+        return render(request, 'results.html', context)
+    return render(request, 'no_marks.html')
+    subjects = grade.subjects.all()
+    context = {'subjects':subjects}
+    return render(request, 'diary_student.html', context)
 
 
 @login_required(login_url="login")

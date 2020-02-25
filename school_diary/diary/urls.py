@@ -57,6 +57,7 @@ urlpatterns = [
     path('diary/lesson-page', views.lesson_page, name='lesson-page'),
     path('diary/delete', views.delete_lesson, name='delete-lesson'),
     path('diary/', views.diary, name='diary'),
+    path('diary/<int:id>/', views.stats, name='statistics'),
 
     # Main part of a website
     path('', views.homepage, name='homepage'),
