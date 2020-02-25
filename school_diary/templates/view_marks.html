@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Оценки</title>
+{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="table-responsive">
+            <table class="table-sm table-bordered">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Предмет</th>
+                    <th scope="col">Средний б.</th>
+                    <th scope="col" colspan="{{ max_length }}"></th>
+    
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for subject, marks in d.items %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+    
+                            <td>{{ subject }}</td>
+                            <td>{{ marks.0 }}</td>
+                            {% for mark in marks.1 %}
+                                {% if mark.amount == 2 %}
+                                    <td scope="col" class="text-danger" data-toggle="tooltip" title="{{ mark.lesson.date }}" data-delay='{"show":"1000", "hide":"1"}'><span><b>{{ mark.amount }}</b></span></td>
+                                {% elif mark.amount == 3 %}
+                                    <td scope="col" style="color: orangered;" data-toggle="tooltip" title="{{ mark.lesson.date }}" data-delay='{"show":"1000", "hide":"1"}'><b>{{ mark.amount }}</b></td>
+                                {% elif mark.amount == 4 %}
+                                    <td scope="col" style="color:darkorange" data-toggle="tooltip" title="{{ mark.lesson.date }}" data-delay='{"show":"1000", "hide":"1"}'><b>{{ mark.amount }}</b></td>
+                                {% elif mark.amount == 5 %}
+                                    <td scope="col" class="text-success" data-toggle="tooltip" title="{{ mark.lesson.date }}" data-delay='{"show":"1000", "hide":"1"}'><b>{{ mark.amount }}</b></td>
+                                {% else %}
+                                     <td scope="col" class="text-secondary" data-toggle="tooltip" title="{{ mark.lesson.date }}" data-delay='{"show":"1000", "hide":"1"}'><b>Н</b></td>
+                                {% endif %}
+                                
+                            {% endfor %}
+                            {% for non in marks.2 %}
+                                <th scope="col"></th>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+        
+    </div>
+    <script>
+        $(document).ready(function(){
+          $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+{% endblock %}

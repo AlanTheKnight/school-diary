@@ -423,6 +423,58 @@ def my_grade(request):
     return render(request, 'grades/my_grade.html', context)
 
 
+def view_students_marks(request):
+    me = Teachers.objects.get(account=request.user)
+    try:
+        grade = Grades.objects.get(main_teacher=me)
+        students = Students.objects.filter(grade=grade)
+        context = {
+            'students':students
+        }
+        return render(request, 'grades/grade_marks.html', context)
+    except ObjectDoesNotExist:
+        return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
+
+
+def students_marks(request, pk):
+    student = Students.objects.get(account=pk)
+    me = Teachers.objects.get(account=request.user)
+    try:
+        grade = Grades.objects.get(main_teacher=me)
+    except ObjectDoesNotExist:
+        return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
+        
+    subjects = grade.subjects.all()
+    d = {}
+    max_length = 0
+    for s in subjects:
+        #m = Marks.objects.filter(student=student, subject=s)
+        marks = student.marks_set.filter(subject=s.id)
+        if len(marks) > max_length:
+            max_length = len(marks)
+        a, n_amount = 0, 0
+        for mark in marks:
+            if mark.amount != -1:
+                a += mark.amount
+            else:
+                n_amount += 1
+        if len(marks) != 0:
+            d.update({s.name:[round(a/(len(marks)-n_amount),2),marks]})
+        else:
+            d.update({s.name:['-',[]]})
+
+    for subject, marks in d.items():
+        d.update({subject:[marks[0],marks[1],range(max_length-len(marks[1]))]})
+    print(d)
+    context = {
+        'student': student,
+        'd': d,
+        'max_length':max_length
+
+    }
+    return render(request, 'view_marks.html', context)
+
+
 @login_required(login_url="login")
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 def delete_student(request, i):

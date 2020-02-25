@@ -8,6 +8,7 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/teacher.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
 <script>
     function myfunction(that){
         that.style.backgroundColor = "#d6d6d6";
@@ -26,7 +27,7 @@
         </div>
     {% endif %}
 
-    <div class="card my-3 w-25">
+    <div class="card my-3">
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
