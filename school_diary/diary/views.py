@@ -152,42 +152,72 @@ def diary(request):
     elif request.user.account_type == 3:
         student = Students.objects.get(account=request.user)
         grade = student.grade
-        if request.method == "POST":
-            subject = request.POST['subject']
-            term = request.POST['term']
-            subject = Subjects.objects.get(id=subject)
-            lessons = Lessons.objects.filter(grade=grade, subject=subject)
-            marks = []
-            for i in lessons:
-                try:
-                    marks.append(Marks.objects.get(student=student, lesson=i))
-                except:
-                    pass
+        if 'selected' in request.POST:  
+            if request.method == "POST":
+                subject = request.POST['subject']
+                term = request.POST['term']
+                subject = Subjects.objects.get(id=subject)
+                lessons = Lessons.objects.filter(grade=grade, subject=subject)
+                marks = []
+                for i in lessons:
+                    try: marks.append(Marks.objects.get(student=student, lesson=i))
+                    except: pass
 
-            # If student has no marks than send him a page with info.
-            # Otherwise, student will get a page with statistics and his results.
-            if marks:
-                n_amount = 0
-                marks_list = []
-                for i in marks:
-                    m = i.amount
-                    if m == -1:
-                        n_amount += 1
+                # If student has no marks than send him a page with info.
+                # Otherwise, student will get a page with statistics and his results.
+                if marks:
+                    n_amount = 0
+                    marks_list = []
+                    for i in marks:
+                        m = i.amount
+                        if m == -1:
+                            n_amount += 1
+                        else:
+                            marks_list.append(m)
+                    avg = get_averange(marks_list) # Get averange of marks
+                    data = []
+                    for i in range(5, 1, -1): data.append(marks_list.count(i))
+                    data.append(n_amount)
+                    context = {
+                        'lessons':lessons, 
+                        'marks':marks,
+                        'subject':subject,
+                        'data':data,
+                        'avg':avg,
+                        'term':term}
+                    return render(request, 'results.html', context)
+                return render(request, 'no_marks.html')
+        elif 'all' in request.POST:
+            subjects = grade.subjects.all()
+            d = {}
+            max_length = 0
+            for s in subjects:
+                #m = Marks.objects.filter(student=student, subject=s)
+                marks = student.marks_set.filter(subject=s.id)
+                if len(marks) > max_length:
+                    max_length = len(marks)
+                a, n_amount = 0, 0
+                for mark in marks:
+                    if mark.amount != -1:
+                        a += mark.amount
                     else:
-                        marks_list.append(m)
-                avg = get_averange(marks_list)  # Get averange of marks
-                data = []
-                for i in range(5, 1, -1): data.append(marks_list.count(i))
-                data.append(n_amount)
-                context = {
-                    'lessons': lessons,
-                    'marks': marks,
-                    'subject': subject,
-                    'data': data,
-                    'avg': avg,
-                    'term': term}
-                return render(request, 'results.html', context)
-            return render(request, 'no_marks.html')
+                        n_amount += 1
+                if len(marks) != 0:
+                    d.update({s.name:[round(a/(len(marks)-n_amount),2),marks]})
+                else:
+                    d.update({s.name:['-',[]]})
+
+            for subject, marks in d.items():
+                d.update({subject:[marks[0],marks[1],range(max_length-len(marks[1]))]})
+            print(d)
+            context = {
+                'student': student,
+                'd': d,
+                'max_length':max_length
+
+            }
+            return render(request,'marklist.html',context)
+
         subjects = grade.subjects.all()
         context = {'subjects': subjects}
         return render(request, 'diary_student.html', context)
@@ -273,6 +303,7 @@ def diary(request):
             # GETTING MARKS FROM FORM AND SAVE THEM
             # TODO: Optimize this algorithm, because it's slow
             else:
+                subject = Subjects.objects.get(id=request.session['subject'])
                 # We make a dictionary from all data we send
                 for i in dict(request.POST):
                     # Missing a csrf token
@@ -304,7 +335,8 @@ def diary(request):
                         if amount:
                             Marks.objects.create(lesson=lesson,
                                                  student=student,
-                                                 amount=amount
+                                                 amount=amount,
+                                                 subject=subject
                                                  )
                 return redirect(diary)
         else:
