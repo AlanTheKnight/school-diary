@@ -3,8 +3,12 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-    <title>Расписание</title>
-    <link rel="stylesheet" href="{% static 'css/registration.css' %}">
+    <title>Регистрация</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/registration.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -14,16 +18,16 @@
         Такой пользователь уже существует
     </div>
     {% endif %}
-    <div class="card my-5 w-75">
+    <div class="card my-5   ">
         <div class="card-body">
             <h5 class="card-title">Уже зарегистрированы?</h5>
-            <a href="/diary/login/" class="btn btn-primary">Войти</a>
+            <a href="/login/" class="btn btn-primary">Войти</a>
         </div>
     </div>
-    <div class="card w-75">
+    <div class="card">
         <div class="card-body">
             <h3 class="card-title text-center">Регистрация нового ученика</h3>
-            <form method="POST" class="my-5 mx-5">
+            <form method="POST" class="my-5">
                 {% csrf_token %}
                 <div class="form-group">
                     {{ form.email.label }}

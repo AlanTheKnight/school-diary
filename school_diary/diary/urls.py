@@ -1,6 +1,8 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     # Authorization and login
@@ -9,7 +11,6 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     path('profile/', views.user_profile, name='profile'),
     path('registerteacher', views.teacher_register, name="teacher_register"),
-    path('', views.diary, name='diary'),
 
     # Students and grades
     path('add-student/', views.add_student_page, name="add_student_page"),
@@ -44,13 +45,32 @@ urlpatterns = [
     # Admin messages
     path('send-message-to-admin/', views.admin_message, name="message_to_admin"),
     
-    # URLs for password reset system
+    # Reset password
     path('reset_password/', auth_views.PasswordResetView.as_view(template_name="password_reset/reset.html", email_template_name='email/email_template.html'), name="reset_password"),
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(template_name="password_reset/done.html"), name="password_reset_done"),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name="password_reset/confirm.html"), name="password_reset_confirm"),
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(template_name="password_reset/complete.html"), name="password_reset_complete"),
 
-    # Main diary
-    path('', views.diary, name='diary'),
-    path('lesson-page', views.lesson_page, name='lesson-page'),
-]
+    # Main diary part
+    path('diary/lesson-page', views.lesson_page, name='lesson-page'),
+    path('diary/delete', views.delete_lesson, name='delete-lesson'),
+    path('diary/', views.diary, name='diary'),
+
+    # Main part of a website
+    path('', views.homepage, name='homepage'),
+    path('social/', views.social, name='social'),
+    path('help/', views.get_help, name='help'),
+    path('error/', views.error404, name='404'),
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+                      path('__debug__/', include(debug_toolbar.urls)),
+
+                      # For django versions before 2.0:
+                      # url(r'^__debug__/', include(debug_toolbar.urls)),
+
+                  ] + urlpatterns

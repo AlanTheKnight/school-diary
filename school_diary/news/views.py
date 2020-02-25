@@ -31,7 +31,7 @@ def post(request, url):
         })
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def create_post(request):
     if request.method == "POST":
@@ -44,7 +44,7 @@ def create_post(request):
         return render(request, 'news_editor.html', {'form':form})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def dashboard(request, page):
     news = Publications.objects.all()
@@ -53,13 +53,13 @@ def dashboard(request, page):
     return render(request, 'news_view.html', {'news':news})
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def dashboard_first(request):
     return redirect('/news/dashboard/1')
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def news_delete(request, id):
     article = Publications.objects.get(id=id)
@@ -70,7 +70,7 @@ def news_delete(request, id):
     return render(request, 'news_delete.html', context)
 
 
-@login_required(login_url="/diary/login/")
+@login_required(login_url="/login/")
 @admin_only
 def news_update(request, id):
     article = Publications.objects.get(id=id)

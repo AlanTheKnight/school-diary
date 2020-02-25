@@ -36,13 +36,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',
     'timetable.apps.TimetableConfig',
     'crispy_forms',
     'minimum.apps.MinimumConfig',
     'diary',
     'news.apps.NewsConfig',
     'django_cleanup',
+    'debug_toolbar',
 ]
 
 """
@@ -73,6 +73,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'school_diary.urls'
@@ -129,6 +130,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+INTERNAL_IPS = [
+    # ...
+    '127.0.0.1',
+    # ...
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/

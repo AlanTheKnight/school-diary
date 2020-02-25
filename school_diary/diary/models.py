@@ -146,7 +146,6 @@ class Administrators(models.Model):
 class Controls(models.Model):
     name = models.CharField(max_length=120, verbose_name='Вид работы')
     weight = models.FloatField(verbose_name=' Коэффицент', default=1.0)
-
     class Meta:
         verbose_name = "Вид контороля"
         verbose_name_plural = "Виды контороля"

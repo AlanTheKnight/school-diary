@@ -3,11 +3,16 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-    <title>Оценки</title>
+<title>Оценки</title>
 {% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/teacher.css' %}">
+<script>
+    function myfunction(that){
+        that.style.backgroundColor = "#d6d6d6";
+    }
+</script>
 {% endblock %}
 
 {% block content %}
@@ -45,7 +50,7 @@
             </form>
         </div>
     </div>
-    
+
         {% if request.method == 'POST' %}
         <form method="POST">
         {% csrf_token %}
@@ -53,17 +58,17 @@
             <button type="submit" class="btn btn-primary">Сохранить изменения</button>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
         </div>
-        
-        {% if lessons and scope %}
+
+        {% if lessons %}
 
         <div class="table-responsive">
             <table class="table table-bordered table-sm ">
-                
+
                 <thead class="thead-light">
                     <tr>
                         <th scope="col">Ученики</th>
                         {% for lesson in lessons %}
-                            
+
                             <th scope="col">
                                 <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}">
                                     <p>{{ lesson.date.day }}.{{ lesson.date.month }}</p>
@@ -73,62 +78,37 @@
                         {% endfor %}
                     </tr>
                 </thead>
+
                 
                 <tbody>
                 {% for student, small_scope in scope.items %}
                     <tr>
                         <th scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</th>
-                        {% for lesson, mark in  small_scope.items %}
-                            {% if mark %}
-                            <th>
-
-                                <select name="{{ student.account }}|{{ lesson.id }}" id="" class="inp_table select">
-                                    {% if mark.amount == 5 %}
-                                    <option value="5" selected>5</option>
-                                    <option value="4">4</option>
-                                    <option value="3">3</option>
-                                    <option value="2">2</option>
-                                    <option value="-1">Н</option>
-                                    {% elif mark.amount == 4 %}
-                                    <option value="5">5</option>
-                                    <option value="4" selected>4</option>
-                                    <option value="3">3</option>
-                                    <option value="2">2</option>
-                                    <option value="-1">Н</option>
-                                    {% elif mark.amount == 3 %}
-                                    <option value="5">5</option>
-                                    <option value="4">4</option>
-                                    <option value="3" selected>3</option>
-                                    <option value="2">2</option>
-                                    <option value="-1">Н</option>
-                                    {% elif mark.amount == 2 %}
-                                    <option value="5">5</option>
-                                    <option value="4">4</option>
-                                    <option value="3">3</option>
-                                    <option value="2" selected>2</option>
-                                    <option value="-1">Н</option>
-                                    {% elif mark.amount == -1 %}
-                                    <option value="5">5</option>
-                                    <option value="4">4</option>
-                                    <option value="3">3</option>
-                                    <option value="2">2</option>
-                                    <option value="-1" selected>Н</option>
-                                    {% endif %}
-                                </select>
-                                <a href="#" class="edit">+</a>
-                            </th>
-                            {% else %}
-                            <td>
-                                <select name="{{ student.account }}|{{ lesson.id }}" id="" class="inp_table select">
-                                    <option value="" selected></option>
-                                    <option value="5">5</option>
-                                    <option value="4">4</option>
-                                    <option value="3">3</option>
-                                    <option value="2">2</option>
-                                    <option value="-1">Н</option>
-                                </select>
-                            </td>
-                            {% endif %}
+                        {% for lesson, mark in small_scope.items %}
+                                {% if mark %}
+                                    <th>
+                                    <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
+                                        <option value="5" {% if mark.amount == 5 %}selected{% endif %}>5</option>
+                                        <option value="4" {% if mark.amount == 4 %}selected{% endif %}>4</option>
+                                        <option value="3" {% if mark.amount == 3 %}selected{% endif %}>3</option>
+                                        <option value="2" {% if mark.amount == 2 %}selected{% endif %}>2</option>
+                                        <option value="-1" {% if mark.amount == -1 %}selected{% endif %}>Н</option>
+                                    </select>
+                                    <a href="#" class="edit">+</a>
+                                    
+                                </th>
+                                {% else %}
+                                <td>
+                                    <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
+                                        <option value="" selected></option>
+                                        <option value="5">5</option>
+                                        <option value="4">4</option>
+                                        <option value="3">3</option>
+                                        <option value="2">2</option>
+                                        <option value="-1">Н</option>
+                                    </select>
+                                </td>
+                                {% endif %}
                         {% endfor %}
                     </tr>
                 {% endfor %}
@@ -140,7 +120,7 @@
             Уроки еще не были добавлены.
         </div>
         {% endif %}
-        
+
         </form>
         {% endif %}
 
@@ -176,13 +156,13 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            
-                        
+
+
                             <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
                             <button type="submit" class="btn btn-primary" name="createlesson">Создать</button>
                             </div>
-                        </form> 
+                        </form>
                     </div>
                     </div>
                 </div>
