@@ -210,8 +210,7 @@ def diary(request):
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
-                lessons_list = Lessons.objects.filter(grade=grade, subject=subject).select_related("control")
-                lessons = { lesson.id: lesson for lesson in lessons_list }
+                lessons = { lesson.id: lesson for lesson in Lessons.objects.filter(grade=grade, subject=subject).select_related("control") }
                 students = { student.account_id: student for student in Students.objects.filter(grade=grade) }
                 # Делаем запрос 1 раз
                 marks = Marks.objects.raw("""
@@ -240,7 +239,7 @@ def diary(request):
 
                 context.update({
                     'is_post': True,
-                    'lessons': lessons_list,
+                    'lessons': lessons,
                     'scope': scope
                 })
                 return render(request, 'teacher.html', context)
