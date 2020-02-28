@@ -23,8 +23,7 @@
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
     
-                            <td>{{ subject }}</td>
-                            <td><a href="{{ subject }}">{{ subject }}</a></td>
+                            <td><a href="{{ subject.id }}">{{ subject }}</a></td>
                             <td>{{ marks.0 }}</td>
                             {% for mark in marks.1 %}
                                 {% if mark.amount == 2 %}

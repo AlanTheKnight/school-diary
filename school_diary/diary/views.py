@@ -10,6 +10,7 @@ from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
 
 
+
 @unauthenticated_user
 def user_register(request):
     if request.method == 'POST':
@@ -131,6 +132,16 @@ def get_averange(list):
     return round(sum(list) / len(list), 2)
 
 
+def get_smart_averange(list):
+    s = 0
+    w = 0
+    for i in list:
+        weight = i.lesson.control.weight
+        s += weight * i.amount
+        w += weight
+    return round(s / w)
+
+
 def delete_lesson(request):
     pk = request.GET.get('pk')
     l = Lessons.objects.get(pk=pk)
@@ -143,7 +154,6 @@ def diary(request):
     """
     Main function for displaying diary pages to admins/teachers/students.
     """
-
     # If user is admin
     if request.user.account_type == 0 or request.user.account_type == 1:
         return render(request, 'diary_admin_main.html')
@@ -174,13 +184,13 @@ def diary(request):
                     else:
                         n_amount += 1
                 if len(marks) != 0:
-                    d.update({s.name:[round(a/(len(marks)-n_amount),2),marks]})
+                    d.update({s:[round(a/(len(marks)-n_amount),2),marks]})
                 else:
-                    d.update({s.name:['-',[]]})
+                    d.update({s:['-',[]]})
 
             for subject, marks in d.items():
                 d.update({subject:[marks[0],marks[1],range(max_length-len(marks[1]))]})
-            print(d)
+            print(d.items())
             context = {
                 'student': student,
                 'd': d,
@@ -347,7 +357,12 @@ def stats(request, id):
                  n_amount += 1
             else:
                 marks_list.append(m)
+        marks_smart_list = []
+        for i in marks:
+            if i.amount != -1:
+                marks_smart_list.append(i)
         avg = get_averange(marks_list) # Get averange of marks
+        smart_avg = get_smart_averange(marks_smart_list)
         data = []
         for i in range(5, 1, -1): data.append(marks_list.count(i))
         data.append(n_amount)
@@ -356,7 +371,8 @@ def stats(request, id):
             'marks':marks,
             'subject':subject,
             'data':data,
-            'avg':avg}
+            'avg':avg,
+            'smartavg':smart_avg}
         return render(request, 'results.html', context)
     return render(request, 'no_marks.html')
     subjects = grade.subjects.all()
