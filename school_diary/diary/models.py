@@ -144,9 +144,8 @@ class Administrators(models.Model):
 
 
 class Controls(models.Model):
-    name = models.CharField(max_length=120, verbose_name=' Контроль')
-    # weight = models.DecimalField(verbose_name=' Коэфицент')
-
+    name = models.CharField(max_length=120, verbose_name='Вид работы')
+    weight = models.IntegerField(verbose_name=' Коэффицент', default=1)
     class Meta:
         verbose_name = "Вид контороля"
         verbose_name_plural = "Виды контороля"

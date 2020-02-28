@@ -4,11 +4,17 @@
 {% load templateLibs %}
 
 {% block title %}
-    <title>Оценки</title>
+<title>Оценки</title>
 {% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/teacher.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<script>
+    function myfunction(that){
+        that.style.backgroundColor = "#d6d6d6";
+    }
+</script>
 {% endblock %}
 
 {% block content %}
@@ -22,7 +28,7 @@
         </div>
     {% endif %}
 
-    <div class="card my-3 w-25">
+    <div class="card my-3">
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
@@ -55,7 +61,7 @@
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
         </div>
 
-        {% if lessons and scope %}
+        {% if lessons %}
 
         <div class="table-responsive">
             <table class="table table-bordered table-sm ">
@@ -75,6 +81,7 @@
                     </tr>
                 </thead>
 
+
                 <tbody>
                 {% for student, small_scope in scope.items %}
                     <tr>
@@ -83,7 +90,7 @@
                             {% with mark=small_scope|lookup:lesson %}
                                 <td>
                                     {% if mark %}
-                                        <select name="{{ student.account_id }}|{{ lesson.id }}" id="" class="inp_table select">
+                                        <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
                                             <option value="5" {% if mark.amount == 5 %}selected{% endif %}>5</option>
                                             <option value="4" {% if mark.amount == 4 %}selected{% endif %}>4</option>
                                             <option value="3" {% if mark.amount == 3 %}selected{% endif %}>3</option>
@@ -92,7 +99,7 @@
                                         </select>
                                         <a href="#" class="edit">+</a>
                                     {% else %}
-                                        <select name="{{ student.account_id }}|{{ lesson.id }}" id="" class="inp_table select">
+                                        <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
                                             <option value="" selected></option>
                                             <option value="5">5</option>
                                             <option value="4">4</option>

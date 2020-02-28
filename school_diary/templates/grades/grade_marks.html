@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Выбор ученика</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/card-align.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+{% endblock %}
+
+{% block content %}
+
+
+
+<div class="container">
+    {% if students %}
+    <div class="table-responsive my-5">
+        <table class="table table-sm text-center">
+            <thead>
+                <th scope="col">Почта</th>
+                <th scope="col">Имя</th>
+                <th scope="col">Фамилия</th>
+                <th scope="col">Просмотр</th>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student.account.email }}</td>
+                        <td>{{ student.first_name }}</td>
+                        <td>{{ student.surname }}</td>
+                        <td><a href="{% url 'view_marks' student.account_id %}" class="btn btn-primary btn-sm text-white" style="display:inline-block;"><i><i class="fas fa-eye"></i></a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alter alert-info">
+        Ни один ученик еще не был добавлен в Ваш класс. Добавьте учеников и просматривайте их оценки.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

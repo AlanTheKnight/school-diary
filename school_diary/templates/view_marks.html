@@ -14,8 +14,7 @@
                     <th scope="col">#</th>
                     <th scope="col">Предмет</th>
                     <th scope="col">Средний б.</th>
-                    <th scope="col">Умный б.</th>
-                    <!--<th scope="col" colspan="{{ max_length }}"></th>-->
+                    <th scope="col" colspan="{{ max_length }}"></th>
     
                   </tr>
                 </thead>
@@ -24,20 +23,19 @@
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
     
-                            <td><a href="{{ subject.id }}">{{ subject }}</a></td>
+                            <td>{{ subject }}</td>
                             <td>{{ marks.0 }}</td>
-                            <td>{{ marks.3 }}</td>
                             {% for mark in marks.1 %}
                                 {% if mark.amount == 2 %}
-                                    <td scope="col" class="text-danger" data-toggle="tooltip" title="{{ mark.lesson.date }}{{ mark.lesson.control }}" data-delay='{"show":"790", "hide":"1"}'><span><b>{{ mark.amount }}</b></span></td>
+                                    <td scope="col" class="text-danger" data-toggle="tooltip" title="{{ mark.lesson.date }}" data-delay='{"show":"1000", "hide":"1"}'><span><b>{{ mark.amount }}</b></span></td>
                                 {% elif mark.amount == 3 %}
-                                    <td scope="col" style="color: orangered;" data-toggle="tooltip" title="{{ mark.lesson.date }}{{ mark.lesson.control }}" data-delay='{"show":"790", "hide":"1"}'><b>{{ mark.amount }}</b></td>
+                                    <td scope="col" style="color: orangered;" data-toggle="tooltip" title="{{ mark.lesson.date }}" data-delay='{"show":"1000", "hide":"1"}'><b>{{ mark.amount }}</b></td>
                                 {% elif mark.amount == 4 %}
-                                    <td scope="col" style="color:darkorange" data-toggle="tooltip" title="{{ mark.lesson.date }}{{ mark.lesson.control }}" data-delay='{"show":"790", "hide":"1"}'><b>{{ mark.amount }}</b></td>
+                                    <td scope="col" style="color:darkorange" data-toggle="tooltip" title="{{ mark.lesson.date }}" data-delay='{"show":"1000", "hide":"1"}'><b>{{ mark.amount }}</b></td>
                                 {% elif mark.amount == 5 %}
-                                    <td scope="col" class="text-success" data-toggle="tooltip" title="{{ mark.lesson.date }}{{ mark.lesson.control }}" data-delay='{"show":"790", "hide":"1"}'><b>{{ mark.amount }}</b></td>
+                                    <td scope="col" class="text-success" data-toggle="tooltip" title="{{ mark.lesson.date }}" data-delay='{"show":"1000", "hide":"1"}'><b>{{ mark.amount }}</b></td>
                                 {% else %}
-                                     <td scope="col" class="text-secondary" data-toggle="tooltip" title="{{ mark.lesson.date }}{{ mark.lesson.control }}" data-delay='{"show":"790", "hide":"1"}'><b>Н</b></td>
+                                     <td scope="col" class="text-secondary" data-toggle="tooltip" title="{{ mark.lesson.date }}" data-delay='{"show":"1000", "hide":"1"}'><b>Н</b></td>
                                 {% endif %}
                                 
                             {% endfor %}
@@ -55,8 +53,5 @@
         $(document).ready(function(){
           $('[data-toggle="tooltip"]').tooltip();
         });
-
-
-
     </script>
 {% endblock %}

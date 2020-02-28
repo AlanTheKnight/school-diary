@@ -46,6 +46,10 @@
         <p class="text-muted" style="margin-top: -20px;"><small>
             Получен из среднего арифметического оценок.
         </small></p>
+        <p>Предполагаемая четвертная оценка: {{ smartavg }}</p>
+        <p class="text-muted" style="margin-top: -20px;"><small>
+            Получена с помощью системы весов для каждого вида работы.
+        </small></p>
     </div>
     <script>
         let ctx = document.getElementById('MyChart').getContext('2d');

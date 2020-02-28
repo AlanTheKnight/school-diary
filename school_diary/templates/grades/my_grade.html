@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container my-5">
     {% if grade is not None %}
     <div class="row">
         <div class="col-md-3 col-sm-6 my-3">
@@ -14,6 +14,14 @@
                 <a href="{% url 'add_student_page' %}"><img src="{% static 'students.png' %}" class="card-img-top" alt="Редактировать список учеников класса"></a>
                 <div class="card-body">
                     <h5 class="card-title">Редактировать список учеников класса</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 my-3">
+            <div class="card h-100">
+                <a href="#"><img src="{% static 'diary.png' %}" class="card-img-top" alt="Редактировать список учеников класса"></a>
+                <div class="card-body">
+                    <h5 class="card-title">Просмотр оценок учеников</h5>
                 </div>
             </div>
         </div>
