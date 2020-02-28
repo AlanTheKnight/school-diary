@@ -92,14 +92,13 @@ def teacher_register(request):
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
 
 
-def create_table_of_results(subjects, student, grade):
+def create_table_of_results(students, lessons, marks):
     table = {}
-    for subject in subjects:
+    for student in students:
         s = {}
-        lessons = Lessons.objects.filter(subject=subject, grade=grade)
         for lesson in lessons:
-            s.update({lesson: Marks.objects.get(lesson=lesson, student=student)})
-        table.update({subject: s})
+            s.update({lesson: marks.objects.get(lesson=lesson)})
+        table.update({student: s})
     return table
 
 
@@ -234,11 +233,12 @@ def diary(request):
                             AND diary_lessons.grade_id = %s
                             AND diary_students.grade_id = %s
                             AND diary_lessons.subject_id = %s
+                    ORDER BY diary_marks.date
                 """, params=[grade.id, grade.id, subject.id])
-
-                scope = {}
+                scope = create_table_of_results(students=students, subject=subject, marks=marks)
                 # Ошибка - student.marks_set.get(lesson=lesson) делает 1 запрос. Получется n*m запросов, хотя все marks можно вытащить за 1 запрос
                 for mark in marks:
+                    print(mark.date)
                     if students[mark.student_id] not in scope:
                         scope[students[mark.student_id]] = {}
                     lesson = lessons[mark.lesson_id]
@@ -307,7 +307,8 @@ def diary(request):
                             Marks.objects.create(lesson=lesson,
                                                  student=student,
                                                  amount=amount,
-                                                 subject=subject
+                                                 subject=subject,
+                                                 date=lesson.date,
                                                  )
                 return redirect(diary)
         else:
