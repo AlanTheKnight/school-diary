@@ -139,7 +139,7 @@ def get_smart_averange(list):
         weight = i.lesson.control.weight
         s += weight * i.amount
         w += weight
-    return round(s / w)
+    return round(s / w,2)
 
 
 def delete_lesson(request):
@@ -178,18 +178,20 @@ def diary(request):
                 if len(marks) > max_length:
                     max_length = len(marks)
                 a, n_amount = 0, 0
+                marks_smart_list = []
                 for mark in marks:
                     if mark.amount != -1:
                         a += mark.amount
+                        marks_smart_list.append(mark)
                     else:
                         n_amount += 1
                 if len(marks) != 0:
-                    d.update({s:[round(a/(len(marks)-n_amount),2),marks]})
+                    d.update({s:[round(a/(len(marks)-n_amount),2),marks,0,get_smart_averange(marks_smart_list)]})
                 else:
-                    d.update({s:['-',[]]})
+                    d.update({s:['-',[],0,'-']})
 
             for subject, marks in d.items():
-                d.update({subject:[marks[0],marks[1],range(max_length-len(marks[1]))]})
+                d.update({subject:[marks[0],marks[1],range(max_length-len(marks[1])),marks[3]]})
             print(d.items())
             context = {
                 'student': student,
