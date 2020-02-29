@@ -46,6 +46,10 @@
         <p class="text-muted" style="margin-top: -20px;"><small>
             Получен из среднего арифметического оценок.
         </small></p>
+        <p>Взвешенный средний балл: {{ smartavg }}</p>
+        <p class="text-muted" style="margin-top: -20px;"><small>
+            Получен с помощью системы весов для каждого вида работы.
+        </small></p>
     </div>
     <script>
         let ctx = document.getElementById('MyChart').getContext('2d');

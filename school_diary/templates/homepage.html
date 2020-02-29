@@ -33,6 +33,16 @@
                   </div>
             </div>
         </div>
+        {% elif user.account_type == 3 %}
+        <div class="col-md-4 col-sm-6 my-3">
+            <div class="card h-100">
+                <a href="{% url 'homework' %}"><img src="{% static 'homework.png' %}" class="card-img-top" alt="Мой класс"></a>
+                <div class="card-body">
+                    <h5 class="card-title">Домашнее задание</h5>
+                    <p class="card-text text-muted">Просмотр домашнего задания на любой день.</p>
+                  </div>
+            </div>
+        </div>
         {% endif %}
         {% if user.account_type == 2 or user.account_type == 3 %}
         <div class="col-md-4 col-sm-6 my-3">
