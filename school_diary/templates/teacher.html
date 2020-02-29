@@ -91,6 +91,7 @@
                                 <td>
                                     {% if mark %}
                                         <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
+                                            <option value="" {% if not mark %}selected{%endif%}></option>
                                             <option value="5" {% if mark.amount == 5 %}selected{% endif %}>5</option>
                                             <option value="4" {% if mark.amount == 4 %}selected{% endif %}>4</option>
                                             <option value="3" {% if mark.amount == 3 %}selected{% endif %}>3</option>

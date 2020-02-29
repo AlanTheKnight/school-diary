@@ -4,13 +4,8 @@
 
 {% block title %}
     <title>Регистрация учителя</title>
-    <style>
-        .card {
-        margin: 0 auto; /* Added */
-        float: none; /* Added */
-        margin-bottom: 10px; /* Added */
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+    <link rel="stylesheet" href="{% static 'css/card_align.css' %}">
     <link rel="stylesheet" href="{% static 'css/registration.css' %}">
 {% endblock %}
 
@@ -21,7 +16,7 @@
         Такой администратор уже существует
     </div>
     {% endif %}
-    <div class="card w-75">
+    <div class="card">
         <div class="card-body">
             <h3 class="card-title text-center">Регистрация нового учителя</h3>
             <form method="POST" class="my-5 mx-5">

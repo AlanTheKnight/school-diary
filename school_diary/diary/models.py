@@ -173,7 +173,7 @@ class Lessons(models.Model):
 
 class Marks(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
-    amount = models.IntegerField(verbose_name="Балл")
+    amount = models.IntegerField(verbose_name="Балл", null=True, default=None)
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок')
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name='Предмет', null=True, default=None)
     date = models.DateField(null=True)
