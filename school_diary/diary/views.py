@@ -8,6 +8,7 @@ from .models import *
 from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
+import datetime
 
 
 
@@ -139,7 +140,7 @@ def get_smart_averange(list):
         weight = i.lesson.control.weight
         s += weight * i.amount
         w += weight
-    return round(s / w)
+    return round(s / w, 2)
 
 
 def delete_lesson(request):
@@ -378,6 +379,23 @@ def stats(request, id):
     subjects = grade.subjects.all()
     context = {'subjects':subjects}
     return render(request, 'diary_student.html', context)
+
+
+def homework(request):
+    if request.method == "POST":
+        if "day" in request.POST:
+            form = DatePickForm(request.POST)
+            if form.is_valid():
+                date = form.cleaned_data['date']
+                student = Students.objects.get(account=request.user)
+                grade = student.grade
+                lessons = Lessons.objects.filter(date=date, grade=grade)
+            return render(request, 'homework.html', {'form':form, 'lessons':lessons, 'date':date})
+    start_date = datetime.date.today()
+    end_date = start_date + datetime.timedelta(days=6)
+    lessons = Lessons.objects.filter(date__range=[start_date, end_date])
+    form = DatePickForm()
+    return render(request, 'homework.html', {'form':form, 'lessons':lessons})
 
 
 @login_required(login_url="login")
