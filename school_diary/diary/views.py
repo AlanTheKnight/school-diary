@@ -8,6 +8,7 @@ from .models import *
 from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
+import datetime
 
 
 
@@ -93,14 +94,20 @@ def teacher_register(request):
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
 
 
-def create_table_of_results(subjects, student, grade):
+def create_table_of_results(students, lessons, marks):
     table = {}
-    for subject in subjects:
+    for student in students:
         s = {}
-        lessons = Lessons.objects.filter(subject=subject, grade=grade)
         for lesson in lessons:
-            s.update({lesson: Marks.objects.get(lesson=lesson, student=student)})
-        table.update({subject: s})
+            a = 0
+            for mark in marks:
+                if mark.lesson_id == lesson.pk:
+                    s.update({lesson: mark})
+                    a = 1
+            if not a:
+                s.update({lesson:None})
+        table.update({student: s})
+    print(table)
     return table
 
 
@@ -139,7 +146,7 @@ def get_smart_averange(list):
         weight = i.lesson.control.weight
         s += weight * i.amount
         w += weight
-    return round(s / w,2)
+    return round(s / w, 2)
 
 
 def delete_lesson(request):
@@ -178,20 +185,18 @@ def diary(request):
                 if len(marks) > max_length:
                     max_length = len(marks)
                 a, n_amount = 0, 0
-                marks_smart_list = []
                 for mark in marks:
                     if mark.amount != -1:
                         a += mark.amount
-                        marks_smart_list.append(mark)
                     else:
                         n_amount += 1
                 if len(marks) != 0:
-                    d.update({s:[round(a/(len(marks)-n_amount),2),marks,0,get_smart_averange(marks_smart_list)]})
+                    d.update({s:[round(a/(len(marks)-n_amount),2),marks]})
                 else:
-                    d.update({s:['-',[],0,'-']})
+                    d.update({s:['-',[]]})
 
             for subject, marks in d.items():
-                d.update({subject:[marks[0],marks[1],range(max_length-len(marks[1])),marks[3]]})
+                d.update({subject:[marks[0],marks[1],range(max_length-len(marks[1]))]})
             print(d.items())
             context = {
                 'student': student,
@@ -233,8 +238,14 @@ def diary(request):
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
+                  
                 lessons = { lesson.id: lesson for lesson in Lessons.objects.filter(grade=grade, subject=subject).select_related("control").all() }
-                students = {student.account_id: student for student in Students.objects.filter(grade=grade)}
+                students = {student.account_id: student for student in Students.objects.filter(grade=grade)}      
+                # Before pull request
+                # lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
+                #lessons = Lessons.objects.filter(grade=grade, subject=subject).select_related("control")
+                #students = Students.objects.filter(grade=grade)
+                
                 # Делаем запрос 1 раз
                 marks = Marks.objects.raw("""
                     SELECT
@@ -244,6 +255,7 @@ def diary(request):
                             AND diary_lessons.grade_id = %s
                             AND diary_students.grade_id = %s
                             AND diary_lessons.subject_id = %s
+                    ORDER BY diary_marks.date
                 """, params=[grade.id, grade.id, subject.id])
 
                 scope = {}
@@ -259,6 +271,24 @@ def diary(request):
                             scope[student] = {}
                         if lesson not in scope[student]:
                             scope[student].update({lesson: None})
+
+                # Changes before pull request
+                #scope = create_table_of_results(students=students, lessons=lessons, marks=marks)
+                # Ошибка - student.marks_set.get(lesson=lesson) делает 1 запрос. Получется n*m запросов, хотя все marks можно вытащить за 1 запрос
+                # for mark in marks:
+                #     print(mark.date)
+                #     if students[mark.student_id] not in scope:
+                #         scope[students[mark.student_id]] = {}
+                #     lesson = lessons[mark.lesson_id]
+                #     scope[students[mark.student_id]].update({lesson: mark})
+                #
+                # for sk, student in students.items():
+                #     for lk, lesson in lessons.items():
+                #         if student not in scope:
+                #             scope[student] = {}
+                #         if lesson not in scope[student]:
+                #             scope[student].update({lesson: None})
+
 
                 context.update({
                     'is_post': True,
@@ -316,7 +346,8 @@ def diary(request):
                             Marks.objects.create(lesson=lesson,
                                                  student=student,
                                                  amount=amount,
-                                                 subject=subject
+                                                 subject=subject,
+                                                 date=lesson.date,
                                                  )
                 return redirect(diary)
         else:
@@ -326,7 +357,7 @@ def diary(request):
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['students'], message="Доступом к своей статистике по предметам имеют только ученики.")
+@allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
 def stats(request, id):
     student = Students.objects.get(account=request.user)
     grade = student.grade
@@ -377,6 +408,25 @@ def stats(request, id):
     subjects = grade.subjects.all()
     context = {'subjects':subjects}
     return render(request, 'diary_student.html', context)
+
+
+@login_required(login_url="login")
+@allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
+def homework(request):
+    if request.method == "POST":
+        if "day" in request.POST:
+            form = DatePickForm(request.POST)
+            if form.is_valid():
+                date = form.cleaned_data['date']
+                student = Students.objects.get(account=request.user)
+                grade = student.grade
+                lessons = Lessons.objects.filter(date=date, grade=grade)
+            return render(request, 'homework.html', {'form':form, 'lessons':lessons, 'date':date})
+    start_date = datetime.date.today()
+    end_date = start_date + datetime.timedelta(days=6)
+    lessons = Lessons.objects.filter(date__range=[start_date, end_date])
+    form = DatePickForm()
+    return render(request, 'homework.html', {'form':form, 'lessons':lessons})
 
 
 @login_required(login_url="login")
@@ -482,7 +532,7 @@ def students_marks(request, pk):
     d = {}
     max_length = 0
     for s in subjects:
-        #m = Marks.objects.filter(student=student, subject=s)
+        # m = Marks.objects.filter(student=student, subject=s)
         marks = student.marks_set.filter(subject=s.id)
         if len(marks) > max_length:
             max_length = len(marks)
@@ -717,9 +767,8 @@ def social(request):
 def get_help(request):
     """
     Return a page with help information.
-    TODO: Change this page to documentation page: docs.html
     """
-    return render(request, 'help.html')
+    return render(request, 'docs.html')
 
 
 def error404(request):

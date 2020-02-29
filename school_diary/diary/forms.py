@@ -187,3 +187,7 @@ class LessonEditForm(forms.ModelForm):
     class Meta:
         model = Lessons
         fields = ('date', 'theme', 'homework', 'control')
+
+
+class DatePickForm(forms.Form):
+    date = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control', 'type':'date', 'id':'date'})) 
