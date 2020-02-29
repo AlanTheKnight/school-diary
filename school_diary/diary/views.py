@@ -501,7 +501,7 @@ def students_marks(request, pk):
     d = {}
     max_length = 0
     for s in subjects:
-        #m = Marks.objects.filter(student=student, subject=s)
+        # m = Marks.objects.filter(student=student, subject=s)
         marks = student.marks_set.filter(subject=s.id)
         if len(marks) > max_length:
             max_length = len(marks)
