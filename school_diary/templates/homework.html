@@ -18,7 +18,10 @@
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
-                {{ form|crispy }}
+                <div class="form-group">
+                    <label for="date">Дата</label>
+                    {{ form.date }}
+                </div>
                 <button type="submit" class="btn btn-primary" name="day">Найти</button>
                 <a href="{% url 'homework' %}" class="btn btn-primary">Д/з на неделю</a>
             </form>
@@ -28,11 +31,11 @@
     {% if request.method == "POST" %}
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title">Домашнее задание на {{ date }}</h4>
+            <h4 class="card-title">Домашнее задание на {{ date|date:"d.m" }}</h4>
             <hr>
             {% for lesson in lessons %}
             {% if lesson.homework %}
-            <h5><span class="badge badge-secondary" style="display: inline;">{{ lesson.date|date:"d.m" }}</span> {{ lesson.subject }}</h5>
+            <h5>{{ lesson.subject }}</h5>
             <p>{{ lesson.homework }}</p>
             <hr>
             {% endif %}

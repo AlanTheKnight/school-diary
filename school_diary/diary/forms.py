@@ -190,4 +190,4 @@ class LessonEditForm(forms.ModelForm):
 
 
 class DatePickForm(forms.Form):
-    date = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control', 'type':'date'})) 
+    date = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control', 'type':'date', 'id':'date'})) 

@@ -328,7 +328,7 @@ def diary(request):
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['students'], message="Доступом к своей статистике по предметам имеют только ученики.")
+@allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
 def stats(request, id):
     student = Students.objects.get(account=request.user)
     grade = student.grade
@@ -381,6 +381,8 @@ def stats(request, id):
     return render(request, 'diary_student.html', context)
 
 
+@login_required(login_url="login")
+@allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
 def homework(request):
     if request.method == "POST":
         if "day" in request.POST:
@@ -736,9 +738,8 @@ def social(request):
 def get_help(request):
     """
     Return a page with help information.
-    TODO: Change this page to documentation page: docs.html
     """
-    return render(request, 'help.html')
+    return render(request, 'docs.html')
 
 
 def error404(request):
