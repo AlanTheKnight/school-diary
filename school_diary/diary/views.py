@@ -107,7 +107,6 @@ def create_table_of_results(students, lessons, marks):
             if not a:
                 s.update({lesson:None})
         table.update({student: s})
-    print(table)
     return table
 
 
@@ -131,15 +130,12 @@ def lesson_page(request):
     return render(request, 'lesson_page.html', context)
 
 
-def get_averange(list):
-    """
-    In: list of marks (integers)
-    Out: averange value
-    """
-    return round(sum(list) / len(list), 2)
+def get_average(list):
+    grades = [i.amount for i in list]
+    return round(sum(grades) / len(list), 2)
 
 
-def get_smart_averange(list):
+def get_smart_average(list):
     s = 0
     w = 0
     for i in list:
@@ -177,32 +173,41 @@ def diary(request):
             return redirect('/diary/{}'.format(subject))
         elif 'all' in request.POST:
             subjects = grade.subjects.all()
+            all_marks = student.marks_set.all()
             d = {}
-            max_length = 0
+            max_length, total_missed = 0, 0
             for s in subjects:
-                #m = Marks.objects.filter(student=student, subject=s)
-                marks = student.marks_set.filter(subject=s.id)
+                marks = all_marks.filter(subject=s.id).order_by('date')
+                
                 if len(marks) > max_length:
                     max_length = len(marks)
-                a, n_amount = 0, 0
-                for mark in marks:
-                    if mark.amount != -1:
-                        a += mark.amount
+                
+                n_amount = 0
+                marks_list = []
+                for i in marks:
+                    if i.amount != -1:
+                        marks_list.append(i)
                     else:
                         n_amount += 1
-                if len(marks) != 0:
-                    d.update({s:[round(a/(len(marks)-n_amount),2),marks]})
-                else:
-                    d.update({s:['-',[]]})
+    
+                avg = get_average(marks_list)
+                smart_avg = get_smart_average(marks_list)
 
-            for subject, marks in d.items():
-                d.update({subject:[marks[0],marks[1],range(max_length-len(marks[1]))]})
-            print(d.items())
+                if len(marks) != 0:
+                    d.update({s:[avg, smart_avg, marks]})
+                else:
+                    d.update({s:['-', '-', []]})
+
+                total_missed += n_amount
+
+
+            for subject in d:
+                d[subject].append(range(max_length - len(d[subject][2])))
             context = {
                 'student': student,
                 'd': d,
-                'max_length':max_length
-
+                'max_length':max_length,
+                'total_missed':total_missed
             }
             return render(request,'marklist.html',context)
 
@@ -276,7 +281,6 @@ def diary(request):
                 #scope = create_table_of_results(students=students, lessons=lessons, marks=marks)
                 # Ошибка - student.marks_set.get(lesson=lesson) делает 1 запрос. Получется n*m запросов, хотя все marks можно вытащить за 1 запрос
                 # for mark in marks:
-                #     print(mark.date)
                 #     if students[mark.student_id] not in scope:
                 #         scope[students[mark.student_id]] = {}
                 #     lesson = lessons[mark.lesson_id]
@@ -382,20 +386,19 @@ def stats(request, id):
         n_amount = 0
         marks_list = []
         for i in marks:
-            m = i.amount
-            if m == -1:
-                 n_amount += 1
-            else:
-                marks_list.append(m)
-        marks_smart_list = []
-        for i in marks:
             if i.amount != -1:
-                marks_smart_list.append(i)
-        avg = get_averange(marks_list) # Get averange of marks
-        smart_avg = get_smart_averange(marks_smart_list)
+                marks_list.append(i)
+            else:
+                n_amount += 1
+
+        avg = get_average(marks_list)
+        smart_avg = get_smart_average(marks_list)
+        
+        marks_amounts = [i.amount for i in marks if i.amount != -1]
         data = []
-        for i in range(5, 1, -1): data.append(marks_list.count(i))
+        for i in range(5, 1, -1): data.append(marks_amounts.count(i))
         data.append(n_amount)
+
         context = {
             'lessons':lessons,
             'marks':marks,
@@ -529,11 +532,12 @@ def students_marks(request, pk):
         return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
 
     subjects = grade.subjects.all()
+    all_marks = student.marks_set.all()
     d = {}
     max_length = 0
     for s in subjects:
         # m = Marks.objects.filter(student=student, subject=s)
-        marks = student.marks_set.filter(subject=s.id)
+        marks = all_marks.filter(subject=s.id).order_by('date')
         if len(marks) > max_length:
             max_length = len(marks)
         a, n_amount = 0, 0
@@ -549,7 +553,6 @@ def students_marks(request, pk):
 
     for subject, marks in d.items():
         d.update({subject:[marks[0],marks[1],range(max_length-len(marks[1]))]})
-    print(d)
     context = {
         'student': student,
         'd': d,
