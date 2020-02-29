@@ -131,11 +131,15 @@ def lesson_page(request):
 
 
 def get_average(list):
+    if len(list) == 0:
+        return '-'
     grades = [i.amount for i in list]
     return round(sum(grades) / len(list), 2)
 
 
 def get_smart_average(list):
+    if len(list) == 0:
+        return "-"
     s = 0
     w = 0
     for i in list:
@@ -192,11 +196,7 @@ def diary(request):
     
                 avg = get_average(marks_list)
                 smart_avg = get_smart_average(marks_list)
-
-                if len(marks) != 0:
-                    d.update({s:[avg, smart_avg, marks]})
-                else:
-                    d.update({s:['-', '-', []]})
+                d.update({s:[avg, smart_avg, marks]})
 
                 total_missed += n_amount
 
@@ -523,43 +523,52 @@ def view_students_marks(request):
         return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
 
 
-def students_marks(request, pk):
-    student = Students.objects.get(account=pk)
-    me = Teachers.objects.get(account=request.user)
+def get_class_or_access_denied(teacher):
     try:
-        grade = Grades.objects.get(main_teacher=me)
+        my_class = Grades.objects.get(main_teacher=teacher)
+        return my_class
     except ObjectDoesNotExist:
         return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
 
-    subjects = grade.subjects.all()
+
+def students_marks(request, pk):
+    student = Students.objects.get(account=pk)
+    me = Teachers.objects.get(account=request.user)
+    my_class = get_class_or_access_denied(me)
+    
+    subjects = my_class.subjects.all()
     all_marks = student.marks_set.all()
     d = {}
-    max_length = 0
+    max_length, total_missed = 0, 0
     for s in subjects:
-        # m = Marks.objects.filter(student=student, subject=s)
         marks = all_marks.filter(subject=s.id).order_by('date')
+        
         if len(marks) > max_length:
             max_length = len(marks)
-        a, n_amount = 0, 0
-        for mark in marks:
-            if mark.amount != -1:
-                a += mark.amount
+        
+        n_amount = 0
+        marks_list = []
+        for i in marks:
+            if i.amount != -1:
+                marks_list.append(i)
             else:
                 n_amount += 1
-        if len(marks) != 0:
-            d.update({s.name:[round(a/(len(marks)-n_amount),2),marks]})
-        else:
-            d.update({s.name:['-',[]]})
 
-    for subject, marks in d.items():
-        d.update({subject:[marks[0],marks[1],range(max_length-len(marks[1]))]})
+        avg = get_average(marks_list)
+        smart_avg = get_smart_average(marks_list)
+        d.update({s:[avg, smart_avg, marks]})
+        total_missed += n_amount
+
+
+    for subject in d:
+        d[subject].append(range(max_length - len(d[subject][2])))
     context = {
         'student': student,
         'd': d,
-        'max_length':max_length
-
+        'max_length':max_length,
+        'total_missed':total_missed
     }
-    return render(request, 'view_marks.html', context)
+    return render(request,'view_marks.html',context)
 
 
 @login_required(login_url="login")

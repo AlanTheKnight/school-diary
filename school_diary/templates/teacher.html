@@ -73,7 +73,7 @@
 
                             <th scope="col">
                                 <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}">
-                                    <p>{{ lesson.date.day }}.{{ lesson.date.month }}</p>
+                                    <p>{{ lesson.date|date:'m.d' }}</p>
                                     <p></p>{{ lesson.control }}
                                 </a>
                             </th>
