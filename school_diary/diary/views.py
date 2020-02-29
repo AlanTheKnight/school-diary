@@ -238,9 +238,14 @@ def diary(request):
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
+                  
+                lessons = { lesson.id: lesson for lesson in Lessons.objects.filter(grade=grade, subject=subject).select_related("control").all() }
+                students = {student.account_id: student for student in Students.objects.filter(grade=grade)}      
+                # Before pull request
                 # lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
-                lessons = Lessons.objects.filter(grade=grade, subject=subject).select_related("control")
-                students = Students.objects.filter(grade=grade)
+                #lessons = Lessons.objects.filter(grade=grade, subject=subject).select_related("control")
+                #students = Students.objects.filter(grade=grade)
+                
                 # Делаем запрос 1 раз
                 marks = Marks.objects.raw("""
                     SELECT
@@ -252,7 +257,23 @@ def diary(request):
                             AND diary_lessons.subject_id = %s
                     ORDER BY diary_marks.date
                 """, params=[grade.id, grade.id, subject.id])
-                scope = create_table_of_results(students=students, lessons=lessons, marks=marks)
+
+                scope = {}
+                for mark in marks:
+                    if students[mark.student_id] not in scope:
+                        scope[students[mark.student_id]] = {}
+                    lesson = lessons[mark.lesson_id]
+                    scope[students[mark.student_id]].update({lesson: mark})
+
+                for sk, student in students.items():
+                    for lk, lesson in lessons.items():
+                        if student not in scope:
+                            scope[student] = {}
+                        if lesson not in scope[student]:
+                            scope[student].update({lesson: None})
+
+                # Changes before pull request
+                #scope = create_table_of_results(students=students, lessons=lessons, marks=marks)
                 # Ошибка - student.marks_set.get(lesson=lesson) делает 1 запрос. Получется n*m запросов, хотя все marks можно вытащить за 1 запрос
                 # for mark in marks:
                 #     print(mark.date)
@@ -267,6 +288,7 @@ def diary(request):
                 #             scope[student] = {}
                 #         if lesson not in scope[student]:
                 #             scope[student].update({lesson: None})
+
 
                 context.update({
                     'is_post': True,
@@ -505,7 +527,7 @@ def students_marks(request, pk):
         grade = Grades.objects.get(main_teacher=me)
     except ObjectDoesNotExist:
         return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
-        
+
     subjects = grade.subjects.all()
     d = {}
     max_length = 0

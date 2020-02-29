@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load templateLibs %}
 
 {% block title %}
 <title>Оценки</title>
@@ -68,7 +69,7 @@
                 <thead class="thead-light">
                     <tr>
                         <th scope="col">Ученики</th>
-                        {% for lesson in lessons %}
+                        {% for k, lesson in lessons.items %}
 
                             <th scope="col">
                                 <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}">
@@ -80,36 +81,35 @@
                     </tr>
                 </thead>
 
-                
+
                 <tbody>
                 {% for student, small_scope in scope.items %}
                     <tr>
-                        <th scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</th>
-                        {% for lesson, mark in small_scope.items %}
-                                {% if mark %}
-                                    <th>
-                                    <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
-                                        <option value="5" {% if mark.amount == 5 %}selected{% endif %}>5</option>
-                                        <option value="4" {% if mark.amount == 4 %}selected{% endif %}>4</option>
-                                        <option value="3" {% if mark.amount == 3 %}selected{% endif %}>3</option>
-                                        <option value="2" {% if mark.amount == 2 %}selected{% endif %}>2</option>
-                                        <option value="-1" {% if mark.amount == -1 %}selected{% endif %}>Н</option>
-                                    </select>
-                                    <a href="#" class="edit">+</a>
-                                    
-                                </th>
-                                {% else %}
+                        <td scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</td>
+                        {% for lk, lesson in lessons.items %}
+                            {% with mark=small_scope|lookup:lesson %}
                                 <td>
-                                    <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
-                                        <option value="" selected></option>
-                                        <option value="5">5</option>
-                                        <option value="4">4</option>
-                                        <option value="3">3</option>
-                                        <option value="2">2</option>
-                                        <option value="-1">Н</option>
-                                    </select>
+                                    {% if mark %}
+                                        <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
+                                            <option value="5" {% if mark.amount == 5 %}selected{% endif %}>5</option>
+                                            <option value="4" {% if mark.amount == 4 %}selected{% endif %}>4</option>
+                                            <option value="3" {% if mark.amount == 3 %}selected{% endif %}>3</option>
+                                            <option value="2" {% if mark.amount == 2 %}selected{% endif %}>2</option>
+                                            <option value="-1" {% if mark.amount == -1 %}selected{% endif %}>Н</option>
+                                        </select>
+                                        <a href="#" class="edit">+</a>
+                                    {% else %}
+                                        <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
+                                            <option value="" selected></option>
+                                            <option value="5">5</option>
+                                            <option value="4">4</option>
+                                            <option value="3">3</option>
+                                            <option value="2">2</option>
+                                            <option value="-1">Н</option>
+                                        </select>
+                                    {% endif %}
                                 </td>
-                                {% endif %}
+                            {% endwith %}
                         {% endfor %}
                     </tr>
                 {% endfor %}
