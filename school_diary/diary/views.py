@@ -97,8 +97,15 @@ def create_table_of_results(students, lessons, marks):
     for student in students:
         s = {}
         for lesson in lessons:
-            s.update({lesson: marks.objects.get(lesson=lesson)})
+            a = 0
+            for mark in marks:
+                if mark.lesson_id == lesson.pk:
+                    s.update({lesson: mark})
+                    a = 1
+            if not a:
+                s.update({lesson:None})
         table.update({student: s})
+    print(table)
     return table
 
 
@@ -221,9 +228,8 @@ def diary(request):
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
                 # lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
-                lessons_list = Lessons.objects.filter(grade=grade, subject=subject).select_related("control").all()
-                lessons = {lesson.id: lesson for lesson in lessons_list}
-                students = {student.account_id: student for student in Students.objects.filter(grade=grade)}
+                lessons = Lessons.objects.filter(grade=grade, subject=subject).select_related("control")
+                students = Students.objects.filter(grade=grade)
                 # Делаем запрос 1 раз
                 marks = Marks.objects.raw("""
                     SELECT
@@ -235,25 +241,25 @@ def diary(request):
                             AND diary_lessons.subject_id = %s
                     ORDER BY diary_marks.date
                 """, params=[grade.id, grade.id, subject.id])
-                scope = create_table_of_results(students=students, subject=subject, marks=marks)
+                scope = create_table_of_results(students=students, lessons=lessons, marks=marks)
                 # Ошибка - student.marks_set.get(lesson=lesson) делает 1 запрос. Получется n*m запросов, хотя все marks можно вытащить за 1 запрос
-                for mark in marks:
-                    print(mark.date)
-                    if students[mark.student_id] not in scope:
-                        scope[students[mark.student_id]] = {}
-                    lesson = lessons[mark.lesson_id]
-                    scope[students[mark.student_id]].update({lesson: mark})
-
-                for sk, student in students.items():
-                    for lk, lesson in lessons.items():
-                        if student not in scope:
-                            scope[student] = {}
-                        if lesson not in scope[student]:
-                            scope[student].update({lesson: None})
+                # for mark in marks:
+                #     print(mark.date)
+                #     if students[mark.student_id] not in scope:
+                #         scope[students[mark.student_id]] = {}
+                #     lesson = lessons[mark.lesson_id]
+                #     scope[students[mark.student_id]].update({lesson: mark})
+                #
+                # for sk, student in students.items():
+                #     for lk, lesson in lessons.items():
+                #         if student not in scope:
+                #             scope[student] = {}
+                #         if lesson not in scope[student]:
+                #             scope[student].update({lesson: None})
 
                 context.update({
                     'is_post': True,
-                    'lessons': lessons_list,
+                    'lessons': lessons,
                     'scope': scope
                 })
                 return render(request, 'teacher.html', context)
