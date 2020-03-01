@@ -799,3 +799,38 @@ def error500(request):
         'title': "Что-то пошло не так",
         "description": "Мы работаем над этим."
     })
+
+
+@login_required(login_url="/login/")
+@admin_only
+def messages_dashboard_first_page(request):
+    """
+    Redirect user to the first page of admin dashboard.
+    """
+    return redirect('/messages/dashboard/1')
+
+
+@login_required(login_url="/login/")
+@admin_only
+def messages_dashboard(request, page):
+    u = AdminMessages.objects.all()
+    u = Paginator(u, 100)
+    u = u.get_page(page)
+    return render(request, 'messages/dashboard.html', {'users': u})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def messages_delete(request, pk):
+    s = AdminMessages.objects.get(id=pk)
+    if request.method == "POST":
+        s.delete()
+        return redirect('messages_dashboard')
+    return render(request, 'messages/delete.html', {'s': s})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def messages_view(request, pk):
+    s = AdminMessages.objects.get(id=pk)
+    return render(request, 'messages/view.html', {'s': s})

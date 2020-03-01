@@ -44,6 +44,12 @@ urlpatterns = [
     path('admins/delete/<str:id>', views.admins_delete, name='admins_delete'),
     path('admins/update/<str:id>', views.admins_update, name='admins_update'),
 
+    #Messages
+    path('messages/', views.messages_dashboard_first_page, name='messages_dashboard'),
+    path('messages/dashboard/<int:page>', views.messages_dashboard),
+    path('messages/delete/<int:pk>', views.messages_delete, name='messages_delete'),
+    path('messages/view/<int:pk>', views.messages_view, name='messages_view'),
+
     # Admin messages
     path('send-message-to-admin/', views.admin_message, name="message_to_admin"),
     
