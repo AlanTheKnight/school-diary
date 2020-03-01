@@ -10,6 +10,7 @@
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/teacher.css' %}">
 <link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+
 <script>
     function myfunction(that){
         that.style.backgroundColor = "#d6d6d6";
@@ -57,7 +58,7 @@
         <form method="POST">
         {% csrf_token %}
         <div class="my-3">
-            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <button type="submit" class="btn btn-primary destroy">Сохранить изменения</button>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
         </div>
 
@@ -72,7 +73,7 @@
                         {% for k, lesson in lessons.items %}
 
                             <th scope="col">
-                                <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}">
+                                <a href="{% url 'lesson-page' lesson.pk %}">
                                     <p>{{ lesson.date|date:'m.d' }}</p>
                                     <p></p>{{ lesson.control }}
                                 </a>
@@ -140,19 +141,19 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="date">Дата</label>
-                                <input type="date" name="date" id="date" class="form-control">
+                                <input type="date" name="date" id="date" class="form-control auto-save">
                             </div>
                             <div class="form-group">
                                 <label for="theme">Тема урока</label>
-                                <input type="text" name="theme" id="theme" maxlenght="120" class="form-control">
+                                <input type="text" name="theme" id="theme" maxlenght="120" class="form-control auto-save">
                             </div>
                             <div class="form-group">
                                 <label for="homework">Домашнее задание <small class="text-muted">(не обязательно)</small></label>
-                                <textarea name="homework" id="homework" rows="10" class="form-control"></textarea>
+                                <textarea name="homework" id="homework" rows="10" class="form-control auto-save"></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="control">Вид работы</label>
-                                <select name="control" id="control" class="form-control">
+                                <select name="control" id="control" class="form-control auto-save">
                                     {% for control in controls %}
                                     <option value="{{ control.id }}">{{ control.name }}</option>
                                     {% endfor %}

@@ -112,8 +112,7 @@ def create_table_of_results(students, lessons, marks):
 
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 @login_required(login_url="/login/")  # TODO fix bug
-def lesson_page(request):
-    pk = request.GET.get('pk')
+def lesson_page(request, pk):
     lesson = Lessons.objects.get(pk=pk)
     if request.method == 'POST':
         form = LessonEditForm(request.POST, instance=lesson)
@@ -149,11 +148,14 @@ def get_smart_average(list):
     return round(s / w, 2)
 
 
-def delete_lesson(request):
-    pk = request.GET.get('pk')
-    l = Lessons.objects.get(pk=pk)
-    l.delete()
-    return redirect('diary')
+@login_required(login_url='/login/')
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+def delete_lesson(request, pk):
+    lesson = Lessons.objects.get(pk=pk)
+    if request.method == "POST":
+        lesson.delete()
+        return redirect('diary')
+    return render(request, 'lesson_delete.html', {'item':lesson})
 
 
 @login_required(login_url="/login/")
