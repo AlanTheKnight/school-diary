@@ -22,20 +22,20 @@
                     {% for subject, marks in d.items %}
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
-                            <td>{{ subject }}</td>
+                            <td><a href="{{ subject.id }}">{{ subject }}</a></td>
                             <td class="text-center">{{ marks.0 }}</td>
                             <td class="text-center">{{ marks.1 }}</td>
                             {% for mark in marks.2 %}
                                 {% if mark.amount == 2 %}
-                                <td scope="col" style="color:red" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.amount }}" data-content="{{ mark.lesson.date|date:'m.d' }}, {{ mark.lesson.control }}"><b>{{ mark.amount }}</b></td>
+                                <td scope="col" style="color:red" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.date|date:'d.m, D' }}" data-content="<b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
                                 {% elif mark.amount == 3 %}
-                                    <td scope="col" style="color:orangered" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.amount }}" data-content="{{ mark.lesson.date|date:'m.d' }}, {{ mark.lesson.control }}"><b>{{ mark.amount }}</b></td>
+                                    <td scope="col" style="color:orangered" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.date|date:'d.m, D' }}" data-content="<b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
                                 {% elif mark.amount == 4 %}
-                                    <td scope="col" style="color:darkorange" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.amount }}" data-content="{{ mark.lesson.date|date:'m.d' }}, {{ mark.lesson.control }}"><b>{{ mark.amount }}</b></td>
+                                    <td scope="col" style="color:darkorange" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.date|date:'d.m, D' }}" data-content="<b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
                                 {% elif mark.amount == 5 %}
-                                    <td scope="col" class="text-success" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.amount }}" data-content="{{ mark.lesson.date|date:'m.d' }}, {{ mark.lesson.control }}"><b>{{ mark.amount }}</b></tdcolspan="100">
+                                    <td scope="col" class="text-success" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.date|date:'d.m, D' }}" data-content="<b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></tdcolspan="100">
                                 {% else %}
-                                    <td scope="col" class="text-secondary" tabindex="0" data-trigger="focus" data-toggle="popover" title="Н" data-content="{{ mark.lesson.date|date:'m.d' }}, {{ mark.lesson.control }}"><b>Н</b></td>
+                                    <td scope="col" class="text-secondary" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.date|date:'d.m, D' }}" data-content="<b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>Н</b></td>
                                 {% endif %}
                             {% endfor %}
                             
@@ -51,9 +51,6 @@
         
     </div>
     <script>
-        $('[data-toggle="popover"]').popover({ trigger: "focus" });
-
-
-
+        $('[data-toggle="popover"]').popover({ trigger: "focus", html:true });
     </script>
 {% endblock %}

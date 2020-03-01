@@ -176,6 +176,7 @@ class Marks(models.Model):
     amount = models.IntegerField(verbose_name="Балл", null=True, default=None)
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок')
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name='Предмет', null=True, default=None)
+    comment = models.TextField(max_length=300, verbose_name="Комментарий", default="", blank=1)
     date = models.DateField(null=True)
     class Meta:
         verbose_name = "Оценка"
