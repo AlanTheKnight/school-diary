@@ -57,6 +57,8 @@
         {% if request.method == 'POST' %}
         <form method="POST">
         {% csrf_token %}
+        <input hidden name="subject_id" value="{{ subject_id }}"/>
+        <input hidden name="grade_id" value="{{ grade_id }}"/>
         <div class="my-3">
             <button type="submit" class="btn btn-primary destroy">Сохранить изменения</button>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
@@ -90,25 +92,16 @@
                         {% for lk, lesson in lessons.items %}
                             {% with mark=small_scope|lookup:lesson %}
                                 <td>
+                                    <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)">
+                                        <option value="" {% if not mark %}selected{%endif%}></option>
+                                        <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
+                                        <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</option>
+                                        <option value="3" {% if mark and mark.amount == 3 %}selected{% endif %}>3</option>
+                                        <option value="2" {% if mark and mark.amount == 2 %}selected{% endif %}>2</option>
+                                        <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
+                                    </select>
                                     {% if mark %}
-                                        <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
-                                            <option value="" {% if not mark %}selected{%endif%}></option>
-                                            <option value="5" {% if mark.amount == 5 %}selected{% endif %}>5</option>
-                                            <option value="4" {% if mark.amount == 4 %}selected{% endif %}>4</option>
-                                            <option value="3" {% if mark.amount == 3 %}selected{% endif %}>3</option>
-                                            <option value="2" {% if mark.amount == 2 %}selected{% endif %}>2</option>
-                                            <option value="-1" {% if mark.amount == -1 %}selected{% endif %}>Н</option>
-                                        </select>
                                         <a href="#" class="edit">+</a>
-                                    {% else %}
-                                        <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
-                                            <option value="" selected></option>
-                                            <option value="5">5</option>
-                                            <option value="4">4</option>
-                                            <option value="3">3</option>
-                                            <option value="2">2</option>
-                                            <option value="-1">Н</option>
-                                        </select>
                                     {% endif %}
                                 </td>
                             {% endwith %}
