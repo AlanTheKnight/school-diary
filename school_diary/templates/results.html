@@ -15,7 +15,7 @@
         <thead>
             <th scope="col" class="text-left">Дата</th>
             {% for lesson in lessons %}
-                <th scope="col"><span data-toggle="tooltip" data-placement="top" title="{{ lesson.control }}">{{ lesson.date.month }}.{{ lesson.date.day }}</span></th>
+                <th scope="col"><span data-toggle="tooltip" data-placement="top" title="{{ lesson.control }}">{{ lesson.date|date:'d.m, D' }}</span></th>
             {% endfor %}
         </thead>
         <tbody>

@@ -1,5 +1,8 @@
+from functools import reduce
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
@@ -94,22 +97,6 @@ def teacher_register(request):
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
 
 
-def create_table_of_results(students, lessons, marks):
-    table = {}
-    for student in students:
-        s = {}
-        for lesson in lessons:
-            a = 0
-            for mark in marks:
-                if mark.lesson_id == lesson.pk:
-                    s.update({lesson: mark})
-                    a = 1
-            if not a:
-                s.update({lesson:None})
-        table.update({student: s})
-    return table
-
-
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 @login_required(login_url="/login/")  # TODO fix bug
 def lesson_page(request, pk):
@@ -183,11 +170,11 @@ def diary(request):
             d = {}
             max_length, total_missed = 0, 0
             for s in subjects:
-                marks = all_marks.filter(subject=s.id).order_by('date')
-                
+                marks = all_marks.filter(subject=s.id).order_by('lesson__date')
+
                 if len(marks) > max_length:
                     max_length = len(marks)
-                
+
                 n_amount = 0
                 marks_list = []
                 for i in marks:
@@ -195,7 +182,7 @@ def diary(request):
                         marks_list.append(i)
                     else:
                         n_amount += 1
-    
+
                 avg = get_average(marks_list)
                 smart_avg = get_smart_average(marks_list)
                 d.update({s:[avg, smart_avg, marks]})
@@ -234,10 +221,7 @@ def diary(request):
                 subject = Subjects.objects.get(name=request.POST.get('subject'))
                 grade = request.POST.get('grade')
                 request.session['subject'] = subject.id
-                if len(grade) == 3:
-                    number = int(grade[0:2])
-                else:
-                    number = int(grade[0])
+                number = int(grade[0:-1])
                 letter = grade[-1]
                 try:
                     grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
@@ -245,25 +229,18 @@ def diary(request):
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
-                  
-                lessons = { lesson.id: lesson for lesson in Lessons.objects.filter(grade=grade, subject=subject).select_related("control").all() }
-                students = {student.account_id: student for student in Students.objects.filter(grade=grade)}      
-                # Before pull request
-                # lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
-                #lessons = Lessons.objects.filter(grade=grade, subject=subject).select_related("control")
-                #students = Students.objects.filter(grade=grade)
-                
-                # Делаем запрос 1 раз
-                marks = Marks.objects.raw("""
-                    SELECT
-                        diary_marks.*
-                    FROM diary_marks, diary_lessons, diary_students
-                    WHERE diary_marks.student_id = diary_students.account_id AND diary_marks.lesson_id = diary_lessons.id
-                            AND diary_lessons.grade_id = %s
-                            AND diary_students.grade_id = %s
-                            AND diary_lessons.subject_id = %s
-                    ORDER BY diary_marks.date
-                """, params=[grade.id, grade.id, subject.id])
+
+                lessons = {
+                    lesson.id: lesson
+                    for lesson in Lessons.objects.filter(grade=grade, subject=subject).select_related("control").order_by("date").all()
+                }
+                students = {student.account_id: student for student in Students.objects.filter(grade=grade).order_by("first_name","surname","second_name")}
+
+                marks = Marks.objects.filter(
+                    student__grade_id=grade.id,
+                    lesson__grade_id=grade.id,
+                    lesson__subject_id=subject.id
+                )
 
                 scope = {}
                 for mark in marks:
@@ -279,27 +256,12 @@ def diary(request):
                         if lesson not in scope[student]:
                             scope[student].update({lesson: None})
 
-                # Changes before pull request
-                #scope = create_table_of_results(students=students, lessons=lessons, marks=marks)
-                # Ошибка - student.marks_set.get(lesson=lesson) делает 1 запрос. Получется n*m запросов, хотя все marks можно вытащить за 1 запрос
-                # for mark in marks:
-                #     if students[mark.student_id] not in scope:
-                #         scope[students[mark.student_id]] = {}
-                #     lesson = lessons[mark.lesson_id]
-                #     scope[students[mark.student_id]].update({lesson: mark})
-                #
-                # for sk, student in students.items():
-                #     for lk, lesson in lessons.items():
-                #         if student not in scope:
-                #             scope[student] = {}
-                #         if lesson not in scope[student]:
-                #             scope[student].update({lesson: None})
-
-
                 context.update({
                     'is_post': True,
                     'lessons': lessons,
-                    'scope': scope
+                    'scope': scope,
+                    'subject_id': subject.id,
+                    'grade_id': grade.id
                 })
                 return render(request, 'teacher.html', context)
 
@@ -316,45 +278,51 @@ def diary(request):
                 lesson.save()
                 return HttpResponseRedirect('/diary/')
 
-            # GETTING MARKS FROM FORM AND SAVE THEM
-            # TODO: Optimize this algorithm, because it's slow
             else:
-                subject = Subjects.objects.get(id=request.session['subject'])
-                # We make a dictionary from all data we send
-                for i in dict(request.POST):
-                    # Missing a csrf token
-                    if i == 'csrfmiddlewaretoken':
-                        continue
+                marks_dict = {
+                    tuple(map(int, k.replace("mark_", "").split("|"))):str(request.POST[k])
+                    for k in dict(request.POST)
+                    if k.startswith('mark_')
+                }
+                subject = Subjects.objects.get(id=request.POST.get('subject_id'))
 
-                    # Split them. We get a student (li[0]) and id of
-                    # lesson (li[1])
-                    li = i.split('|')
-                    account_id = li[0]
-                    id_les = li[1]
+                marks_raw = Marks.objects.select_for_update().filter(
+                    student__grade_id=request.POST.get('grade_id'),
+                    lesson__grade_id=request.POST.get('grade_id'),
+                    lesson__subject_id=subject.id
+                )
 
-                    # Get a student by his/her email
-                    student = Students.objects.get(account=account_id)
+                marks_in_db = {
+                    (x.student_id, x.lesson_id): x
+                    for x in marks_raw
+                }
 
-                    # Get a lesson by it's id
-                    lesson = Lessons.objects.get(pk=id_les)
-                    amount = str(request.POST[i])
+                objs_for_update = []
+                for k, v in marks_dict.items():
+                    if v != "" and k in marks_in_db.keys() and marks_in_db[k].amount != int(v):
+                        marks_in_db[k].amount = int(v)
+                        objs_for_update.append(marks_in_db[k])
 
-                    # If we can get a mark then change it, otherwise create a new one
-                    try:
-                        mark = Marks.objects.get(lesson=lesson, student=student)
-                        if amount:
-                            mark.amount = amount
-                            mark.save()
-                        else:
-                            mark.delete()
-                    except ObjectDoesNotExist:
-                        if amount:
-                            Marks.objects.create(lesson=lesson,
-                                                 student=student,
-                                                 amount=amount,
-                                                 subject=subject,
-                                                 date=lesson.date,
-                                                 )
+                objs_for_create = [
+                    Marks(lesson_id=k[1], student_id=k[0], amount=int(v), subject=subject)
+                    for k, v in marks_dict.items()
+                    if v != "" and k not in marks_in_db.keys()
+                ]
+
+                objs_for_remove = [
+                    Q(id=marks_in_db[k].id)
+                    for k,v in marks_dict.items()
+                    if v == "" and k in marks_in_db
+                ]
+                Marks.objects.bulk_update(objs_for_update, ['amount'])
+
+                Marks.objects.bulk_create(objs_for_create)
+
+                if len(objs_for_remove) != 0:
+                    Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
+
+                print("Added ", len(objs_for_create), " Changed ", len(objs_for_update), " Removed ", len(objs_for_remove))
+                # return render(request, 'teacher.html', context) # For debug
                 return redirect(diary)
         else:
             return render(request, 'teacher.html', context)
@@ -395,7 +363,7 @@ def stats(request, id):
 
         avg = get_average(marks_list)
         smart_avg = get_smart_average(marks_list)
-        
+
         marks_amounts = [i.amount for i in marks if i.amount != -1]
         data = []
         for i in range(5, 1, -1): data.append(marks_amounts.count(i))
@@ -537,17 +505,17 @@ def students_marks(request, pk):
     student = Students.objects.get(account=pk)
     me = Teachers.objects.get(account=request.user)
     my_class = get_class_or_access_denied(me)
-    
+
     subjects = my_class.subjects.all()
     all_marks = student.marks_set.all()
     d = {}
     max_length, total_missed = 0, 0
     for s in subjects:
-        marks = all_marks.filter(subject=s.id).order_by('date')
-        
+        marks = all_marks.filter(subject=s.id).order_by('lesson__date')
+
         if len(marks) > max_length:
             max_length = len(marks)
-        
+
         n_amount = 0
         marks_list = []
         for i in marks:
