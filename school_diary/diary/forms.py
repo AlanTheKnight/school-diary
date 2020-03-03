@@ -182,7 +182,6 @@ class TeacherEditForm(forms.ModelForm):
         }
 
 
-
 class LessonEditForm(forms.ModelForm):
     class Meta:
         model = Lessons
@@ -190,4 +189,9 @@ class LessonEditForm(forms.ModelForm):
 
 
 class DatePickForm(forms.Form):
-    date = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control', 'type':'date', 'id':'date'})) 
+    date = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control', 'type':'date', 'id':'date'}))
+
+
+class CreateSubjectForm(forms.Form):
+    class Meta:
+        model = Subjects

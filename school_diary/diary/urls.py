@@ -66,6 +66,7 @@ urlpatterns = [
     path('diary/<int:id>/', views.stats, name='statistics'),
     path('diary/homework/', views.homework, name='homework'),
 
+
     # Main part of a website
     path('', views.homepage, name='homepage'),
     path('social/', views.social, name='social'),

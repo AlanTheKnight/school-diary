@@ -281,7 +281,8 @@ def diary(request):
                     date=date, theme=theme, homework=homework, control=control, grade=grade, subject=subject
                 )
                 lesson.save()
-                return HttpResponseRedirect('/diary/')
+                context.update(create_table(grade=grade, subject=subject))
+                return render(request, 'teacher.html', context)
 
             else:
                 # Save marks block
@@ -810,3 +811,6 @@ def messages_delete(request, pk):
 def messages_view(request, pk):
     s = AdminMessages.objects.get(id=pk)
     return render(request, 'messages/view.html', {'s': s})
+
+
+
