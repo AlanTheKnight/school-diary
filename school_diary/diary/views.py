@@ -144,6 +144,44 @@ def delete_lesson(request, pk):
     return render(request, 'lesson_delete.html', {'item':lesson})
 
 
+def create_table(grade, subject):
+    lessons = {
+        lesson.id: lesson
+        for lesson in
+        Lessons.objects.filter(grade=grade, subject=subject).select_related("control").order_by("date").all()
+    }
+    students = {student.account_id: student for student in
+                Students.objects.filter(grade=grade).order_by("first_name", "surname", "second_name")}
+
+    marks = Marks.objects.filter(
+        student__grade_id=grade.id,
+        lesson__grade_id=grade.id,
+        lesson__subject_id=subject.id
+    )
+
+    scope = {}
+    for mark in marks:
+        if students[mark.student_id] not in scope:
+            scope[students[mark.student_id]] = {}
+        lesson = lessons[mark.lesson_id]
+        scope[students[mark.student_id]].update({lesson: mark})
+
+    for sk, student in students.items():
+        for lk, lesson in lessons.items():
+            if student not in scope:
+                scope[student] = {}
+            if lesson not in scope[student]:
+                scope[student].update({lesson: None})
+
+    return {
+        'is_post': True,
+        'lessons': lessons,
+        'scope': scope,
+        'subject_id': subject.id,
+        'grade_id': grade.id
+    }
+
+
 @login_required(login_url="/login/")
 def diary(request):
     """
@@ -229,39 +267,7 @@ def diary(request):
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
 
-                lessons = {
-                    lesson.id: lesson
-                    for lesson in Lessons.objects.filter(grade=grade, subject=subject).select_related("control").order_by("date").all()
-                }
-                students = {student.account_id: student for student in Students.objects.filter(grade=grade).order_by("first_name","surname","second_name")}
-
-                marks = Marks.objects.filter(
-                    student__grade_id=grade.id,
-                    lesson__grade_id=grade.id,
-                    lesson__subject_id=subject.id
-                )
-
-                scope = {}
-                for mark in marks:
-                    if students[mark.student_id] not in scope:
-                        scope[students[mark.student_id]] = {}
-                    lesson = lessons[mark.lesson_id]
-                    scope[students[mark.student_id]].update({lesson: mark})
-
-                for sk, student in students.items():
-                    for lk, lesson in lessons.items():
-                        if student not in scope:
-                            scope[student] = {}
-                        if lesson not in scope[student]:
-                            scope[student].update({lesson: None})
-
-                context.update({
-                    'is_post': True,
-                    'lessons': lessons,
-                    'scope': scope,
-                    'subject_id': subject.id,
-                    'grade_id': grade.id
-                })
+                context.update(create_table(grade, subject))
                 return render(request, 'teacher.html', context)
 
             elif 'createlesson' in request.POST:
@@ -278,6 +284,7 @@ def diary(request):
                 return HttpResponseRedirect('/diary/')
 
             else:
+                # Save marks block
                 marks_dict = {
                     tuple(map(int, k.replace("mark_", "").split("|"))):str(request.POST[k])
                     for k in dict(request.POST)
@@ -310,7 +317,7 @@ def diary(request):
 
                 objs_for_remove = [
                     Q(id=marks_in_db[k].id)
-                    for k,v in marks_dict.items()
+                    for k, v in marks_dict.items()
                     if v == "" and k in marks_in_db
                 ]
                 Marks.objects.bulk_update(objs_for_update, ['amount'])
@@ -321,8 +328,10 @@ def diary(request):
                     Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
 
                 print("Added ", len(objs_for_create), " Changed ", len(objs_for_update), " Removed ", len(objs_for_remove))
-                # return render(request, 'teacher.html', context) # For debug
-                return redirect(diary)
+                # Render table
+                context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=subject))
+                return render(request, 'teacher.html', context) # For debug
+                # return redirect(diary)
         else:
             return render(request, 'teacher.html', context)
     else:

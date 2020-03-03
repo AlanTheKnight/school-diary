@@ -20,7 +20,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
+<div class="container-fluid my-5">
 
     {% if messages %}
         <div class="alert alert-danger">
@@ -54,7 +54,6 @@
             </form>
         </div>
     </div>
-
         {% if request.method == 'POST' %}
         <form method="POST" >
         {% csrf_token %}
@@ -166,4 +165,5 @@
             </div>
         </div>
 </div>
+
 {% endblock %}
