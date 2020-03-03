@@ -1,5 +1,13 @@
 @media (min-width: 768px) {
-    .card {
+    .card-50 {
         width: 50% !important;
+    }
+    
+    
+}
+
+@media (min-width: 768px) {
+    .card-75 {
+        width: 75% !important;
     }
 }

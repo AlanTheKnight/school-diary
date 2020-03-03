@@ -187,6 +187,7 @@ def diary(request):
     """
     Main function for displaying diary pages to admins/teachers/students.
     """
+    
     # If user is admin
     if request.user.account_type == 0 or request.user.account_type == 1:
         return render(request, 'diary_admin_main.html')
