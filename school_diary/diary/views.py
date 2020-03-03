@@ -170,7 +170,7 @@ def diary(request):
             d = {}
             max_length, total_missed = 0, 0
             for s in subjects:
-                marks = all_marks.filter(subject=s.id).order_by('date')
+                marks = all_marks.filter(subject=s.id).order_by('lesson__date')
 
                 if len(marks) > max_length:
                     max_length = len(marks)
@@ -220,6 +220,7 @@ def diary(request):
             if 'getgrade' in request.POST:
                 subject = Subjects.objects.get(name=request.POST.get('subject'))
                 grade = request.POST.get('grade')
+                request.session['subject'] = subject.id
                 number = int(grade[0:-1])
                 letter = grade[-1]
                 try:
@@ -510,7 +511,7 @@ def students_marks(request, pk):
     d = {}
     max_length, total_missed = 0, 0
     for s in subjects:
-        marks = all_marks.filter(subject=s.id).order_by('date')
+        marks = all_marks.filter(subject=s.id).order_by('lesson__date')
 
         if len(marks) > max_length:
             max_length = len(marks)
