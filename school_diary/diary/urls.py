@@ -18,6 +18,8 @@ urlpatterns = [
     path('add-grade/', views.create_grade_page, name='create_grade'),
     path('my-grade/', views.my_grade, name='my_grade'),
     path('delete-student/<str:i>', views.delete_student, name='delete_student'),
+    path('students_marks/', views.view_students_marks, name='students_marks'),
+    path('view_marks/<str:pk>', views.students_marks, name='view_marks'),
 
     # Students
     path('students/', views.students_dashboard_first_page, name='students_dashboard'),
@@ -42,6 +44,12 @@ urlpatterns = [
     path('admins/delete/<str:id>', views.admins_delete, name='admins_delete'),
     path('admins/update/<str:id>', views.admins_update, name='admins_update'),
 
+    #Messages
+    path('messages/', views.messages_dashboard_first_page, name='messages_dashboard'),
+    path('messages/dashboard/<int:page>', views.messages_dashboard),
+    path('messages/delete/<int:pk>', views.messages_delete, name='messages_delete'),
+    path('messages/view/<int:pk>', views.messages_view, name='messages_view'),
+
     # Admin messages
     path('send-message-to-admin/', views.admin_message, name="message_to_admin"),
     
@@ -52,9 +60,11 @@ urlpatterns = [
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(template_name="password_reset/complete.html"), name="password_reset_complete"),
 
     # Main diary part
-    path('diary/lesson-page', views.lesson_page, name='lesson-page'),
-    path('diary/delete', views.delete_lesson, name='delete-lesson'),
+    path('diary/lesson/<int:pk>', views.lesson_page, name='lesson-page'),
+    path('diary/lesson/<int:pk>/delete', views.delete_lesson, name='diary_lesson_delete'),
     path('diary/', views.diary, name='diary'),
+    path('diary/<int:id>/', views.stats, name='statistics'),
+    path('diary/homework/', views.homework, name='homework'),
 
     # Main part of a website
     path('', views.homepage, name='homepage'),

@@ -2,22 +2,23 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
-
 {% block title %}
-<title>Редактировать</title>
+<title>Изменить</title>
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="card">
+<div class="container">
+    <div class="card my-5">
         <div class="card-body">
+            <h2 class="card-title">Изменить аккаунт администратора</h2>
             <form method="POST">
                 {% csrf_token %}
-                {{ form|crispy }}
-                <a href="{% url 'diary' %}" class="btn btn-secondary">Назад</a>
+                <div class="form-group">
+                    {{ form }}
+                </div>
                 <button type="submit" class="btn btn-primary">Изменить</button>
             </form>
-            <a href="{% url 'diary_lesson_delete' lesson.pk %}"><button class="btn btn-danger my-1">Удалить</button></a>
         </div>
     </div>
 </div>

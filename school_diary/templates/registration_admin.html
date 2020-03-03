@@ -5,6 +5,8 @@
 {% block title %}
     <title>Регистрация администратора</title>
     <link rel="stylesheet" href="{% static 'css/registration.css' %}">
+    <link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+    <link rel="stylesheet" href="{% static 'css/card_align.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -14,7 +16,7 @@
         Такой администратор уже существует
     </div>
     {% endif %}
-    <div class="card w-75">
+    <div class="card">
         <div class="card-body">
             <h3 class="card-title text-center">Регистрация нового администратора</h3>
             <form method="POST" class="my-5 mx-5">

@@ -144,9 +144,8 @@ class Administrators(models.Model):
 
 
 class Controls(models.Model):
-    name = models.CharField(max_length=120, verbose_name=' Контроль')
-    weight = models.DecimalField(verbose_name=' Коэфицент', decimal_places=2, max_digits=2, null=True)
-
+    name = models.CharField(max_length=120, verbose_name='Вид работы')
+    weight = models.IntegerField(verbose_name=' Коэффицент', default=1)
     class Meta:
         verbose_name = "Вид контороля"
         verbose_name_plural = "Виды контороля"
@@ -174,9 +173,10 @@ class Lessons(models.Model):
 
 class Marks(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
-    amount = models.IntegerField(verbose_name="Балл")
+    amount = models.IntegerField(verbose_name="Балл", null=True, default=None)
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок')
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name='Предмет', null=True, default=None)
+    comment = models.TextField(max_length=300, verbose_name="Комментарий", default="", blank=1)
     class Meta:
         verbose_name = "Оценка"
         verbose_name_plural = "Оценки"

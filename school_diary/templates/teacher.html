@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load templateLibs %}
 
 {% block title %}
 <title>Оценки</title>
@@ -8,6 +9,8 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/teacher.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+
 <script>
     function myfunction(that){
         that.style.backgroundColor = "#d6d6d6";
@@ -27,7 +30,7 @@
         </div>
     {% endif %}
 
-    <div class="card my-3 w-25">
+    <div class="card my-3">
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
@@ -55,8 +58,10 @@
         {% if request.method == 'POST' %}
         <form method="POST" >
         {% csrf_token %}
+        <input hidden name="subject_id" value="{{ subject_id }}"/>
+        <input hidden name="grade_id" value="{{ grade_id }}"/>
         <div class="my-3">
-            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <button type="submit" class="btn btn-primary destroy">Сохранить изменения</button>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
         </div>
 
@@ -68,11 +73,11 @@
                 <thead class="thead-light">
                     <tr>
                         <th scope="col">Ученики</th>
-                        {% for lesson in lessons %}
+                        {% for k, lesson in lessons.items %}
 
                             <th scope="col">
-                                <a href="{% url 'lesson-page' %}?pk={{ lesson.pk }}">
-                                    <p>{{ lesson.date.day }}.{{ lesson.date.month }}</p>
+                                <a href="{% url 'lesson-page' lesson.pk %}">
+                                    <p>{{ lesson.date|date:'m.d' }}</p>
                                     <p></p>{{ lesson.control }}
                                 </a>
                             </th>
@@ -80,36 +85,27 @@
                     </tr>
                 </thead>
 
-                
+
                 <tbody>
                 {% for student, small_scope in scope.items %}
                     <tr>
-                        <th scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</th>
-                        {% for lesson, mark in small_scope.items %}
-                                {% if mark %}
-                                    <th>
-                                    <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
-                                        <option value="5" {% if mark.amount == 5 %}selected{% endif %}>5</option>
-                                        <option value="4" {% if mark.amount == 4 %}selected{% endif %}>4</option>
-                                        <option value="3" {% if mark.amount == 3 %}selected{% endif %}>3</option>
-                                        <option value="2" {% if mark.amount == 2 %}selected{% endif %}>2</option>
-                                        <option value="-1" {% if mark.amount == -1 %}selected{% endif %}>Н</option>
-                                    </select>
-                                    <a href="#" class="edit">+</a>
-                                    
-                                </th>
-                                {% else %}
+                        <td scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</td>
+                        {% for lk, lesson in lessons.items %}
+                            {% with mark=small_scope|lookup:lesson %}
                                 <td>
-                                    <select name="{{ student.account_id }}|{{ lesson.id }}" id="selectmarkbox" class="inp_table select" onchange="myfunction(this)">
-                                        <option value="" selected></option>
-                                        <option value="5">5</option>
-                                        <option value="4">4</option>
-                                        <option value="3">3</option>
-                                        <option value="2">2</option>
-                                        <option value="-1">Н</option>
+                                    <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)">
+                                        <option value="" {% if not mark %}selected{%endif%}></option>
+                                        <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
+                                        <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</option>
+                                        <option value="3" {% if mark and mark.amount == 3 %}selected{% endif %}>3</option>
+                                        <option value="2" {% if mark and mark.amount == 2 %}selected{% endif %}>2</option>
+                                        <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
                                     </select>
+                                    {% if mark %}
+                                        <a href="#" class="edit">+</a>
+                                    {% endif %}
                                 </td>
-                                {% endif %}
+                            {% endwith %}
                         {% endfor %}
                     </tr>
                 {% endfor %}
@@ -139,19 +135,19 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="date">Дата</label>
-                                <input type="date" name="date" id="date" class="form-control">
+                                <input type="date" name="date" id="date" class="form-control auto-save">
                             </div>
                             <div class="form-group">
                                 <label for="theme">Тема урока</label>
-                                <input type="text" name="theme" id="theme" maxlenght="120" class="form-control">
+                                <input type="text" name="theme" id="theme" maxlenght="120" class="form-control auto-save">
                             </div>
                             <div class="form-group">
                                 <label for="homework">Домашнее задание <small class="text-muted">(не обязательно)</small></label>
-                                <textarea name="homework" id="homework" rows="10" class="form-control"></textarea>
+                                <textarea name="homework" id="homework" rows="10" class="form-control auto-save"></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="control">Вид работы</label>
-                                <select name="control" id="control" class="form-control">
+                                <select name="control" id="control" class="form-control auto-save">
                                     {% for control in controls %}
                                     <option value="{{ control.id }}">{{ control.name }}</option>
                                     {% endfor %}

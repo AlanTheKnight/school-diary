@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Просмотр</title>
+<link rel="stylesheet" href="{% static 'css/card_align.html' %}">
+<link rel="stylesheet" href="{% static 'css/card_width.html' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card my-5">
+        <div class="card-body">
+            <h3>{{ s.subject }}</h3>
+            <p>{{ s.content }}</p>
+            <a href="{% url 'messages_dashboard' %}" class="btn btn-primary">Вернуться обратно</a>
+            <a href="{% url 'messages_delete' s.id %}" class="btn btn-danger">Удалить</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

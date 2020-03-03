@@ -15,7 +15,7 @@
         <thead>
             <th scope="col" class="text-left">Дата</th>
             {% for lesson in lessons %}
-                <th scope="col"><span data-toggle="tooltip" data-placement="top" title="{{ lesson.control }}">{{ lesson.date.month }}.{{ lesson.date.day }}</span></th>
+                <th scope="col"><span data-toggle="tooltip" data-placement="top" title="{{ lesson.control }}">{{ lesson.date|date:'d.m, D' }}</span></th>
             {% endfor %}
         </thead>
         <tbody>
@@ -45,6 +45,10 @@
         <p>Средний балл: {{ avg }}</p>
         <p class="text-muted" style="margin-top: -20px;"><small>
             Получен из среднего арифметического оценок.
+        </small></p>
+        <p>Взвешенный средний балл: {{ smartavg }}</p>
+        <p class="text-muted" style="margin-top: -20px;"><small>
+            Получен с помощью системы весов для каждого вида работы.
         </small></p>
     </div>
     <script>

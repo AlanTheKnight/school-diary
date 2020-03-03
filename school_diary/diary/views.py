@@ -1,5 +1,8 @@
+from functools import reduce
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -7,6 +10,8 @@ from django.core.paginator import Paginator
 from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
+import datetime
+
 
 
 @unauthenticated_user
@@ -91,21 +96,9 @@ def teacher_register(request):
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
 
 
-def create_table_of_results(subjects, student, grade):
-    table = {}
-    for subject in subjects:
-        s = {}
-        lessons = Lessons.objects.filter(subject=subject, grade=grade)
-        for lesson in lessons:
-            s.update({lesson: Marks.objects.get(lesson=lesson, student=student)})
-        table.update({subject: s})
-    return table
-
-
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 @login_required(login_url="/login/")  # TODO fix bug
-def lesson_page(request):
-    pk = request.GET.get('pk')
+def lesson_page(request, pk):
     lesson = Lessons.objects.get(pk=pk)
     if request.method == 'POST':
         form = LessonEditForm(request.POST, instance=lesson)
@@ -122,19 +115,33 @@ def lesson_page(request):
     return render(request, 'lesson_page.html', context)
 
 
-def get_averange(list):
-    """
-    In: list of marks (integers)
-    Out: averange value
-    """
-    return round(sum(list) / len(list), 2)
+def get_average(list):
+    if len(list) == 0:
+        return '-'
+    grades = [i.amount for i in list]
+    return round(sum(grades) / len(list), 2)
 
 
-def delete_lesson(request):
-    pk = request.GET.get('pk')
-    l = Lessons.objects.get(pk=pk)
-    l.delete()
-    return redirect('diary')
+def get_smart_average(list):
+    if len(list) == 0:
+        return "-"
+    s = 0
+    w = 0
+    for i in list:
+        weight = i.lesson.control.weight
+        s += weight * i.amount
+        w += weight
+    return round(s / w, 2)
+
+
+@login_required(login_url='/login/')
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+def delete_lesson(request, pk):
+    lesson = Lessons.objects.get(pk=pk)
+    if request.method == "POST":
+        lesson.delete()
+        return redirect('diary')
+    return render(request, 'lesson_delete.html', {'item':lesson})
 
 
 @login_required(login_url="/login/")
@@ -142,7 +149,6 @@ def diary(request):
     """
     Main function for displaying diary pages to admins/teachers/students.
     """
-
     # If user is admin
     if request.user.account_type == 0 or request.user.account_type == 1:
         return render(request, 'diary_admin_main.html')
@@ -151,71 +157,48 @@ def diary(request):
     elif request.user.account_type == 3:
         student = Students.objects.get(account=request.user)
         grade = student.grade
-        subjects = grade.subjects.all()
-        d = {}
-        ml = 0
-        for s in subjects:
-            m = Marks.objects.filter(student=student, subject=s)
-            if len(m)>ml:
-                ml = len(m)
-            a = 0
-            for item in m:
-                a += item.amount
-            if len(m)!=0:
-                d.update({s.name:[round(a/len(m),2),m]})
-            else:
-                d.update({s.name:['-',[]]})
+        if grade is None:
+            return render(request, 'access_denied.html', {'message':"Вы не состоите в классе.\
+            Попросите Вашего классного руководителя добавить вас в класс."})
+        if 'selected' in request.POST:
+            subject = request.POST.get('subject')
+            return redirect('/diary/{}'.format(subject))
+        elif 'all' in request.POST:
+            subjects = grade.subjects.all()
+            all_marks = student.marks_set.all()
+            d = {}
+            max_length, total_missed = 0, 0
+            for s in subjects:
+                marks = all_marks.filter(subject=s.id).order_by('lesson__date')
 
-        for subject, marks in d.items():
-            d.update({subject:[marks[0],marks[1],range(ml-len(marks[1]))]})
-        context = {
-            'student': student,
-            'd': d,
-            'daylist':range(ml),
+                if len(marks) > max_length:
+                    max_length = len(marks)
 
-        }
-        return render(request,'marklist.html',context)
-
-
-    elif request.user.account_type == 33:
-        student = Students.objects.get(account=request.user)
-        grade = student.grade
-        if request.method == "POST":
-            subject = request.POST['subject']
-            term = request.POST['term']
-            subject = Subjects.objects.get(id=subject)
-            lessons = Lessons.objects.filter(grade=grade, subject=subject)
-            marks = []
-            for i in lessons:
-                try:
-                    marks.append(Marks.objects.get(student=student, lesson=i))
-                except:
-                    pass
-
-            # If student has no marks than send him a page with info.
-            # Otherwise, student will get a page with statistics and his results.
-            if marks:
                 n_amount = 0
                 marks_list = []
                 for i in marks:
-                    m = i.amount
-                    if m == -1:
-                        n_amount += 1
+                    if i.amount != -1:
+                        marks_list.append(i)
                     else:
-                        marks_list.append(m)
-                avg = get_averange(marks_list)  # Get averange of marks
-                data = []
-                for i in range(5, 1, -1): data.append(marks_list.count(i))
-                data.append(n_amount)
-                context = {
-                    'lessons': lessons,
-                    'marks': marks,
-                    'subject': subject,
-                    'data': data,
-                    'avg': avg,
-                    'term': term}
-                return render(request, 'results.html', context)
-            return render(request, 'no_marks.html')
+                        n_amount += 1
+
+                avg = get_average(marks_list)
+                smart_avg = get_smart_average(marks_list)
+                d.update({s:[avg, smart_avg, marks]})
+
+                total_missed += n_amount
+
+
+            for subject in d:
+                d[subject].append(range(max_length - len(d[subject][2])))
+            context = {
+                'student': student,
+                'd': d,
+                'max_length':max_length,
+                'total_missed':total_missed
+            }
+            return render(request,'marklist.html',context)
+
         subjects = grade.subjects.all()
         context = {'subjects': subjects}
         return render(request, 'diary_student.html', context)
@@ -237,10 +220,7 @@ def diary(request):
                 subject = Subjects.objects.get(name=request.POST.get('subject'))
                 grade = request.POST.get('grade')
                 request.session['subject'] = subject.id
-                if len(grade) == 3:
-                    number = int(grade[0:2])
-                else:
-                    number = int(grade[0])
+                number = int(grade[0:-1])
                 letter = grade[-1]
                 try:
                     grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
@@ -248,23 +228,20 @@ def diary(request):
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
-                # lessons_list = Lessons.objects.filter(grade=grade, subject=subject)
-                lessons_list = Lessons.objects.filter(grade=grade, subject=subject).select_related("control").all()
-                lessons = {lesson.id: lesson for lesson in lessons_list}
-                students = {student.account_id: student for student in Students.objects.filter(grade=grade)}
-                # Делаем запрос 1 раз
-                marks = Marks.objects.raw("""
-                    SELECT
-                        diary_marks.*
-                    FROM diary_marks, diary_lessons, diary_students
-                    WHERE diary_marks.student_id = diary_students.account_id AND diary_marks.lesson_id = diary_lessons.id
-                            AND diary_lessons.grade_id = %s
-                            AND diary_students.grade_id = %s
-                            AND diary_lessons.subject_id = %s
-                """, params=[grade.id, grade.id, subject.id])
+
+                lessons = {
+                    lesson.id: lesson
+                    for lesson in Lessons.objects.filter(grade=grade, subject=subject).select_related("control").order_by("date").all()
+                }
+                students = {student.account_id: student for student in Students.objects.filter(grade=grade).order_by("first_name","surname","second_name")}
+
+                marks = Marks.objects.filter(
+                    student__grade_id=grade.id,
+                    lesson__grade_id=grade.id,
+                    lesson__subject_id=subject.id
+                )
 
                 scope = {}
-                # Ошибка - student.marks_set.get(lesson=lesson) делает 1 запрос. Получется n*m запросов, хотя все marks можно вытащить за 1 запрос
                 for mark in marks:
                     if students[mark.student_id] not in scope:
                         scope[students[mark.student_id]] = {}
@@ -280,8 +257,10 @@ def diary(request):
 
                 context.update({
                     'is_post': True,
-                    'lessons': lessons_list,
-                    'scope': scope
+                    'lessons': lessons,
+                    'scope': scope,
+                    'subject_id': subject.id,
+                    'grade_id': grade.id
                 })
                 return render(request, 'teacher.html', context)
 
@@ -298,47 +277,128 @@ def diary(request):
                 lesson.save()
                 return HttpResponseRedirect('/diary/')
 
-            # GETTING MARKS FROM FORM AND SAVE THEM
-            # TODO: Optimize this algorithm, because it's slow
             else:
-                # We make a dictionary from all data we send
-                for i in dict(request.POST):
-                    # Missing a csrf token
-                    if i == 'csrfmiddlewaretoken':
-                        continue
+                marks_dict = {
+                    tuple(map(int, k.replace("mark_", "").split("|"))):str(request.POST[k])
+                    for k in dict(request.POST)
+                    if k.startswith('mark_')
+                }
+                subject = Subjects.objects.get(id=request.POST.get('subject_id'))
 
-                    # Split them. We get a student (li[0]) and id of
-                    # lesson (li[1])
-                    li = i.split('|')
-                    account_id = li[0]
-                    id_les = li[1]
+                marks_raw = Marks.objects.select_for_update().filter(
+                    student__grade_id=request.POST.get('grade_id'),
+                    lesson__grade_id=request.POST.get('grade_id'),
+                    lesson__subject_id=subject.id
+                )
 
-                    # Get a student by his/her email
-                    student = Students.objects.get(account=account_id)
+                marks_in_db = {
+                    (x.student_id, x.lesson_id): x
+                    for x in marks_raw
+                }
 
-                    # Get a lesson by it's id
-                    lesson = Lessons.objects.get(pk=id_les)
-                    amount = str(request.POST[i])
+                objs_for_update = []
+                for k, v in marks_dict.items():
+                    if v != "" and k in marks_in_db.keys() and marks_in_db[k].amount != int(v):
+                        marks_in_db[k].amount = int(v)
+                        objs_for_update.append(marks_in_db[k])
 
-                    # If we can get a mark then change it, otherwise create a new one
-                    try:
-                        mark = Marks.objects.get(lesson=lesson, student=student)
-                        if amount:
-                            mark.amount = amount
-                            mark.save()
-                        else:
-                            mark.delete()
-                    except ObjectDoesNotExist:
-                        if amount:
-                            Marks.objects.create(lesson=lesson,
-                                                 student=student,
-                                                 amount=amount
-                                                 )
+                objs_for_create = [
+                    Marks(lesson_id=k[1], student_id=k[0], amount=int(v), subject=subject)
+                    for k, v in marks_dict.items()
+                    if v != "" and k not in marks_in_db.keys()
+                ]
+
+                objs_for_remove = [
+                    Q(id=marks_in_db[k].id)
+                    for k,v in marks_dict.items()
+                    if v == "" and k in marks_in_db
+                ]
+                Marks.objects.bulk_update(objs_for_update, ['amount'])
+
+                Marks.objects.bulk_create(objs_for_create)
+
+                if len(objs_for_remove) != 0:
+                    Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
+
+                print("Added ", len(objs_for_create), " Changed ", len(objs_for_update), " Removed ", len(objs_for_remove))
+                # return render(request, 'teacher.html', context) # For debug
                 return redirect(diary)
         else:
             return render(request, 'teacher.html', context)
     else:
         redirect('/')
+
+
+@login_required(login_url="login")
+@allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
+def stats(request, id):
+    student = Students.objects.get(account=request.user)
+    grade = student.grade
+    try:
+        subject = Subjects.objects.get(id=id)
+    except ObjectDoesNotExist:
+        return render(request,'error.html', context={'title':'Мы не можем найти то, что Вы ищите.',
+                                                     'error':'404',
+                                                     'description':'Данный предмет отстуствует.'})
+    #return HttpResponse(subject.name)
+    lessons = Lessons.objects.filter(grade=grade, subject=subject)
+    #return HttpResponse(len(lessons))
+    marks = []
+    #for i in lessons:
+        #try: marks.append(Marks.objects.get(student=student, lesson=i))
+        #except: pass
+    marks = student.marks_set.filter(subject=subject)
+
+    # If student has no marks than send him a page with info.
+    # Otherwise, student will get a page with statistics and his results.
+    if marks:
+        n_amount = 0
+        marks_list = []
+        for i in marks:
+            if i.amount != -1:
+                marks_list.append(i)
+            else:
+                n_amount += 1
+
+        avg = get_average(marks_list)
+        smart_avg = get_smart_average(marks_list)
+
+        marks_amounts = [i.amount for i in marks if i.amount != -1]
+        data = []
+        for i in range(5, 1, -1): data.append(marks_amounts.count(i))
+        data.append(n_amount)
+
+        context = {
+            'lessons':lessons,
+            'marks':marks,
+            'subject':subject,
+            'data':data,
+            'avg':avg,
+            'smartavg':smart_avg}
+        return render(request, 'results.html', context)
+    return render(request, 'no_marks.html')
+    subjects = grade.subjects.all()
+    context = {'subjects':subjects}
+    return render(request, 'diary_student.html', context)
+
+
+@login_required(login_url="login")
+@allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
+def homework(request):
+    if request.method == "POST":
+        if "day" in request.POST:
+            form = DatePickForm(request.POST)
+            if form.is_valid():
+                date = form.cleaned_data['date']
+                student = Students.objects.get(account=request.user)
+                grade = student.grade
+                lessons = Lessons.objects.filter(date=date, grade=grade)
+            return render(request, 'homework.html', {'form':form, 'lessons':lessons, 'date':date})
+    start_date = datetime.date.today()
+    end_date = start_date + datetime.timedelta(days=6)
+    lessons = Lessons.objects.filter(date__range=[start_date, end_date])
+    form = DatePickForm()
+    return render(request, 'homework.html', {'form':form, 'lessons':lessons})
 
 
 @login_required(login_url="login")
@@ -417,6 +477,67 @@ def my_grade(request):
         grade = None
     context = {'grade': grade}
     return render(request, 'grades/my_grade.html', context)
+
+
+def view_students_marks(request):
+    me = Teachers.objects.get(account=request.user)
+    try:
+        grade = Grades.objects.get(main_teacher=me)
+        students = Students.objects.filter(grade=grade)
+        context = {
+            'students':students
+        }
+        return render(request, 'grades/grade_marks.html', context)
+    except ObjectDoesNotExist:
+        return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
+
+
+def get_class_or_access_denied(teacher):
+    try:
+        my_class = Grades.objects.get(main_teacher=teacher)
+        return my_class
+    except ObjectDoesNotExist:
+        return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
+
+
+def students_marks(request, pk):
+    student = Students.objects.get(account=pk)
+    me = Teachers.objects.get(account=request.user)
+    my_class = get_class_or_access_denied(me)
+
+    subjects = my_class.subjects.all()
+    all_marks = student.marks_set.all()
+    d = {}
+    max_length, total_missed = 0, 0
+    for s in subjects:
+        marks = all_marks.filter(subject=s.id).order_by('lesson__date')
+
+        if len(marks) > max_length:
+            max_length = len(marks)
+
+        n_amount = 0
+        marks_list = []
+        for i in marks:
+            if i.amount != -1:
+                marks_list.append(i)
+            else:
+                n_amount += 1
+
+        avg = get_average(marks_list)
+        smart_avg = get_smart_average(marks_list)
+        d.update({s:[avg, smart_avg, marks]})
+        total_missed += n_amount
+
+
+    for subject in d:
+        d[subject].append(range(max_length - len(d[subject][2])))
+    context = {
+        'student': student,
+        'd': d,
+        'max_length':max_length,
+        'total_missed':total_missed
+    }
+    return render(request,'view_marks.html',context)
 
 
 @login_required(login_url="login")
@@ -645,3 +766,38 @@ def error500(request):
         'title': "Что-то пошло не так",
         "description": "Мы работаем над этим."
     })
+
+
+@login_required(login_url="/login/")
+@admin_only
+def messages_dashboard_first_page(request):
+    """
+    Redirect user to the first page of admin dashboard.
+    """
+    return redirect('/messages/dashboard/1')
+
+
+@login_required(login_url="/login/")
+@admin_only
+def messages_dashboard(request, page):
+    u = AdminMessages.objects.all()
+    u = Paginator(u, 100)
+    u = u.get_page(page)
+    return render(request, 'messages/dashboard.html', {'users': u})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def messages_delete(request, pk):
+    s = AdminMessages.objects.get(id=pk)
+    if request.method == "POST":
+        s.delete()
+        return redirect('messages_dashboard')
+    return render(request, 'messages/delete.html', {'s': s})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def messages_view(request, pk):
+    s = AdminMessages.objects.get(id=pk)
+    return render(request, 'messages/view.html', {'s': s})
