@@ -80,6 +80,16 @@ def download(request):
     return render(request, 'timetable/download.html')
 
 
+def return_results(chosen_grade, chosen_litera):
+    try:
+        my_grade = Grades.objects.get(number=chosen_grade, letter=chosen_litera)
+    except ObjectDoesNotExist:
+        my_grade = Grades.objects.create(number=chosen_grade, letter=chosen_litera)
+        my_grade.save()
+    lessons = Lessons.objects.filter(connection=my_grade).order_by('day', 'number')
+    return lessons
+
+
 @login_required(login_url='/login/')
 @admin_only
 def dashboard(request):
@@ -88,16 +98,26 @@ def dashboard(request):
         if form.is_valid():
             chosen_grade = form.cleaned_data['grade']
             chosen_litera = form.cleaned_data['litera']
-            try:
-                my_grade = Grades.objects.get(number=chosen_grade, letter=chosen_litera)
-            except ObjectDoesNotExist:
-                my_grade = Grades.objects.create(number=chosen_grade, letter=chosen_litera)
-                my_grade.save()
-            lessons = Lessons.objects.filter(connection=my_grade).order_by('day', 'number')
-            return render(request, 'timetable/dashboard.html', {'form':form, 'lessons':lessons})
-        
+            request.session['tt_grade'] = chosen_grade
+            request.session['tt_litera'] = chosen_litera
+            lessons = return_results(chosen_grade, chosen_litera)
+    else:
+        if 'tt_grade' in request.session:
+            chosen_grade = request.session['tt_grade']
+            chosen_litera = request.session['tt_litera']
+            lessons = return_results(chosen_grade, chosen_litera)
+        else:
+            lessons = []
+            chosen_grade = ""
+            chosen_litera = ""
     form = GetTimeTableForm()
-    return render(request, 'timetable/dashboard.html', {'form':form})
+    context = {
+        'form':form,
+        'lessons':lessons,
+        'number':chosen_grade,
+        'letter':chosen_litera
+    }
+    return render(request, 'timetable/dashboard.html', context)
 
 
 @login_required(login_url="/login/")
