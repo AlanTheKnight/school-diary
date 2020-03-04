@@ -251,6 +251,9 @@ def diary(request):
                    'grades': Grades.objects.filter(teachers=teacher),
                    'controls': controls
                    }
+        if 'subject' in request.session.keys() and 'grade' in request.session.keys():
+            context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject'])))
+            return render(request, 'teacher.html', context) 
 
         if request.method == 'POST':
             # If teacher filled in a form with name = 'getgrade' then
@@ -767,7 +770,7 @@ def error404(request):
     return render(request, 'error.html', {
         'error': "404",
         'title': "Страница не найдена.",
-        "description": "Мы не можем найти страницу, которую вы ищите."
+        "description": "Мы не можем найти страницу, которую Вы ищите."
     })
 
 

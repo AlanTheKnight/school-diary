@@ -14,7 +14,7 @@
     {% endfor %}
     <div class="row my-5">
         {% if user.account_type == 0 or user.account_type == 1 %}
-        <div class="col-md-4 col-sm-6 my-3">
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
             <div class="card h-100">
                 <a href="{% url 'diary' %}"><img src="{% static '/admin_gui/admin_panel.png' %}" class="card-img-top" alt="Панель администратора"></a>
                 <div class="card-body">
@@ -24,7 +24,7 @@
             </div>
         </div>
         {% elif user.account_type == 2 %}
-        <div class="col-md-4 col-sm-6 my-3">
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
             <div class="card h-100">
                 <a href="{% url 'my_grade' %}"><img src="{% static 'grade.png' %}" class="card-img-top" alt="Мой класс"></a>
                 <div class="card-body">
@@ -34,7 +34,7 @@
             </div>
         </div>
         {% elif user.account_type == 3 %}
-        <div class="col-md-4 col-sm-6 my-3">
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
             <div class="card h-100">
                 <a href="{% url 'homework' %}"><img src="{% static 'homework.png' %}" class="card-img-top" alt="Мой класс"></a>
                 <div class="card-body">
@@ -45,7 +45,7 @@
         </div>
         {% endif %}
         {% if user.account_type == 2 or user.account_type == 3 %}
-        <div class="col-md-4 col-sm-6 my-3">
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
             <div class="card h-100">
                 <a href="/diary"><img src="{% static 'diary.png' %}" class="card-img-top" alt="Дневник"></a>
                 <div class="card-body">
@@ -59,7 +59,7 @@
             </div>
         </div>
         {% endif %}
-        <div class="col-md-4 col-sm-6 my-3">
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
             <div class="card h-100">
                 <a href="/timetable"><img src="{% static 'timetable.png' %}" class="card-img-top" alt="Расписание"></a>
                 <div class="card-body">
@@ -72,7 +72,7 @@
                   </div>
             </div>
         </div>
-        <div class="col-md-4 col-sm-6 my-3">
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
             <div class="card h-100">
                 <a href="/minimum"><img src="{% static 'minimum.png' %}" class="card-img-top" alt="Минимум"></a>
                 <div class="card-body">
@@ -81,7 +81,7 @@
                   </div>
             </div>
         </div>
-        <div class="col-md-4 col-sm-6 my-3">
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
             <div class="card h-100">
                 <a href="/news"><img src="{% static 'news.png' %}" class="card-img-top" alt="Новости"></a>
                 <div class="card-body">
@@ -90,7 +90,7 @@
                   </div>
             </div>
         </div>
-        <div class="col-md-4 col-sm-6 my-3">
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
             <div class="card h-100">
                 <a href="#"><img src="{% static 'info.png' %}" class="card-img-top" alt="О проекте"></a>
                 <div class="card-body">
@@ -99,7 +99,7 @@
                   </div>
             </div>
         </div>
-        <div class="col-md-4 col-sm-6 my-3">
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
             <div class="card h-100">
                 <a href="/social"><img src="{% static 'social.png' %}" class="card-img-top" alt="Дневник"></a>
                 <div class="card-body">
