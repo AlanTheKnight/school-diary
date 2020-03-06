@@ -122,6 +122,7 @@ def get_average(list):
     return round(sum(grades) / len(list), 2)
 
 
+
 def get_smart_average(list):
     if len(list) == 0:
         return "-"
