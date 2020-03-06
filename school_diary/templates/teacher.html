@@ -170,7 +170,7 @@
                                 <label for="control">Вид работы</label>
                                 <select name="control" id="control" class="form-control auto-save">
                                     {% for control in controls %}
-                                    <option value="{{ control.id }}">{{ control.name }}</option>
+                                    <option id="{{ control.name }}"value="{{ control.id }}">{{ control.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -187,5 +187,5 @@
             </div>
         </div>
 </div>
-
+>
 {% endblock %}

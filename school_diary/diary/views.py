@@ -1,4 +1,5 @@
 from functools import reduce
+import datetime
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -10,7 +11,7 @@ from django.core.paginator import Paginator
 from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
-import datetime
+
 
 
 
@@ -247,6 +248,9 @@ def diary(request):
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
         controls = Controls.objects.all()
+        if datetime.date.today() != datetime.date(datetime.date.today().year, 3, 6): # TODO сделать диапазон
+            controls = controls.exclude(name='Четвертная')
+        
         context = {'Teacher': teacher,
                    'subjects': teacher.subjects.all(),
                    'grades': Grades.objects.filter(teachers=teacher),
