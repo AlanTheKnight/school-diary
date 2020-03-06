@@ -48,9 +48,16 @@
               </table>
               <p>Всего пропущено уроков: {{ total_missed  }}</p>
         </div>
-        
+        <input id="copy_btn" type="button" class="btn btn-primary" value="Скопировать">
     </div>
     <script>
         $('[data-toggle="popover"]').popover({ trigger: "focus", html:true });
+        $('[data-toggle="popover"]').popover({ trigger: "focus", html:true });
+        var copyBtn = document.querySelector('#copy_btn');
+        copyBtn.addEventListener('click', function () {
+            var urlField = document.querySelector('table');
+            range.selectNode(urlField);
+            document.execCommand('copy');
+        }, false);
     </script>
 {% endblock %}

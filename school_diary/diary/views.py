@@ -1,5 +1,4 @@
 from functools import reduce
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -13,6 +12,28 @@ from .models import *
 import datetime
 
 
+TERMS = (
+    ((1, 7), (27, 10)),
+    ((3, 11), (29, 12)),
+    ((12, 1), (27, 3)),
+    ((29, 3), (27, 5))
+    )
+
+
+def get_quater_by_date(datestring):
+    """
+    Returns a number of a quater by the date stamp string.
+    If quater does not exit, return 0 instead.
+    """
+    converted_date = datetime.datetime.strptime(datestring, "%Y-%m-%d").date()
+    year = converted_date.year
+    for i in range(0, 4):
+        start = datetime.date(year, TERMS[i][0][1], TERMS[i][0][0])
+        end = datetime.date(year, TERMS[i][1][1], TERMS[i][1][0])
+        if start <= converted_date <= end:
+            return i+1
+    else:
+        return 0
 
 @unauthenticated_user
 def user_register(request):
@@ -144,11 +165,11 @@ def delete_lesson(request, pk):
     return render(request, 'lesson_delete.html', {'item':lesson})
 
 
-def create_table(grade, subject):
+def create_table(grade, subject, quater):
     lessons = {
         lesson.id: lesson
         for lesson in
-        Lessons.objects.filter(grade=grade, subject=subject).select_related("control").order_by("date").all()
+        Lessons.objects.filter(grade=grade, subject=subject, quater=quater).select_related("control").order_by("date").all()
     }
     students = {student.account_id: student for student in
                 Students.objects.filter(grade=grade).order_by("first_name", "surname", "second_name")}
@@ -156,7 +177,8 @@ def create_table(grade, subject):
     marks = Marks.objects.filter(
         student__grade_id=grade.id,
         lesson__grade_id=grade.id,
-        lesson__subject_id=subject.id
+        lesson__subject_id=subject.id,
+        lesson__quater=quater,
     )
 
     scope = {}
@@ -203,8 +225,10 @@ def diary(request):
             subject = request.POST.get('subject')
             return redirect('/diary/{}'.format(subject))
         elif 'all' in request.POST:
+            chosen_quater = int(request.POST.get('term'))
             subjects = grade.subjects.all()
-            all_marks = student.marks_set.all()
+            all_marks = student.marks_set.filter(lesson__quater=chosen_quater)
+            if not all_marks: return render(request, 'no_marks.html')
             d = {}
             max_length, total_missed = 0, 0
             for s in subjects:
@@ -252,7 +276,7 @@ def diary(request):
                    'controls': controls
                    }
         if 'subject' in request.session.keys() and 'grade' in request.session.keys():
-            context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject'])))
+            context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject']), quater=request.session['term']))
 
 
         if request.method == 'POST':
@@ -262,6 +286,8 @@ def diary(request):
                 subject = Subjects.objects.get(name=request.POST.get('subject'))
                 grade = request.POST.get('grade')
                 request.session['subject'] = subject.id
+                term = request.POST.get('term')
+                request.session['term'] = int(term)
                 number = int(grade[0:-1])
                 letter = grade[-1]
                 try:
@@ -271,21 +297,22 @@ def diary(request):
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
 
-                context.update(create_table(grade, subject))
+                context.update(create_table(grade, subject, term))
                 return render(request, 'teacher.html', context)
 
             elif 'createlesson' in request.POST:
                 date = request.POST.get('date')
+                quater = get_quater_by_date(date)
                 theme = request.POST.get('theme')
                 homework = request.POST.get('homework')
                 control = Controls.objects.get(id=request.POST.get('control'))
                 grade = Grades.objects.get(id=request.session['grade'])
                 subject = Subjects.objects.get(id=request.session['subject'])
                 lesson = Lessons.objects.create(
-                    date=date, theme=theme, homework=homework, control=control, grade=grade, subject=subject
+                    date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject
                 )
                 lesson.save()
-                context.update(create_table(grade=grade, subject=subject))
+                context.update(create_table(grade=grade, subject=subject, term=quater))
                 return render(request, 'teacher.html', context)
 
             else:
@@ -334,7 +361,7 @@ def diary(request):
 
                 print("Added ", len(objs_for_create), " Changed ", len(objs_for_update), " Removed ", len(objs_for_remove))
                 # Render table
-                context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=subject))
+                context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=subject), quater=request.session['term'])
                 return render(request, 'teacher.html', context) # For debug
                 # return redirect(diary)
         else:
