@@ -31,7 +31,7 @@
     {% if request.method == "POST" %}
     <div class="card  card-50">
         <div class="card-body">
-            <h4 class="card-title">Домашнее задание на {{ date|date:"d.m, D" }}</h4>
+            <h1 class="card-title">Домашнее задание на {{ date|date:"d.m, D" }}</h1>
             <hr>
             {% for lesson in lessons %}
             {% if lesson.homework %}
@@ -45,7 +45,7 @@
     {% else %}
     <div class="card  card-50">
         <div class="card-body">
-            <h4 class="card-title">Домашнее задание на неделю:</h4>
+            <h2 class="card-title">Домашнее задание на неделю:</h2>
             <hr>
             {% for lesson in lessons %}
             {% if lesson.homework %}

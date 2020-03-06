@@ -11,36 +11,57 @@
 
     <div>
         <table class="table">
-            <tr>
-                <td>
-                    <a href="{% url 'admins_dashboard' %}">Администраторы</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a href="{% url 'teachers_dashboard' %}">Учителя</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a href="{% url 'students_dashboard' %}">Ученики</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a href="{% url 'news_dashboard' %}">Новостной блок сайта</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a href="{% url 'timetable_dashboard' %}">Расписание</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a href="{% url 'messages_dashboard' %}"><i class="fas fa-mess"></i>Сообщения от пользователей</a>
-                </td>
-            </tr>
+            <tbody>
+                <tr>
+                    <td style="width: 3%;">
+                        <i class="fas fa-user" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'admins_dashboard' %}">Администраторы</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fas fa-user" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'teachers_dashboard' %}">Учителя</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fas fa-user" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'students_dashboard' %}">Ученики</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fas fa-newspaper" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'news_dashboard' %}">Новостной блок сайта</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fas fa-clock" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'timetable_dashboard' %}">Расписание</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fas fa-comment" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'messages_dashboard' %}">Сообщения от пользователей</a>
+                    </td>
+                </tr>
+            </tbody>
+            
         </table>
     </div>
 </div>
