@@ -4,18 +4,15 @@
 
 {% block title %}
 <title>Расписание</title>
-<style>
-	.card {
-	margin: 0 auto;
-	float: none;
-	margin-bottom: 10px;
-	}
-</style>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <div class="card my-5 w-50">
+    <div class="card my-5 card-50">
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
@@ -25,6 +22,7 @@
         </div>
     </div>
     {% if lessons %}
+    <h4 class="text-center my-3" colspan="6">Показано расписание {{ number }} "{{ letter }}" класса</h4>
     <div class="table-responsive-sm">
         <table class="table">
             <thead class="thead-dark">

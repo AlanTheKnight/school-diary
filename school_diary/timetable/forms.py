@@ -15,7 +15,7 @@ class GetTimeTableForm(forms.Form):
         (9, 9),
         (10, 10),
         (11, 11)])
-    litera = forms.ChoiceField(label="Литера:", choices=[
+    litera = forms.ChoiceField(label="Буква:", choices=[
         ("А", "А"),
         ("Б", "Б"),
         ("В", "В"),

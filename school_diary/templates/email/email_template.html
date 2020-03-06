@@ -6,7 +6,7 @@
 {{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
 {% endblock %}
 
-Ваш логин, если вы его забыли: {{ user.get_username }}
+Ваш логин, если Вы его забыли: {{ user.get_username }}
 
 Списибо, что используете наш сайт!
 Команда сайта {{ site_name }}.

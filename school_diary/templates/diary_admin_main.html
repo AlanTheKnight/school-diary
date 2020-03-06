@@ -8,63 +8,61 @@
 {% block content %}
 <div class="container my-5">
     <h1>Панель администратора</h1>
-    <div class="row">
-        <div class="col-md-3 col-sm-6 my-3">
-            <div class="card h-100">
-                <a href="{% url 'admins_dashboard' %}"><img src="{% static '/admin_gui/admins.png' %}" class="card-img-top" alt="Просмотр администраторов"></a>
-                <div class="card-body">
-                    <p class="text-muted">Создание, изменение и удаление администраторов.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 my-3">
-            <div class="card h-100">
-                <a href="{% url 'teachers_dashboard' %}"><img src="{% static '/admin_gui/teachers.png' %}" class="card-img-top" alt="Просмотр учителей" title="Просмотр учителей"></a>
-                <div class="card-body">
-                    <p class="text-muted">Создание, изменение и удаление учителей.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 my-3">
-            <div class="card h-100">
-                <a href="{% url 'students_dashboard' %}"><img src="{% static 'admin_gui/students.png' %}" class="card-img-top" alt="Просмотр учеников"></a>
-                <div class="card-body">
-                    <p class="text-muted">Создание, изменение и удаление учеников.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 my-3">
-            <div class="card h-100">
-                <a href="{% url 'news_dashboard' %}"><img src="{% static 'news.png' %}" class="card-img-top" alt="Панель новостей" title="Панель новостей"></a>
-                <div class="card-body">
-                    <p class="text-muted">Редактирование новостного блока сайта.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 my-3">
-            <div class="card h-100">
-                <a href="{% url 'timetable_dashboard' %}"><img src="{% static 'timetable.png' %}" class="card-img-top" alt="Панель расписания" title="Панель расписания"></a>
-                <div class="card-body">
-                    <p class="text-muted">Редактирование расписания.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 my-3">
-            <div class="card h-100">
-                <a href="{% url 'minimum_dashboard' %}"><img src="{% static 'minimum.png' %}" class="card-img-top" alt="Панель минимумов" title="Панель минимумов"></a>
-                <div class="card-body">
-                    <p class="text-muted">Редактирование минимумов.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 my-3">
-            <div class="card h-100">
-                <a href="{% url 'messages_dashboard' %}"><img src="{% static 'admin_gui/messages.png' %}" class="card-img-top" alt="Панель минимумов" title="Панель минимумов"></a>
-                <div class="card-body">
-                    <p class="text-muted">Просмотр сообщений и запросов пользователей.</p>
-                </div>
-            </div>
-        </div>
+
+    <div>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td style="width: 3%;">
+                        <i class="fas fa-user" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'admins_dashboard' %}">Администраторы</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fas fa-user" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'teachers_dashboard' %}">Учителя</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fas fa-user" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'students_dashboard' %}">Ученики</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fas fa-newspaper" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'news_dashboard' %}">Новостной блок сайта</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fas fa-clock" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'timetable_dashboard' %}">Расписание</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i class="fas fa-comment" style="color: black;"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'messages_dashboard' %}">Сообщения от пользователей</a>
+                    </td>
+                </tr>
+            </tbody>
+            
+        </table>
     </div>
 </div>
 {% endblock %}

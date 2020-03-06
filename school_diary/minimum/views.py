@@ -20,7 +20,7 @@ def minimum(request):
                 return render(request, 'error.html', {
                     'title': "Минимум не найден",
                     'error': "404",
-                    'description': "Минимум, который вы ищите, не найден."
+                    'description': "Минимум, который Вы ищите, не найден."
                 })
     else:
         form = GetMinimumForm()

@@ -30,37 +30,55 @@
         </div>
     {% endif %}
 
-    <div class="card my-3">
+    <div class="card card-50 my-5">
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="subject">Предмет</label>
-                    <select name="subject" id="subject" class="form-control">
-                        {% for subject in subjects %}
-                            <option>{{ subject }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="grade">Класс</label>
-                    <select name="grade" id="grade" class="form-control">
-                        {% for grade in grades %}
-                            <option>{{ grade }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="row">
+                    <div class="col-6 col-sm-4">
+                        <div class="form-group">
+                            <label for="subject">Предмет</label>
+                            <select name="subject" id="subject" class="form-control">
+                                {% for subject in subjects %}
+                                    <option>{{ subject }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <div class="form-group">
+                            <label for="grade">Класс</label>
+                            <select name="grade" id="grade" class="form-control">
+                                {% for grade in grades %}
+                                    <option>{{ grade }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <div class="form-group">
+                            <label for="term">Четверть</label>
+                            <select name="term" id="term" class="form-control">
+                                <option value="1">I</option>
+                                <option value="2">II</option>
+                                <option value="3">III</option>
+                                <option value="4">IV</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary" name="getgrade">Найти</button>
             </form>
         </div>
     </div>
+
         {% if request.method == 'POST' %}
         <form method="POST" >
         {% csrf_token %}
         <input hidden name="subject_id" value="{{ subject_id }}"/>
         <input hidden name="grade_id" value="{{ grade_id }}"/>
         <div class="my-3">
-            <button type="submit" class="btn btn-primary destroy">Сохранить изменения</button>
+            <button type="submit" class="btn btn-success">Сохранить изменения</button>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
         </div>
 
@@ -111,6 +129,10 @@
                 </tbody>
              </table>
         </div>
+        <hr>
+        <p><small class="text-muted">Серым цветом выделяются поля с оценками, которые Вы изменили. Перед выходом с этой страницы не забудьте сохранить
+            все изменения.<br>Вы можете нажать на дату урока и редактировать информацию о выбранном уроке.
+        </small></p>
         {% else %}
         <div class="alert alert-info mt-5">
             Уроки еще не были добавлены.

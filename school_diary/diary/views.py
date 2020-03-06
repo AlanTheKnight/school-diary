@@ -188,6 +188,7 @@ def diary(request):
     """
     Main function for displaying diary pages to admins/teachers/students.
     """
+    
     # If user is admin
     if request.user.account_type == 0 or request.user.account_type == 1:
         return render(request, 'diary_admin_main.html')
@@ -251,6 +252,9 @@ def diary(request):
                    'grades': Grades.objects.filter(teachers=teacher),
                    'controls': controls
                    }
+        if 'subject' in request.session.keys() and 'grade' in request.session.keys():
+            context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject'])))
+
 
         if request.method == 'POST':
             # If teacher filled in a form with name = 'getgrade' then
@@ -767,7 +771,7 @@ def error404(request):
     return render(request, 'error.html', {
         'error': "404",
         'title': "Страница не найдена.",
-        "description": "Мы не можем найти страницу, которую вы ищите."
+        "description": "Мы не можем найти страницу, которую Вы ищите."
     })
 
 
