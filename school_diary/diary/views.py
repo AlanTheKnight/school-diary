@@ -13,8 +13,6 @@ from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
 
 
-
-
 @unauthenticated_user
 def user_register(request):
     if request.method == 'POST':
@@ -101,18 +99,28 @@ def teacher_register(request):
 @login_required(login_url="/login/")  # TODO fix bug
 def lesson_page(request, pk):
     lesson = Lessons.objects.get(pk=pk)
-    if request.method == 'POST':
-        form = LessonEditForm(request.POST, instance=lesson)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/diary/')
-        else:
-            pass
-    form = LessonEditForm(instance=lesson)
+    # if request.method == 'POST':
+    #     form = LessonEditForm(request.POST, instance=lesson)
+    #     if form.is_valid():
+    #         form.save()
+    #         return HttpResponseRedirect('/diary/')
+    #     else:
+    #         pass
+    # form = LessonEditForm(instance=lesson)
+    controls = Controls.objects.all()
+    controls = term_valid(controls, 3, 7)
     context = {
         'lesson': lesson,
-        'form': form
+        'controls': controls
     }
+    if request.method == 'POST':
+        lesson = Lessons.objects.get(pk=request.POST.get('pk'))
+        lesson.date = request.POST.get('date')
+        lesson.theme = request.POST.get('theme')
+        lesson.control = Controls.objects.get(pk=request.POST.get('control'))
+        lesson.homework = request.POST.get('homework')
+        lesson.save()
+
     return render(request, 'lesson_page.html', context)
 
 
@@ -121,7 +129,6 @@ def get_average(list):
         return '-'
     grades = [i.amount for i in list]
     return round(sum(grades) / len(list), 2)
-
 
 
 def get_smart_average(list):
@@ -184,6 +191,13 @@ def create_table(grade, subject):
     }
 
 
+def term_valid(controls, month, day):
+    if datetime.date(datetime.date.today().year, month, day) <= datetime.date.today() <= datetime.date(datetime.date.today().year, month, day + 7):
+        return controls
+    else:
+        return controls.exclude(name='Четвертная')
+
+
 @login_required(login_url="/login/")
 def diary(request):
     """
@@ -229,7 +243,6 @@ def diary(request):
 
                 total_missed += n_amount
 
-
             for subject in d:
                 d[subject].append(range(max_length - len(d[subject][2])))
             context = {
@@ -248,8 +261,7 @@ def diary(request):
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
         controls = Controls.objects.all()
-        if datetime.date.today() != datetime.date(datetime.date.today().year, 3, 6): # TODO сделать диапазон
-            controls = controls.exclude(name='Четвертная')
+        controls = term_valid(controls, 3, 6)
         
         context = {'Teacher': teacher,
                    'subjects': teacher.subjects.all(),
