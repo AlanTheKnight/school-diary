@@ -378,7 +378,7 @@ def diary(request):
 
                 print("Added ", len(objs_for_create), " Changed ", len(objs_for_update), " Removed ", len(objs_for_remove))
                 # Render table
-                context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=subject), quater=request.session['term'])
+                context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=subject, quater=request.session['term']))
                 return render(request, 'teacher.html', context) # For debug
                 # return redirect(diary)
         else:
