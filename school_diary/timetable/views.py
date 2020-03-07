@@ -110,7 +110,8 @@ def dashboard(request):
             lessons = []
             chosen_grade = ""
             chosen_litera = ""
-    form = GetTimeTableForm()
+        form = GetTimeTableForm()
+        
     context = {
         'form':form,
         'lessons':lessons,

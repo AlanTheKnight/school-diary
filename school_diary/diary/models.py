@@ -159,7 +159,7 @@ class Lessons(models.Model):
     quater = models.SmallIntegerField(verbose_name='Четверть', null=True, default=None)
     homework = models.TextField(blank=True, verbose_name='ДЗ')
     theme = models.CharField(max_length=120, verbose_name='Тема')
-    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name='Предмет')
+    subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет')
     grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
     control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')  # As homework or test
 
@@ -176,7 +176,7 @@ class Marks(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
     amount = models.IntegerField(verbose_name="Балл", null=True, default=None)
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок')
-    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name='Предмет', null=True, default=None)
+    subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет', null=True, default=None)
     comment = models.TextField(max_length=300, verbose_name="Комментарий", default="", blank=1, null=True)
     class Meta():
         verbose_name_plural = "Оценки"
