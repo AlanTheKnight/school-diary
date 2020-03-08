@@ -11,6 +11,7 @@ from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
 
+
 TERMS = (
     ((1, 7), (27, 10)),
     ((3, 11), (29, 12)),
@@ -19,7 +20,7 @@ TERMS = (
     )
 
 
-def get_quater_by_date(datestring):
+def get_quater_by_date(datestring: str) -> int:
     """
     Returns a number of a quater by the date stamp string.
     If quater does not exit, return 0 instead.
@@ -280,7 +281,8 @@ def diary(request):
                 'student': student,
                 'd': d,
                 'max_length':max_length,
-                'total_missed':total_missed
+                'total_missed':total_missed,
+                'term':chosen_quater
             }
             return render(request,'marklist.html',context)
 

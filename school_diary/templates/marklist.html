@@ -5,26 +5,38 @@
 <title>Оценки</title>
 {% endblock %}
 
+{% block css %}
+<style>
+    .sm-width {
+        width:2%;
+    }
+    .md-width {
+        width:10%;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
     <div class="container my-5">
+        <h1>Оценки за {{ term }} четверть:  </h1>
         <div class="table-responsive">
-            <table class="table-sm table-bordered">
+            <table class="table table-sm table-bordered">
                 <thead>
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Предмет</th>
-                    <th scope="col" tabindex="0" data-trigger="focus" data-toggle="popover" title="Средний балл" data-content="Высчитывается исходя из среднего арифметического оценок.">AVG</th>
-                    <th scope="col" tabindex="0" data-trigger="focus" data-toggle="popover" title="Взвешенный средний балл" data-content="Взвешенный балл высчитывается с помощью системы весов - исходя из значимости определенного вида работы.">SM.AVG</th>
+                    <th scope="col" class="text-center" tabindex="0" data-trigger="focus" data-toggle="popover" title="Средний балл" data-content="Высчитывается исходя из среднего арифметического оценок.">AVG</th>
+                    <th scope="col" class="text-center" tabindex="0" data-trigger="focus" data-toggle="popover" title="Взвешенный средний балл" data-content="Взвешенный балл высчитывается с помощью системы весов - исходя из значимости определенного вида работы.">SM.AVG</th>
                     <th scope="col" colspan="{{ max_length }}"></th>
                   </tr>
                 </thead>
                 <tbody>
                     {% for subject, marks in d.items %}
                         <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a href="{{ subject.id }}">{{ subject }}</a></td>
-                            <td class="text-center">{{ marks.0 }}</td>
-                            <td class="text-center">{{ marks.1 }}</td>
+                            <th scope="row" class="sm-width">{{ forloop.counter }}</th>
+                            <td class="md-width"><a href="{{ subject.id }}">{{ subject }}</a></td>
+                            <td class="text-center md-width">{{ marks.0 }}</td>
+                            <td class="text-center md-width">{{ marks.1 }}</td>
                             {% for mark in marks.2 %}
                                 {% if mark.amount == 2 %}
                                 <td scope="col" style="color:red" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
