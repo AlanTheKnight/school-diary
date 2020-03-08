@@ -10,6 +10,7 @@
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/teacher.css' %}">
 <link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<script src="{% static 'js/savy.min.js' %}"></script>
 
 <script>
     function myfunction(that){
@@ -58,11 +59,11 @@
                     <div class="col-6 col-sm-4">
                         <div class="form-group">
                             <label for="term">Четверть</label>
-                            <select name="term" id="term" class="form-control">
-                                <option {% if session_term == 1 %} selected {% endif %} value="1">I</option>
-                                <option {% if session_term == 2 %} selected {% endif %} value="2">II</option>
-                                <option {% if session_term == 3 %} selected {% endif %} value="3">III</option>
-                                <option {% if session_term == 4 %} selected {% endif %} value="4">IV</option>
+                            <select name="term" id="term" class="form-control auto-save">
+                                <option value="1">I</option>
+                                <option value="2">II</option>
+                                <option value="3">III</option>
+                                <option value="4">IV</option>
                             </select>
                         </div>
                     </div>
@@ -187,5 +188,7 @@
             </div>
         </div>
 </div>
->
+<script>
+    $('.auto-save').savy('load');
+</script>
 {% endblock %}
