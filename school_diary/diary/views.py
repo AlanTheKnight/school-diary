@@ -130,7 +130,8 @@ def lesson_page(request, pk):
     #         pass
     # form = LessonEditForm(instance=lesson)
     controls = Controls.objects.all()
-    controls = term_valid(controls, 3, 7)
+    controls = term_valid(controls, TERMS)
+    controls = year_valid(controls)
     context = {
         'lesson': lesson,
         'controls': controls
@@ -213,13 +214,23 @@ def create_table(grade, subject, quater):
         'subject_id': subject.id,
         'grade_id': grade.id
     }
-
-
-def term_valid(controls, month, day):
-    if datetime.date(datetime.date.today().year, month, day) <= datetime.date.today() <= datetime.date(datetime.date.today().year, month, day + 7):
+def year_valid(controls):
+    if datetime.date(datetime.date.today().year, 5, 20) <= datetime.date.today() <= datetime.date(datetime.date.today().year, 5, 27):
         return controls
     else:
+        return controls.exclude(name='Годовая')
+
+def term_valid(controls,terms):
+    a = 0
+    for i in range(1,5):
+        print(i)
+        if datetime.date(datetime.date.today().year, terms[i-1][1][1], terms[i-1][1][0]-7) <= datetime.date.today() <= datetime.date(datetime.date.today().year, terms[i-1][1][1], terms[i-1][1][0]):
+            a = 1 
+            break
+    if not a:
         return controls.exclude(name='Четвертная')
+    else:
+        return controls
 
 
 @login_required(login_url="/login/")
@@ -288,8 +299,8 @@ def diary(request):
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
         controls = Controls.objects.all()
-        controls = term_valid(controls, 3, 6)
-        
+        controls = term_valid(controls, TERMS)
+        controls = year_valid(controls)
         context = {'Teacher': teacher,
                    'subjects': teacher.subjects.all(),
                    'grades': Grades.objects.filter(teachers=teacher),
