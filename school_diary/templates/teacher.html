@@ -12,11 +12,6 @@
 <link rel="stylesheet" href="{% static 'css/card_width.css' %}">
 <script src="{% static 'js/savy.min.js' %}"></script>
 
-<script>
-    function myfunction(that){
-        that.style.backgroundColor = "#d6d6d6";
-    }
-</script>
 
 {% endblock %}
 
@@ -120,7 +115,7 @@
                                         <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
                                     </select>
                                     {% if mark %}
-                                        <a href="#" class="edit">+</a>
+                                        <button type="button" style="border: none; background-color: white;" onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}">+</button>
                                     {% endif %}
                                 </td>
                             {% endwith %}
@@ -187,8 +182,49 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="commentmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="lessonmodalLabel">Добавить комментарий</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="comment">Текст комментария</label>
+                                <input type="text" name="comment" id="comment" maxlenght="120" class="form-control">
+                            </div>
+                            <input id="commentdata" name="commentdata" value="">
+
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                            <button type="submit" class="btn btn-primary" name="addcomment">Создать</button>
+                            </div>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 </div>
 <script>
     $('.auto-save').savy('load');
+    function myfunction(that){
+        that.style.backgroundColor = "#d6d6d6";
+    }
+
+    function show_confirm(element){
+        document.getElementById("commentdata").value = element.value
+        $("#commentmodal").modal('show');
+    }
+
+    function myfunction(that){
+        that.style.backgroundColor = "#d6d6d6";
+    }
 </script>
 {% endblock %}

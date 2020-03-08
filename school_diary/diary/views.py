@@ -348,6 +348,18 @@ def diary(request):
                 context.update(create_table(grade=grade, subject=subject, quater=quater))
                 return render(request, 'teacher.html', context)
 
+            elif 'addcomment' in request.POST:
+                comment = request.POST.get('comment')
+                data = request.POST.get('commentdata')
+                student_id = data.split("|")[0]
+                lesson_id = data.split("|")[1]
+                student = Students.objects.get(account=student_id)
+                lesson = Lessons.objects.get(id=lesson_id)
+                mark = Marks.objects.get(student=student, lesson=lesson)
+                mark.comment = comment
+                mark.save()
+                return HttpResponseRedirect('/diary/')
+
             else:
                 # Save marks block
                 marks_dict = {
