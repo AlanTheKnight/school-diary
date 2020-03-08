@@ -10,6 +10,7 @@
     {% block title %}{% endblock %}
     <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/savy.min.js' %}"></script>
     <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
     {% block css %}
     {% endblock %}
@@ -102,4 +103,7 @@
     IdeaSoft, 2020
   </div>
 </footer>
+<script>
+  $('.auto-save').savy('load');
+</script>
 </html>
