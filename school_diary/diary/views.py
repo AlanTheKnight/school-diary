@@ -332,7 +332,6 @@ def diary(request):
                     return render(request, 'teacher.html', context)
 
                 context.update(create_table(grade, subject, term))
-                context.update({'session_grade': grade, 'session_term': term, 'session_subject': subject})
                 return render(request, 'teacher.html', context)
 
             elif 'createlesson' in request.POST:

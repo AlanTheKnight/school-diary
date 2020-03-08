@@ -41,7 +41,7 @@
                             <label for="subject">Предмет</label>
                             <select name="subject" id="subject" class="form-control auto-save">
                                 {% for subject in subjects %}
-                                    <option {% if session_subject == subject %} selected {% endif %}>{{ subject }}</option>
+                                    <option>{{ subject }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -51,7 +51,7 @@
                             <label for="grade">Класс</label>
                             <select name="grade" id="grade" class="form-control auto-save">
                                 {% for grade in grades %}
-                                    <option {% if session_grade == grade %} selected {% endif %}>{{ grade }}</option>
+                                    <option >{{ grade }}</option>
                                 {% endfor %}
                             </select>
                         </div>
