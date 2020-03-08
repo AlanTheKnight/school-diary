@@ -88,8 +88,8 @@
                         <th scope="col">Ученики</th>
                         {% for k, lesson in lessons.items %}
 
-                            <th scope="col" {%  if lesson.control_id == 3  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}> #Need to change id
-                                
+                            <th scope="col" {%  if lesson.control_id == 3  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}> {# Need to change id #}
+                            
                                 <a href="{% url 'lesson-page' lesson.pk %}">
                                     <p>{{ lesson.date|date:'m.d' }}</p>
                                     <p></p>{{ lesson.control }}
@@ -116,7 +116,7 @@
                                         <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
                                     </select>
                                     {% if mark %}
-                                        <button type="button" style="border: none; background-color: white;" onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}">+</button>
+                                        <button type="button" style="border: none; {%  if lesson.control_id == 3  %} background-color: #fa9537; {% endif %} {%  if lesson.control_id == 5  %} background-color: rgb(250, 84, 55); {% endif %}" onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" >+</button>
                                     {% endif %}
                                 </td>
                             {% endwith %}
