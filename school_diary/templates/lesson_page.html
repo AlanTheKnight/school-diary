@@ -17,7 +17,7 @@
                 {% csrf_token %}
             <input type="hidden" value="{{  lesson.pk}}" name="pk">
                 <label>Дата*</label>
-                <input type="text" name="date" value="{{ lesson.date|date:"Y-m-d" }}">
+                <input type="date" name="date" value="{{ lesson.date|date:"Y-m-d" }}">
                 <label>Тема*</label>
                 <input type="text" name="theme" value="{{ lesson.theme }}">
                 <label>Домашняя работа</label>
