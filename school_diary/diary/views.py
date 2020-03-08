@@ -226,7 +226,6 @@ def year_valid(controls):
 def term_valid(controls,terms):
     a = 0
     for i in range(1,5):
-        print(i)
         if datetime.date(datetime.date.today().year, terms[i-1][1][1], terms[i-1][1][0]-7) <= datetime.date.today() <= datetime.date(datetime.date.today().year, terms[i-1][1][1], terms[i-1][1][0]):
             a = 1 
             break
@@ -590,6 +589,8 @@ def students_marks(request, pk, term):
 
     subjects = my_class.subjects.all()
     all_marks = student.marks_set.filter(lesson__quater=term)
+    if not all_marks:
+        return render(request, 'grades/no_marks.html')
     d = {}
     max_length, total_missed = 0, 0
     for s in subjects:
