@@ -557,11 +557,17 @@ def my_grade(request):
 
 def view_students_marks(request):
     me = Teachers.objects.get(account=request.user)
+    if request.method == "POST":
+        term = int(request.POST.get('term'))
+    else:
+        term = get_quater_by_date(str(datetime.date.today()))
+    
     try:
         grade = Grades.objects.get(main_teacher=me)
         students = Students.objects.filter(grade=grade)
         context = {
-            'students':students
+            'students':students,
+            'term':term,
         }
         return render(request, 'grades/grade_marks.html', context)
     except ObjectDoesNotExist:
@@ -576,13 +582,13 @@ def get_class_or_access_denied(teacher):
         return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
 
 
-def students_marks(request, pk):
+def students_marks(request, pk, term):
     student = Students.objects.get(account=pk)
     me = Teachers.objects.get(account=request.user)
     my_class = get_class_or_access_denied(me)
 
     subjects = my_class.subjects.all()
-    all_marks = student.marks_set.all()
+    all_marks = student.marks_set.filter(lesson__quater=term)
     d = {}
     max_length, total_missed = 0, 0
     for s in subjects:

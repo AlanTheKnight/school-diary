@@ -19,7 +19,7 @@ urlpatterns = [
     path('my-grade/', views.my_grade, name='my_grade'),
     path('delete-student/<str:i>', views.delete_student, name='delete_student'),
     path('students_marks/', views.view_students_marks, name='students_marks'),
-    path('view_marks/<str:pk>', views.students_marks, name='view_marks'),
+    path('view_marks/<int:pk>/<int:term>', views.students_marks, name='view_marks'),
 
     # Students
     path('students/', views.students_dashboard_first_page, name='students_dashboard'),

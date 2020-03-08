@@ -8,11 +8,30 @@
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/card_align.css' %}">
 <link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<script src="{% static 'js/savy.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
 <div class="container">
     {% if students %}
+    <div class="card card-50 my-3">
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="term">Четверть</label>
+                    <select name="term" id="term" class="form-control auto-save">
+                        <option value="1">I</option>
+                        <option value="2">II</option>
+                        <option value="3">III</option>
+                        <option value="4">IV</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" name="all">Показать</button>
+            </form>
+        </div>
+    </div>
+    
     <div class="table-responsive my-5">
         <table class="table table-sm text-center">
             <thead>
@@ -27,7 +46,7 @@
                         <td>{{ student.account.email }}</td>
                         <td>{{ student.first_name }}</td>
                         <td>{{ student.surname }}</td>
-                        <td><a href="{% url 'view_marks' student.account_id %}" class="btn btn-primary btn-sm text-white" style="display:inline-block;"><i><i class="fas fa-eye"></i></a></td>
+                        <td><a href="{% url 'view_marks' student.account_id term %}" class="btn btn-primary btn-sm text-white" style="display:inline-block;"><i><i class="fas fa-eye"></i></a></td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -39,4 +58,7 @@
     </div>
     {% endif %}
 </div>
+<script>
+    $('.auto-save').savy('load',function(){});
+</script>
 {% endblock %}
