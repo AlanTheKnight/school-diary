@@ -10,6 +10,25 @@
 
 {% block content %}
 <div class="container">
-    
+    <div class="my-5">
+        <h1>Настройки класса</h1>
+        <p class="lead"><i class="fas fa-exclamation-circle text-danger"></i> Будьте осторожны с изменением этих настроек, так как учителя могут потерять доступ к Вашему классу.</p>
+        <hr>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="alert alert-secondary">
+                Для того, чтобы выбрать несколько элементов в этих полях, зажмите клавишу CTRL.
+            </div>
+            <div class="form-group">
+                <label for="subjects">Предметы</label>
+                {{ form.subjects }}
+            </div>
+            <div class="form-group">
+                <label for="subjects">Учителя</label>
+                {{ form.teachers }}
+            </div>
+            <button type="submit" class="btn btn-success">Сохранить изменения</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

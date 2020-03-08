@@ -132,8 +132,8 @@ class GradeCreationForm(forms.ModelForm):
         widgets = {
             'number':forms.Select(attrs={'class': 'form-control'}),
             'letter':forms.Select(attrs={'class': 'form-control'}),
-            'subjects':forms.SelectMultiple(attrs={'class': 'form-control'}),
-            'teachers':forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'subjects':forms.SelectMultiple(attrs={'class': 'form-control', 'id':'subjects'}),
+            'teachers':forms.SelectMultiple(attrs={'class': 'form-control', 'id':'teachers'}),
         }
 
 
@@ -182,12 +182,6 @@ class TeacherEditForm(forms.ModelForm):
         }
 
 
-class LessonEditForm(forms.ModelForm):
-    class Meta:
-        model = Lessons
-        fields = ('date', 'theme', 'homework', 'control')
-
-
 class DatePickForm(forms.Form):
     date = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control', 'type':'date', 'id':'date'}))
 
@@ -195,3 +189,14 @@ class DatePickForm(forms.Form):
 class CreateSubjectForm(forms.Form):
     class Meta:
         model = Subjects
+
+
+class ClassSettingsForm(forms.ModelForm):
+    class Meta:
+        model = Grades
+        fields = ('subjects', 'teachers')
+        widgets = {
+            'subjects':forms.SelectMultiple(attrs={'class': 'form-control', 'id':'subjects'}),
+            'teachers':forms.SelectMultiple(attrs={'class': 'form-control', 'id':'teachers'}),
+        }
+

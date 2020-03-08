@@ -898,4 +898,19 @@ def messages_view(request, pk):
     return render(request, 'messages/view.html', {'s': s})
 
 
-
+@login_required(login_url="login")
+@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+def mygradesettings(request):
+    me = Teachers.objects.get(account=request.user)
+    try:
+        grade = Grades.objects.get(main_teacher=me)
+        if request.method == "POST":
+            form = ClassSettingsForm(request.POST, instance=grade)
+            if form.is_valid():
+                form.save()
+                return redirect('my_grade')
+            print("NOT VALID")
+        form = ClassSettingsForm(instance=grade)
+        return render(request, 'grades/class_settings.html', {'form':form})
+    except ObjectDoesNotExist:
+        return render(request, 'access_denied.html', {'message':'Вы не классный руководитель.'})
