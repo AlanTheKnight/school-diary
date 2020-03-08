@@ -63,7 +63,7 @@ urlpatterns = [
     path('diary/lesson/<int:pk>', views.lesson_page, name='lesson-page'),
     path('diary/lesson/<int:pk>/delete', views.delete_lesson, name='diary_lesson_delete'),
     path('diary/', views.diary, name='diary'),
-    path('diary/<int:id>/', views.stats, name='statistics'),
+    path('diary/<int:id>/<int:term>/', views.stats, name='statistics'),
     path('diary/homework/', views.homework, name='homework'),
 
 

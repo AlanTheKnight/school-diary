@@ -392,7 +392,7 @@ def diary(request):
 
 @login_required(login_url="login")
 @allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
-def stats(request, id):
+def stats(request, id, term):
     student = Students.objects.get(account=request.user)
     grade = student.grade
     try:
@@ -402,13 +402,13 @@ def stats(request, id):
                                                      'error':'404',
                                                      'description':'Данный предмет отстуствует.'})
     #return HttpResponse(subject.name)
-    lessons = Lessons.objects.filter(grade=grade, subject=subject)
+    lessons = Lessons.objects.filter(grade=grade, subject=subject, quater=term)
     #return HttpResponse(len(lessons))
     marks = []
     #for i in lessons:
         #try: marks.append(Marks.objects.get(student=student, lesson=i))
         #except: pass
-    marks = student.marks_set.filter(subject=subject)
+    marks = student.marks_set.filter(subject=subject, lesson__quater=term)
 
     # If student has no marks than send him a page with info.
     # Otherwise, student will get a page with statistics and his results.
@@ -430,6 +430,7 @@ def stats(request, id):
         data.append(n_amount)
 
         context = {
+            'term':term,
             'lessons':lessons,
             'marks':marks,
             'subject':subject,
