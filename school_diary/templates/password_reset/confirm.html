@@ -4,18 +4,16 @@
 
 {% block title %}
 <title>Сброс пароля</title>
-<style>
-    .card {
-        margin: 0 auto;
-        float: none;
-        margin-bottom: 10px;
-	}
-</style>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/card_align' %}">
+<link rel="stylesheet" href="{% static 'css/card_width' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <div class="card w-50">
+    <div class="card card-50">
         <div class="card-body">
             <h3 class="text-center card-title">Введите новый пароль</h3>
             <p>Введите новый пароль для своего аккаунта.</p>

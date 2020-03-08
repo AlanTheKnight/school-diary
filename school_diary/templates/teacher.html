@@ -107,7 +107,7 @@
                         {% for lk, lesson in lessons.items %}
                             {% with mark=small_scope|lookup:lesson %}
                                 <td {%  if lesson.control_id == 3  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}>
-                                <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control_id == 3  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}>
+                                    <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control_id == 3  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}>
                                         <option value="" {% if not mark %}selected{%endif%}></option>
                                         <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
                                         <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</option>
@@ -116,7 +116,7 @@
                                         <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
                                     </select>
                                     {% if mark %}
-                                        <button type="button" style="border: none; {%  if lesson.control_id == 3  %} background-color: #fa9537; {% endif %} {%  if lesson.control_id == 5  %} background-color: rgb(250, 84, 55); {% endif %}" onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" >+</button>
+                                        <button type="button" style="border: none; {%  if lesson.control_id == 3  %} background-color: #fa9537; {% endif %} {%  if lesson.control_id == 5  %} background-color: rgb(250, 84, 55); {% endif %}" onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" comment="{{ mark.comment }}" >+</button>
                                     {% endif %}
                                 </td>
                             {% endwith %}
@@ -196,9 +196,9 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="comment">Текст комментария</label>
-                                <input type="text" name="comment" id="comment" maxlenght="120" class="form-control">
+                                <textarea name="comment" id="commenttextfield" class="form-control" maxlength="400" cols="40" rows=5></textarea>
                             </div>
-                            <input id="commentdata" name="commentdata" value="">
+                            <input id="commentdata" type="hidden" name="commentdata" value="">
 
                             <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
@@ -217,7 +217,9 @@
     }
 
     function show_confirm(element){
-        document.getElementById("commentdata").value = element.value
+        var content = element.getAttribute('comment');
+        document.getElementById("commenttextfield").value = content;
+        document.getElementById("commentdata").value = element.value;
         $("#commentmodal").modal('show');
     }
 

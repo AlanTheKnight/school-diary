@@ -340,11 +340,18 @@ def diary(request):
                 control = Controls.objects.get(id=request.POST.get('control'))
                 grade = Grades.objects.get(id=request.session['grade'])
                 subject = Subjects.objects.get(id=request.session['subject'])
+                term = request.session['term']
                 lesson = Lessons.objects.create(date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject)
                 lesson.save()
-                context.update(create_table(grade=grade, subject=subject, quater=quater))
+                context.update(create_table(grade=grade, subject=subject, quater=term))
                 return render(request, 'teacher.html', context)
+
             elif 'addcomment' in request.POST:
+                # Get data from session
+                grade = Grades.objects.get(id=request.session['grade'])
+                term = request.session['term']
+                subject = Subjects.objects.get(id=request.session['subject'])
+                #
                 comment = request.POST.get('comment')
                 data = request.POST.get('commentdata')
                 student_id = data.split("|")[0]
@@ -354,7 +361,8 @@ def diary(request):
                 mark = Marks.objects.get(student=student, lesson=lesson)
                 mark.comment = comment
                 mark.save()
-                return HttpResponseRedirect('/diary/')
+                context.update(create_table(grade=grade, subject=subject, quater=term))
+                return render(request, 'teacher.html', context)
             else:
                 # Save marks block
                 marks_dict = {

@@ -2,12 +2,17 @@
 {% load static %}
 
 {% block title %}
-<title></title>
+<title>Пароль обновлен</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/card_align' %}">
+<link rel="stylesheet" href="{% static 'css/card_width' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="card my-5 w-50">
+    <div class="card my-5 card-50">
         <div class="card-body">
             <h3 class="card-title">Пароль был обновлен.</h3>
             <p>Вы успешно обновили пароль для своего аккаунта. Теперь Вы можете перйти на страницу входа.</p>
