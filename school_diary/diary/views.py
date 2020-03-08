@@ -251,7 +251,7 @@ def diary(request):
         grade = student.grade
         if grade is None:
             return render(request, 'access_denied.html', {'message':"Вы не состоите в классе.\
-            Попросите Вашего классного руководителя добавить вас в класс."})
+            Попросите Вашего классного руководителя добавить Вас в класс."})
         if 'selected' in request.POST:
             subject = request.POST.get('subject')
             return redirect('/diary/{}'.format(subject))
@@ -506,9 +506,13 @@ def add_student_page(request):
     if request.method == "POST":
         form = AddStudentToGradeForm(request.POST)
         if form.is_valid:
-            fn = request.POST.get('first_name')
-            s = request.POST.get('surname')
-            search = Students.objects.filter(first_name=fn, surname=s)
+            email = request.POST.get('email')
+            fn = request.POST.get('first_name').strip()
+            s = request.POST.get('surname').strip()
+            if fn or s or email:
+                search = Students.objects.filter(first_name__icontains=fn, surname__icontains=s, account__email__icontains=email)
+            else:
+                search = []
             context = {'form': form, 'search': search, 'grade': grade, 'students': students}
             return render(request, 'grades/add_student.html', context)
 

@@ -121,8 +121,9 @@ class TeacherSignUpForm(UserCreationForm):
 
 
 class AddStudentToGradeForm(forms.Form):
-    first_name = forms.CharField(label="Имя", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    surname = forms.CharField(label="Фамилия", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.CharField(label="Почта", required=False, max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(label="Имя", required=False, max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    surname = forms.CharField(label="Фамилия", required=False, max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
 
 class GradeCreationForm(forms.ModelForm):

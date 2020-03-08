@@ -7,8 +7,8 @@
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/card_align' %}">
-<link rel="stylesheet" href="{% static 'css/card_width' %}">
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -16,7 +16,7 @@
     <div class="card card-50">
         <div class="card-body">
             <h3 class="text-center card-title">Забыли пароль?</h3>
-            <p>Введите свой адрес электронной почты, и мы пришлем вам ссылку для сброса пароля.</p>
+            <p>Введите свой адрес электронной почты, и мы пришлем Вам ссылку для сброса пароля.</p>
             <form method="post">
                 {% csrf_token %}
                 {{ form|crispy }}
