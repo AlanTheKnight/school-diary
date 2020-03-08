@@ -18,17 +18,23 @@
         Такой пользователь уже существует
     </div>
     {% endif %}
-    <div class="card my-5 card-50">
+    <div class="card card-50 my-3">
         <div class="card-body">
             <h5 class="card-title">Уже зарегистрированы?</h5>
             <a href="/login/" class="btn btn-primary">Войти</a>
         </div>
     </div>
-    <div class="card card-50">
+    <div class="card card-50 my-3">
         <div class="card-body">
-            <h3 class="card-title text-center">Регистрация нового ученика</h3>
-            <form method="POST" class="my-5">
+            <h1 class="card-title text-center">Регистрация нового ученика</h1>
+            <form method="POST">
                 {% csrf_token %}
+                <hr>
+                <p><i class="fas fa-exclamation-circle text-danger"></i>
+                Регистрируйтесь внимательно, так как после заполнения формы
+                Вам потребуется время, чтобы изменить персональные данные.
+                Настоятельно рекомендуется указывать полное имя.</p>
+                <hr>
                 <div class="form-group">
                     {{ form.email.label }}
                     {{ form.email }}
@@ -45,6 +51,7 @@
                     {{ form.second_name.label }} (необязательно)
                     {{ form.second_name }}
                 </div>
+                <hr>
                 <div class="form-group">
                     {{ form.password1.label }}
                     <div class="input-group" id="show_hide_password">
@@ -82,7 +89,7 @@
                     {{ form.password2 }}
                 </div>
                 <p><small>Регистрируясь на этом сайте, Вы принимаете условия <a href=#>пользовательского договора</a>.</small></p>
-                <button type="submit" class="btn btn-primary">Зарегестрироваться</button>
+                <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
             </form>
         </div>
     </div>

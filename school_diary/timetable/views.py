@@ -47,16 +47,17 @@ def output(request, grade, litera):
         class_letter = litera
         my_class = str(class_number) + class_letter
         my_grade = Grades.objects.get(number=class_number, letter=class_letter)
-        if CURRENT_DAY != 7: lessons_list_today = Lessons.objects.filter(connection=my_grade.id, day=current_day_name)
+        all_lessons = Lessons.objects.filter(connection=my_grade.id)
+        if CURRENT_DAY != 7: lessons_list_today = all_lessons.filter(day=current_day_name)
         else: lessons_list_today = []
-        if CURRENT_DAY != 6: lessons_list_tomorrow = Lessons.objects.filter(connection=my_grade.id, day=next_day_name)
+        if CURRENT_DAY != 6: lessons_list_tomorrow = all_lessons.filter(day=next_day_name)
         else: lessons_list_tomorrow = []
-        lessons_list_monday = Lessons.objects.filter(connection=my_grade.id, day="Понедельник")
-        lessons_list_tuesday = Lessons.objects.filter(connection=my_grade.id, day="Вторник")
-        lessons_list_wednesday = Lessons.objects.filter(connection=my_grade.id, day="Среда")
-        lessons_list_thursday = Lessons.objects.filter(connection=my_grade.id, day="Четверг")
-        lessons_list_friday = Lessons.objects.filter(connection=my_grade.id, day="Пятница")
-        lessons_list_saturday = Lessons.objects.filter(connection=my_grade.id, day="Суббота")
+        lessons_list_monday = all_lessons.filter(day="Понедельник")
+        lessons_list_tuesday = all_lessons.filter(day="Вторник")
+        lessons_list_wednesday = all_lessons.filter(day="Среда")
+        lessons_list_thursday = all_lessons.filter(day="Четверг")
+        lessons_list_friday = all_lessons.filter(day="Пятница")
+        lessons_list_saturday = all_lessons.filter(day="Суббота")
         return render(request, 'timetable/list.html', {
             'current_weekday': current_day_name,
             'today': lessons_list_today,

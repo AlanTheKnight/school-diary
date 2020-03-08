@@ -14,13 +14,14 @@
         width:10%;
     }
 </style>
+<script src="{% static 'js/clipboard.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
     <div class="container my-5">
-        <h1>Оценки за {{ term }} четверть:  </h1>
+        <h2>Оценки за {{ term }} четверть:  </h2>
         <div class="table-responsive">
-            <table class="table table-sm table-bordered">
+            <table class="table table-sm table-bordered" id="marks_table">
                 <thead>
                   <tr>
                     <th scope="col">#</th>
@@ -60,15 +61,35 @@
               </table>
               <p>Всего пропущено уроков: {{ total_missed  }}</p>
         </div>
-        <input id="copy_btn" type="button" class="btn btn-primary" value="Скопировать">
+        <button type="button" class="btn btn-primary copy_btn copy" data-clipboard-target="#marks_table"><i class="fas fa-copy"></i></button>    
     </div>
     <script>
         $('[data-toggle="popover"]').popover({ trigger: "focus", html:true });
-        var copyBtn = document.querySelector('#copy_btn');
-        copyBtn.addEventListener('click', function () {
-            var urlField = document.querySelector('table');
-            range.selectNode(urlField);
-            document.execCommand('copy');
-        }, false);
+        
+        $('.copy').tooltip({
+            trigger: 'click',
+            placement: 'bottom'
+          });
+
+        function setTooltip(message) {
+            $('.copy').tooltip('hide')
+              .attr('data-original-title', message)
+              .tooltip('show');
+          }
+          
+          function hideTooltip() {
+            setTimeout(function() {
+              $('.copy').tooltip('hide');
+            }, 1000);
+          }
+        
+        clipboard = new ClipboardJS('.copy_btn');
+
+        clipboard.on('success', function(e) {
+            e.clearSelection();
+            setTooltip('Скопировано!');
+            hideTooltip();
+        });
+        
     </script>
 {% endblock %}
