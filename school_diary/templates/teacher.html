@@ -93,7 +93,8 @@
                         <th scope="col">Ученики</th>
                         {% for k, lesson in lessons.items %}
 
-                            <th scope="col">
+                            <th scope="col" {%  if lesson.control_id == 3  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}> #Need to change id
+                                
                                 <a href="{% url 'lesson-page' lesson.pk %}">
                                     <p>{{ lesson.date|date:'m.d' }}</p>
                                     <p></p>{{ lesson.control }}
@@ -110,8 +111,8 @@
                         <td scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</td>
                         {% for lk, lesson in lessons.items %}
                             {% with mark=small_scope|lookup:lesson %}
-                                <td>
-                                    <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)">
+                                <td {%  if lesson.control_id == 3  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}>
+                                <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control_id == 3  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}>
                                         <option value="" {% if not mark %}selected{%endif%}></option>
                                         <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
                                         <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</option>
@@ -175,8 +176,6 @@
                                     {% endfor %}
                                 </select>
                             </div>
-
-
                             <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
                             <button type="submit" class="btn btn-primary" name="createlesson">Создать</button>

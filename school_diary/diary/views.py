@@ -330,7 +330,6 @@ def diary(request):
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
-
                 context.update(create_table(grade, subject, term))
                 return render(request, 'teacher.html', context)
 
@@ -342,13 +341,10 @@ def diary(request):
                 control = Controls.objects.get(id=request.POST.get('control'))
                 grade = Grades.objects.get(id=request.session['grade'])
                 subject = Subjects.objects.get(id=request.session['subject'])
-                lesson = Lessons.objects.create(
-                    date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject
-                )
+                lesson = Lessons.objects.create(date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject)
                 lesson.save()
                 context.update(create_table(grade=grade, subject=subject, quater=quater))
                 return render(request, 'teacher.html', context)
-
             else:
                 # Save marks block
                 marks_dict = {
