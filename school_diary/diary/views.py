@@ -142,6 +142,7 @@ def lesson_page(request, pk):
         lesson.control = Controls.objects.get(pk=request.POST.get('control'))
         lesson.homework = request.POST.get('homework')
         lesson.save()
+        return redirect('diary')
 
     return render(request, 'lesson_page.html', context)
 
@@ -294,7 +295,7 @@ def diary(request):
                    'grades': Grades.objects.filter(teachers=teacher),
                    'controls': controls
                    }
-        if 'subject' in request.session.keys() and 'grade' in request.session.keys():
+        if 'subject' in request.session.keys() and 'grade' in request.session.keys() and 'term' in request.session.keys():
             context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject']), quater=request.session['term']))
 
 
@@ -331,7 +332,7 @@ def diary(request):
                     date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject
                 )
                 lesson.save()
-                context.update(create_table(grade=grade, subject=subject, term=quater))
+                context.update(create_table(grade=grade, subject=subject, quater=quater))
                 return render(request, 'teacher.html', context)
 
             else:
