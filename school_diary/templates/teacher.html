@@ -40,7 +40,7 @@
                             <label for="subject">Предмет</label>
                             <select name="subject" id="subject" class="form-control">
                                 {% for subject in subjects %}
-                                    <option>{{ subject }}</option>
+                                    <option {% if session_subject == subject %} selected {% endif %}>{{ subject }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -50,7 +50,7 @@
                             <label for="grade">Класс</label>
                             <select name="grade" id="grade" class="form-control">
                                 {% for grade in grades %}
-                                    <option>{{ grade }}</option>
+                                    <option {% if session_grade == grade %} selected {% endif %}>{{ grade }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -59,10 +59,10 @@
                         <div class="form-group">
                             <label for="term">Четверть</label>
                             <select name="term" id="term" class="form-control">
-                                <option value="1">I</option>
-                                <option value="2">II</option>
-                                <option value="3">III</option>
-                                <option value="4">IV</option>
+                                <option {% if session_term == 1 %} selected {% endif %} value="1">I</option>
+                                <option {% if session_term == 2 %} selected {% endif %} value="2">II</option>
+                                <option {% if session_term == 3 %} selected {% endif %} value="3">III</option>
+                                <option {% if session_term == 4 %} selected {% endif %} value="4">IV</option>
                             </select>
                         </div>
                     </div>
