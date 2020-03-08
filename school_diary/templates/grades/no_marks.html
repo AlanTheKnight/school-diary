@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Нет оценок</title>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5 text-center">
+    <img src="{% static 'search.svg' %}" alt="" width="100">
+    <p class="text-muted my-3">Мы не можем найти ни одной оценки на эту четверть.</p>
+    <a href="{% url 'students_marks' %}" class="btn btn-primary">Назад</a>
+</div>
+{% endblock %}

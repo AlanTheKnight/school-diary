@@ -25,6 +25,14 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3 col-sm-6 my-3">
+            <div class="card h-100">
+                <a href="{% url 'students_marks' %}"><img src="{% static 'settings.png' %}" class="card-img-top" alt="Редактировать список учеников класса"></a>
+                <div class="card-body">
+                    <h5 class="card-title">Редактрирование параметров класса</h5>
+                </div>
+            </div>
+        </div>
     </div>
     {% else %}
     <div class="card my-5">

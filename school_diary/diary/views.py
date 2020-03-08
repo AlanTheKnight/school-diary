@@ -226,7 +226,6 @@ def year_valid(controls):
 def term_valid(controls,terms):
     a = 0
     for i in range(1,5):
-        print(i)
         if datetime.date(datetime.date.today().year, terms[i-1][1][1], terms[i-1][1][0]-7) <= datetime.date.today() <= datetime.date(datetime.date.today().year, terms[i-1][1][1], terms[i-1][1][0]):
             a = 1 
             break
@@ -345,6 +344,17 @@ def diary(request):
                 lesson.save()
                 context.update(create_table(grade=grade, subject=subject, quater=quater))
                 return render(request, 'teacher.html', context)
+            elif 'addcomment' in request.POST:
+                comment = request.POST.get('comment')
+                data = request.POST.get('commentdata')
+                student_id = data.split("|")[0]
+                lesson_id = data.split("|")[1]
+                student = Students.objects.get(account=student_id)
+                lesson = Lessons.objects.get(id=lesson_id)
+                mark = Marks.objects.get(student=student, lesson=lesson)
+                mark.comment = comment
+                mark.save()
+                return HttpResponseRedirect('/diary/')
             else:
                 # Save marks block
                 marks_dict = {
@@ -585,6 +595,8 @@ def students_marks(request, pk, term):
 
     subjects = my_class.subjects.all()
     all_marks = student.marks_set.filter(lesson__quater=term)
+    if not all_marks:
+        return render(request, 'grades/no_marks.html')
     d = {}
     max_length, total_missed = 0, 0
     for s in subjects:
