@@ -88,7 +88,7 @@
                         <th scope="col">Ученики</th>
                         {% for k, lesson in lessons.items %}
 
-                            <th scope="col" {%  if lesson.control_id == 2  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}> {# Need to change id #}
+                            <th scope="col" {%  if lesson.control_id == 2  %} style="background-color: #e9ecef;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}> {# Need to change id #}
                             
                                 <a href="{% url 'lesson-page' lesson.pk %}">
                                     <p>{{ lesson.date|date:'m.d' }}</p>
@@ -106,8 +106,8 @@
                         <td scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</td>
                         {% for lk, lesson in lessons.items %}
                             {% with mark=small_scope|lookup:lesson %}
-                                <td {%  if lesson.control.name == 'Четвертная'  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control.name == 'Годовая'  %} style="background-color: rgb(250, 84, 55);" {% endif %}>
-                                    <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная'  %} style="background-color: #fa9537;" {% endif %} {%  if lesson.control.name == 'Годовая'  %} style="background-color: rgb(250, 84, 55);" {% endif %}>
+                                <td {%  if lesson.control.name == 'Четвертная'  %} style="background-color: #e9ecef;" {% endif %} {%  if lesson.control.name == 'Годовая'  %} style="background-color: rgb(233,236,239);" {% endif %}>
+                                    <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная'  %} style="background-color: #e9ecef;" {% endif %} {%  if lesson.control.name == 'Годовая'  %} style="background-color: rgb(233,236,239);" {% endif %}>
                                         <option value="" {% if not mark %}selected{%endif%}></option>
                                         <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
                                         <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</option>
@@ -116,7 +116,7 @@
                                         <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
                                     </select>
                                     {% if mark %}
-                                        <button type="button" style="border: none; {%  if lesson.control.name == 'Четвертная'  %} background-color: #fa9537; {% endif %} {%  if lesson.control.name == 'Годовая'  %} background-color: rgb(250, 84, 55); {% endif %}" onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" comment="{{ mark.comment }}" >+</button>
+                                        <button type="button" style="border: none; {%  if lesson.control.name == 'Четвертная'  %} background-color: #e9ecef; {% endif %} {%  if lesson.control.name == 'Годовая'  %} background-color: rgb(233,236,239); {% endif %}" onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" comment="{{ mark.comment }}" >+</button>
                                     {% endif %}
                                 </td>
                             {% endwith %}
