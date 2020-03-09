@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'timetable.apps.TimetableConfig',
     'crispy_forms',
     'minimum.apps.MinimumConfig',
-    'diary',
+    'diary.apps.DiaryConfig',
     'news.apps.NewsConfig',
     'django_cleanup',
     'debug_toolbar',
