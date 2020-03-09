@@ -31,15 +31,20 @@
     {% if request.method == "POST" %}
     <div class="card  card-50">
         <div class="card-body">
-            <h1 class="card-title">Домашнее задание на {{ date|date:"d.m, D" }}</h1>
+            <h2 class="card-title">Домашнее задание на {{ date|date:"d.m, D" }}</h2>
             <hr>
+            {% if lessons %}
             {% for lesson in lessons %}
-            {% if lesson.homework %}
             <h5>{{ lesson.subject }}</h5>
             <p>{{ lesson.homework }}</p>
             <hr>
-            {% endif %}
             {% endfor %}
+            {% else %}
+            <div class="text-center my-3">
+                <img src="{% static 'book.svg' %}" alt="" width="100">
+                <p>Домашнее задание не задано.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% else %}
@@ -47,13 +52,18 @@
         <div class="card-body">
             <h2 class="card-title">Домашнее задание на неделю:</h2>
             <hr>
+            {% if lessons %}
             {% for lesson in lessons %}
-            {% if lesson.homework %}
             <h5><span class="badge badge-secondary" style="display: inline;">{{ lesson.date|date:"d.m, D" }}</span> {{ lesson.subject }}</h5>
             <p>{{ lesson.homework }}</p>
             <hr>
-            {% endif %}
             {% endfor %}
+            {% else %}
+            <div class="text-center my-3">
+                <img src="{% static 'book.svg' %}" alt="" width="100">
+                <p>Домашнее задание не задано.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endif %}

@@ -478,18 +478,20 @@ def stats(request, id, term):
 @login_required(login_url="login")
 @allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
 def homework(request):
+    student = Students.objects.get(account=request.user)
+    grade = student.grade
+    print(grade)
     if request.method == "POST":
         if "day" in request.POST:
             form = DatePickForm(request.POST)
             if form.is_valid():
                 date = form.cleaned_data['date']
-                student = Students.objects.get(account=request.user)
-                grade = student.grade
-                lessons = Lessons.objects.filter(date=date, grade=grade)
+               
+                lessons = Lessons.objects.filter(date=date, grade=grade, homework__iregex=r'\S+')
             return render(request, 'homework.html', {'form':form, 'lessons':lessons, 'date':date})
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=6)
-    lessons = Lessons.objects.filter(date__range=[start_date, end_date])
+    lessons = Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, homework__iregex=r'\S+')
     form = DatePickForm()
     return render(request, 'homework.html', {'form':form, 'lessons':lessons})
 
