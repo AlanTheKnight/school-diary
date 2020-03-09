@@ -287,12 +287,14 @@ def diary(request):
 
             for subject in d:
                 d[subject].append(range(max_length - len(d[subject][2])))
+
             context = {
                 'student': student,
                 'd': d,
                 'max_length':max_length,
                 'total_missed':total_missed,
-                'term':chosen_quater
+                'term':chosen_quater,
+                'values': list(d.values())
             }
             return render(request, 'marklist.html', context)
 

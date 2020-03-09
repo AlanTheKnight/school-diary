@@ -31,8 +31,11 @@
                     <th scope="col">Предмет</th>
                     <th scope="col" class="text-center" tabindex="0" data-trigger="focus" data-toggle="popover" title="Средний балл" data-content="Высчитывается исходя из среднего арифметического оценок.">AVG</th>
                     <th scope="col" class="text-center" tabindex="0" data-trigger="focus" data-toggle="popover" title="Взвешенный средний балл" data-content="Взвешенный балл высчитывается с помощью системы весов - исходя из значимости определенного вида работы.">SM.AVG</th>
-                    <th scope="col" colspan="{{ max_length }}"></th>
+                    {% for i in values.0.2 %}
+                    <th scope="col">{{ i.lesson.date }}</th>
+                    {% endfor %}
                   </tr>
+
                 </thead>
                 <tbody>
                     {% for subject, marks in d.items %}
