@@ -263,22 +263,39 @@ def diary(request):
             if not all_marks: return render(request, 'no_marks.html')
             d = {}
             max_length, total_missed = 0, 0
+
+            # make list of all dates
+            # lesson_dates = []
+            # for mark in all_marks.order_by('lesson__date'):
+            #     if not (mark.lesson.date in lesson_dates):
+            #         lesson_dates.append(mark.lesson.date)
+
             for s in subjects:
                 marks = all_marks.filter(subject=s.id).order_by('lesson__date')
-
                 if len(marks) > max_length:
                     max_length = len(marks)
 
                 n_amount = 0
                 marks_list = []
                 for i in marks:
-                    if i.lesson.control.name == 'Четвертная': # delete Term or Year mark from avg
+                    if i.lesson.control.name == 'Четвертная' or i.lesson.control.name == 'Годовая': # delete Term or Year mark from avg
                         continue
 
                     if i.amount != -1:
                         marks_list.append(i)
                     else:
                         n_amount += 1
+                # g_marks = [] TODO create dates
+                # for mark in marks:
+                #     a = 1
+                #     for date in dates:
+                #         if mark.lesson.date == date:
+                #             a = 0
+                #     if a:
+                #         g_marks.append(None)
+                #     else:
+                #         g_marks.append()
+                # print(g_marks)
                 avg = get_average(marks_list)
                 smart_avg = get_smart_average(marks_list)
                 d.update({s:[avg, smart_avg, marks]})
@@ -294,7 +311,7 @@ def diary(request):
                 'max_length':max_length,
                 'total_missed':total_missed,
                 'term':chosen_quater,
-                'values': list(d.values())
+                # 'dates': lesson_dates
             }
             return render(request, 'marklist.html', context)
 

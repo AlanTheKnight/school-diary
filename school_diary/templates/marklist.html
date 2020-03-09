@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container my-5">
+    <div class="container-fluid my-5">
         <h2>Оценки за {{ term }} четверть:  </h2>
         <div class="alert alert-secondary my-3">
             Нажмите на оценку, чтобы увидеть больше информации.
@@ -31,9 +31,10 @@
                     <th scope="col">Предмет</th>
                     <th scope="col" class="text-center" tabindex="0" data-trigger="focus" data-toggle="popover" title="Средний балл" data-content="Высчитывается исходя из среднего арифметического оценок.">AVG</th>
                     <th scope="col" class="text-center" tabindex="0" data-trigger="focus" data-toggle="popover" title="Взвешенный средний балл" data-content="Взвешенный балл высчитывается с помощью системы весов - исходя из значимости определенного вида работы.">SM.AVG</th>
-                    {% for i in values.0.2 %}
-                    <th scope="col">{{ i.lesson.date }}</th>
-                    {% endfor %}
+                      <th scope="col" colspan="{{ max_length }}"></th>
+{#{% for i in dates %}#}
+{#                    <th scope="col">{{ i|date:'d.m'}}</th>#}
+{#                    {% endfor %}#}
                   </tr>
 
                 </thead>
@@ -45,6 +46,7 @@
                             <td class="text-center md-width">{{ marks.0 }}</td>
                             <td class="text-center md-width">{{ marks.1 }}</td>
                             {% for mark in marks.2 %}
+
                                 {% if mark.amount == 2 %}
                                 <td scope="col" style="color:red" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
                                 {% elif mark.amount == 3 %}
