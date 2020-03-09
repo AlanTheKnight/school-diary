@@ -11,6 +11,7 @@ from django.core.paginator import Paginator
 from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
+import datetime
 
 
 TERMS = (
@@ -271,11 +272,13 @@ def diary(request):
                 n_amount = 0
                 marks_list = []
                 for i in marks:
+                    if i.lesson.control.name == 'Четвертная': # delete Term or Year mark from avg
+                        continue
+
                     if i.amount != -1:
                         marks_list.append(i)
                     else:
                         n_amount += 1
-
                 avg = get_average(marks_list)
                 smart_avg = get_smart_average(marks_list)
                 d.update({s:[avg, smart_avg, marks]})
@@ -291,7 +294,7 @@ def diary(request):
                 'total_missed':total_missed,
                 'term':chosen_quater
             }
-            return render(request,'marklist.html',context)
+            return render(request, 'marklist.html', context)
 
         subjects = grade.subjects.all()
         context = {'subjects': subjects}
