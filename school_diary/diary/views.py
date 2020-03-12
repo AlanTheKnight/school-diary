@@ -236,7 +236,7 @@ def term_valid(controls, terms):
     '''
     check dates to term marks
     '''
-    year = datetime.today().year
+    year = datetime.date.today().year
     a = 0
     for i in range(1,5):
         # FIX OPTIMIZATION:
