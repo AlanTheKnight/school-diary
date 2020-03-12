@@ -223,23 +223,30 @@ def year_valid(controls):
     '''
     check date to year mark
     '''
-    if datetime.date(datetime.date.today().year, 5, 20) <= datetime.date.today() <= datetime.date(datetime.date.today().year, 5, 27):
+    # OPTIMIZATION: The same gist as in term_valid(): use timedelta to know the days
+    year = datetime.date.today().year
+    delta = datetime.date(year, TERMS[3][1][1], TERMS[3][1][0]) - datetime.date.today()
+    if delta.days < 14:
         return controls
     else:
-        return controls.exclude(name='Годовая')
+        return controls.exclude(name='Годовая оценка')
 
 
-def term_valid(controls,terms):
+def term_valid(controls, terms):
     '''
     check dates to term marks
     '''
+    year = datetime.today().year
     a = 0
     for i in range(1,5):
-        if datetime.date(datetime.date.today().year, terms[i-1][1][1], terms[i-1][1][0]-7) <= datetime.date.today() <= datetime.date(datetime.date.today().year, terms[i-1][1][1], terms[i-1][1][0]):
-            a = 1 
+        # FIX OPTIMIZATION:
+        # If delta between today and the end of the quater lower than 14 days, I allow setting quater marks.
+        delta = datetime.date(year, terms[i-1][1][1], terms[i-1][1][0]) - datetime.date.today()
+        if delta.days < 14:
+            a = 1
             break
     if not a:
-        return controls.exclude(name='Четвертная')
+        return controls.exclude(name='Четвертная оценка')
     else:
         return controls
 
@@ -250,10 +257,10 @@ def create_controls(grade, subject, term):
     controls = year_valid(controls)
     lessons = Lessons.objects.filter(grade=grade, subject=subject, quater=term).all()
     for lesson in lessons:
-        if lesson.control.name == 'Четвертная':
-            controls = controls.exclude(name='Четвертная')
-        if lesson.control.name == 'Годоваяая':
-            controls = controls.exclude(name='Годовая')
+        if lesson.control.name == 'Четвертная оценка':
+            controls = controls.exclude(name='Четвертная оценка')
+        if lesson.control.name == 'Годовая оценка':
+            controls = controls.exclude(name='Годовая оценка')
     return {'controls': controls}
 
 
@@ -965,8 +972,11 @@ def mygradesettings(request):
             if form.is_valid():
                 form.save()
                 return redirect('my_grade')
-            print("NOT VALID")
         form = ClassSettingsForm(instance=grade)
         return render(request, 'grades/class_settings.html', {'form':form})
     except ObjectDoesNotExist:
         return render(request, 'access_denied.html', {'message':'Вы не классный руководитель.'})
+
+
+def about(request):
+    return render(request, 'about_us.html', {})
