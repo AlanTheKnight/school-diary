@@ -133,13 +133,13 @@ def lesson_page(request, pk):
     #     else:
     #         pass
     # form = LessonEditForm(instance=lesson)
-    controls = Controls.objects.all()
-    controls = term_valid(controls, TERMS)
-    controls = year_valid(controls)
+
     context = {
         'lesson': lesson,
-        'controls': controls
     }
+    context.update(create_controls(grade=Grades.objects.get(pk=request.session['grade']),
+                                   subject=Subjects.objects.get(pk=request.session['subject']),
+                                   term=request.session['term']))
     if request.method == 'POST':
         lesson = Lessons.objects.get(pk=request.POST.get('pk'))
         lesson.date = request.POST.get('date')
@@ -252,7 +252,9 @@ def create_controls(grade, subject, term):
     for lesson in lessons:
         if lesson.control.name == 'Четвертная':
             controls = controls.exclude(name='Четвертная')
-    return {'controls':controls}
+        if lesson.control.name == 'Годоваяая':
+            controls = controls.exclude(name='Годовая')
+    return {'controls': controls}
 
 
 @login_required(login_url="/login/")
