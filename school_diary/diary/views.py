@@ -17,7 +17,7 @@ import datetime
 TERMS = (
     ((1, 7), (27, 10)),
     ((3, 11), (29, 12)),
-    ((12, 1), (27, 3)),
+    ((12, 1), (12, 3)),  # FIX ON PRODUCTION
     ((29, 3), (27, 5))
     )
 
@@ -36,6 +36,7 @@ def get_quater_by_date(datestring: str) -> int:
             return i+1
     else:
         return 0
+
 
 @unauthenticated_user
 def user_register(request):
@@ -183,9 +184,7 @@ def delete_lesson(request, pk):
 
 def create_table(grade, subject, quater):
     lessons = {
-        lesson.id: lesson
-        for lesson in
-        Lessons.objects.filter(grade=grade, subject=subject, quater=quater).select_related("control").order_by("date").all()
+        lesson.id: lesson for lesson in Lessons.objects.filter(grade=grade, subject=subject, quater=quater).select_related("control").order_by("date").all()
     }
     students = {student.account_id: student for student in
                 Students.objects.filter(grade=grade).order_by("first_name", "surname", "second_name")}
@@ -218,13 +217,22 @@ def create_table(grade, subject, quater):
         'subject_id': subject.id,
         'grade_id': grade.id
     }
+
+
 def year_valid(controls):
+    '''
+    check date to year mark
+    '''
     if datetime.date(datetime.date.today().year, 5, 20) <= datetime.date.today() <= datetime.date(datetime.date.today().year, 5, 27):
         return controls
     else:
         return controls.exclude(name='Годовая')
 
+
 def term_valid(controls,terms):
+    '''
+    check dates to term marks
+    '''
     a = 0
     for i in range(1,5):
         if datetime.date(datetime.date.today().year, terms[i-1][1][1], terms[i-1][1][0]-7) <= datetime.date.today() <= datetime.date(datetime.date.today().year, terms[i-1][1][1], terms[i-1][1][0]):
@@ -234,6 +242,17 @@ def term_valid(controls,terms):
         return controls.exclude(name='Четвертная')
     else:
         return controls
+
+
+def create_controls(grade, subject, term):
+    controls = Controls.objects.all()
+    controls = term_valid(controls, TERMS)
+    controls = year_valid(controls)
+    lessons = Lessons.objects.filter(grade=grade, subject=subject, quater=term).all()
+    for lesson in lessons:
+        if lesson.control.name == 'Четвертная':
+            controls = controls.exclude(name='Четвертная')
+    return {'controls':controls}
 
 
 @login_required(login_url="/login/")
@@ -322,17 +341,16 @@ def diary(request):
     # If user is teacher
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
-        controls = Controls.objects.all()
-        controls = term_valid(controls, TERMS)
-        controls = year_valid(controls)
+        # controls = Controls.objects.all()
+        # controls = term_valid(controls, TERMS)
+        # controls = year_valid(controls)
         context = {'Teacher': teacher,
                    'subjects': teacher.subjects.all(),
                    'grades': Grades.objects.filter(teachers=teacher),
-                   'controls': controls
+                   # 'controls': controls
                    }
         if 'subject' in request.session.keys() and 'grade' in request.session.keys() and 'term' in request.session.keys():
             context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject']), quater=request.session['term']))
-
 
         if request.method == 'POST':
             # If teacher filled in a form with name = 'getgrade' then
@@ -352,6 +370,8 @@ def diary(request):
                     messages.error(request, 'Ошибка')
                     return render(request, 'teacher.html', context)
                 context.update(create_table(grade, subject, term))
+
+                context.update(create_controls(grade=grade, subject=subject, term=term))
                 return render(request, 'teacher.html', context)
 
             elif 'createlesson' in request.POST:
@@ -366,6 +386,7 @@ def diary(request):
                 lesson = Lessons.objects.create(date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject)
                 lesson.save()
                 context.update(create_table(grade=grade, subject=subject, quater=term))
+                context.update(create_controls(grade=grade, subject=subject, term=term))
                 return render(request, 'teacher.html', context)
 
             elif 'addcomment' in request.POST:
@@ -384,6 +405,7 @@ def diary(request):
                 mark.comment = comment
                 mark.save()
                 context.update(create_table(grade=grade, subject=subject, quater=term))
+                context.update(create_controls(grade=grade, subject=subject, term=term))
                 return render(request, 'teacher.html', context)
             else:
                 # Save marks block
@@ -432,7 +454,8 @@ def diary(request):
                 print("Added ", len(objs_for_create), " Changed ", len(objs_for_update), " Removed ", len(objs_for_remove))
                 # Render table
                 context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=subject, quater=request.session['term']))
-                return render(request, 'teacher.html', context) # For debug
+                context.update(create_controls(grade=Grades.objects.get(pk=request.session['grade']), subject=subject, term=request.session['term']))
+                return render(request, 'teacher.html', context)
                 # return redirect(diary)
         else:
             return render(request, 'teacher.html', context)
