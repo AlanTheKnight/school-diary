@@ -171,11 +171,11 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="date">Дата</label>
-                                <input type="date" name="date" id="date" class="form-control auto-save">
+                                <input type="date" name="date" id="date" class="form-control auto-save" required>
                             </div>
                             <div class="form-group">
                                 <label for="theme">Тема урока</label>
-                                <input type="text" name="theme" id="theme" maxlenght="120" class="form-control auto-save">
+                                <input type="text" name="theme" id="theme" maxlenght="120" class="form-control auto-save" required>
                             </div>
                             <div class="form-group">
                                 <label for="homework">Домашнее задание <small class="text-muted">(не обязательно)</small></label>
@@ -183,7 +183,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="control">Вид работы</label>
-                                <select name="control" id="control" class="form-control auto-save">
+                                <select name="control" id="control" class="form-control auto-save" required>
                                     {% for control in controls %}
                                     <option id="{{ control.name }}"value="{{ control.id }}">{{ control.name }}</option>
                                     {% endfor %}
