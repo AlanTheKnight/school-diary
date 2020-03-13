@@ -392,8 +392,8 @@ def diary(request):
                 grade = Grades.objects.get(id=request.session['grade'])
                 subject = Subjects.objects.get(id=request.session['subject'])
                 term = request.session['term']
-                h_file = request.POST.get('h_file')
-                lesson = Lessons.objects.create(date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject, h_file=h_file)
+                # h_file = request.POST.get('h_file')
+                lesson = Lessons.objects.create(date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject)
                 lesson.save()
                 context.update(create_table(grade=grade, subject=subject, quater=term))
                 context.update(create_controls(grade=grade, subject=subject, term=term))
