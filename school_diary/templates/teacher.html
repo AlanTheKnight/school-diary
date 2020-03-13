@@ -11,7 +11,25 @@
 <link rel="stylesheet" href="{% static 'css/teacher.css' %}">
 <link rel="stylesheet" href="{% static 'css/card_width.css' %}">
 
-
+<style>
+    .quater-mark{
+        background-color: #e9ecef;
+    }
+    .year-mark{
+        background-color: rgb(233,236,239);
+    }
+    .quater-mark-select{
+        border: none;
+        background-color: #e9ecef;
+    }
+    .year-mark-select{
+        border: none;
+        background-color: rgb(233,236,239);
+    }
+    .mark-plus-btn{
+        border: none;
+    }
+</style>
 
 {% endblock %}
 
@@ -106,8 +124,10 @@
                         <td scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</td>
                         {% for lk, lesson in lessons.items %}
                             {% with mark=small_scope|lookup:lesson %}
-                                <td {%  if lesson.control.name == 'Четвертная оценка'  %} style="background-color: #e9ecef;" {% endif %} {%  if lesson.control.name == 'Годовая оценка'  %} style="background-color: rgb(233,236,239);" {% endif %}>
-                                    <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная оценка'  %} style="background-color: #e9ecef;" {% endif %} {%  if lesson.control.name == 'Годовая оценка'  %} style="background-color: rgb(233,236,239);" {% endif %}>
+
+                                <td {% if lesson.control.name == 'Четвертная оценка' %} class="quater-mark" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="year-mark" {% endif %}>
+                                    <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная оценка' %} class="inp_table select quater-mark" style="background-color: #e9ecef;" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="inp_table select year-mark" style="background-color: rgb(233,236,239);" {% endif %}>
+
                                         <option value="" {% if not mark %}selected{%endif%}></option>
                                         <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
                                         <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</opti+on>
@@ -116,7 +136,8 @@
                                         <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
                                     </select>
                                     {% if mark %}
-                                        <button type="button" style="border: none; {%  if lesson.control.name == 'Четвертная оценка'  %} background-color: #e9ecef; {% endif %} {%  if lesson.control.name == 'Годовая оценка'  %} background-color: rgb(233,236,239); {% endif %}" onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" comment="{{ mark.comment }}" >+</button>
+
+                                        <button type="button" {% if lesson.control.name == 'Четвертная оценка'  %} class="quater-mark-select" {%  elif lesson.control.name == 'Годовая оценка'  %} class="year-mark-select" {% else %} class="mark-plus-btn" {% endif %} onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" comment="{{ mark.comment }}" >+</button>
                                     {% endif %}
                                 </td>
                             {% endwith %}
@@ -153,11 +174,11 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="date">Дата</label>
-                                <input type="date" name="date" id="date" class="form-control auto-save">
+                                <input type="date" name="date" id="date" class="form-control auto-save" required>
                             </div>
                             <div class="form-group">
                                 <label for="theme">Тема урока</label>
-                                <input type="text" name="theme" id="theme" maxlenght="120" class="form-control auto-save">
+                                <input type="text" name="theme" id="theme" maxlenght="120" class="form-control auto-save" required>
                             </div>
                             <div class="form-group">
                                 <label for="homework">Домашнее задание <small class="text-muted">(не обязательно)</small></label>
@@ -169,7 +190,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="control">Вид работы</label>
-                                <select name="control" id="control" class="form-control auto-save">
+                                <select name="control" id="control" class="form-control auto-save" required>
                                     {% for control in controls %}
                                     <option id="{{ control.name }}"value="{{ control.id }}">{{ control.name }}</option>
                                     {% endfor %}
