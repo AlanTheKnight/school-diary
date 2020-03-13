@@ -12,7 +12,7 @@
 <div class="container my-5">
     <div class="card">
         <div class="card-body">
-            <form method="POST" class="form" id="form">
+            <form method="POST" class="form" id="form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group">
                     <label>Дата</label>
@@ -27,14 +27,13 @@
                     <label>Домашняя работа <small class="text-muted">(необязательно)</small></label>
                     <textarea name="homework" class="form-control">{{ lesson.homework }}</textarea>
                 </div>
-                <!-- <div class="form-group">
+                <div class="form-group">
                     {% if lesson.h_file %}
-                    <label for="homework">Загруженный файл</label>
-                    <a href='{{lesson.h_file.url}}'>{{lesson.h_file}}</a>
+                    <p><a href='{{lesson.h_file.url}}'>Просмотреть загруженный файл</a></p>
                     {%endif%}
                     <label for="homework">Загрузить файл <small class="text-muted">(не обязательно)</small></label>
                     <input type='file' name='h_file'>
-                </div> -->
+                </div>
                 <div class="form-group">
                     <label>Вид контроля</label>
                     <select name="control" class="form-control">

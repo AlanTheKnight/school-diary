@@ -170,7 +170,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form method="POST">
+                        <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="date">Дата</label>
@@ -184,10 +184,10 @@
                                 <label for="homework">Домашнее задание <small class="text-muted">(не обязательно)</small></label>
                                 <textarea name="homework" id="homework" rows="10" class="form-control auto-save"></textarea>
                             </div>
-                            <!-- <div class="form-group">
+                            <div class="form-group">
                                 <label for="homework">Загрузить файл <small class="text-muted">(не обязательно)</small></label>
                                 <input type='file' name='h_file'>
-                            </div> -->
+                            </div>
                             <div class="form-group">
                                 <label for="control">Вид работы</label>
                                 <select name="control" id="control" class="form-control auto-save" required>

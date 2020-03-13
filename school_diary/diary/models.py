@@ -165,7 +165,7 @@ class Lessons(models.Model):
     subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет')
     grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
     control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')  # As homework or test
-    h_file = models.FileField(null=True)
+    h_file = models.FileField(null=True, default="None", verbose_name="Файл")
 
     class Meta:
         verbose_name = "Урок"
@@ -177,7 +177,7 @@ class Lessons(models.Model):
 
 
 class Marks(models.Model):
-    student = models.ForeignKey(Students, on_delete=models.CASCADE+, verbose_name="Ученик")
+    student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
     amount = models.IntegerField(verbose_name="Балл", null=True, default=None)
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок')
     subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет', null=True, default=None)

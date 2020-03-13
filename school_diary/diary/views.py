@@ -125,14 +125,6 @@ def teacher_register(request):
 @transaction.atomic
 def lesson_page(request, pk):
     lesson = Lessons.objects.get(pk=pk)
-    # if request.method == 'POST':
-    #     form = LessonEditForm(request.POST, instance=lesson)
-    #     if form.is_valid():
-    #         form.save()
-    #         return HttpResponseRedirect('/diary/')
-    #     else:
-    #         pass
-    # form = LessonEditForm(instance=lesson)
 
     context = {
         'lesson': lesson,
@@ -142,6 +134,7 @@ def lesson_page(request, pk):
                                    term=request.session['term']))
     if request.method == 'POST':
         lesson = Lessons.objects.get(pk=request.POST.get('pk'))
+        lesson.h_file = request.FILES.get('h_file')
         lesson.date = request.POST.get('date')
         lesson.quater = get_quater_by_date(lesson.date)
         lesson.theme = request.POST.get('theme')
@@ -392,8 +385,8 @@ def diary(request):
                 grade = Grades.objects.get(id=request.session['grade'])
                 subject = Subjects.objects.get(id=request.session['subject'])
                 term = request.session['term']
-                # h_file = request.POST.get('h_file')
-                lesson = Lessons.objects.create(date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject)
+                h_file = request.FILES.get('h_file')
+                lesson = Lessons.objects.create(date=date,h_file=h_file, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject)
                 lesson.save()
                 context.update(create_table(grade=grade, subject=subject, quater=term))
                 context.update(create_controls(grade=grade, subject=subject, term=term))
