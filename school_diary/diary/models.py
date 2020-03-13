@@ -154,6 +154,10 @@ class Controls(models.Model):
         return '{} '.format(self.name)
 
 
+def lesson_path(instance, filename):
+    return 'media/homework/{}/{}'.format(instance.user.id, filename)
+
+
 class Lessons(models.Model):
     date = models.DateField(verbose_name='Дата')
     quater = models.SmallIntegerField(verbose_name='Четверть', null=True, default=None)
@@ -162,6 +166,7 @@ class Lessons(models.Model):
     subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет')
     grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
     control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')  # As homework or test
+    h_file = models.FileField(upload_to=lesson_path, null=True)
 
     class Meta:
         verbose_name = "Урок"

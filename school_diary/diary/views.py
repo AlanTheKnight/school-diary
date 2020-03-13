@@ -17,7 +17,7 @@ import datetime
 TERMS = (
     ((1, 7), (27, 10)),
     ((3, 11), (29, 12)),
-    ((12, 1), (12, 3)),  # FIX ON PRODUCTION
+    ((12, 1), (21, 3)),  
     ((29, 3), (27, 5))
     )
 
@@ -392,7 +392,8 @@ def diary(request):
                 grade = Grades.objects.get(id=request.session['grade'])
                 subject = Subjects.objects.get(id=request.session['subject'])
                 term = request.session['term']
-                lesson = Lessons.objects.create(date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject)
+                h_file = request.POST.get('h_file')
+                lesson = Lessons.objects.create(date=date, quater=quater, theme=theme, homework=homework, control=control, grade=grade, subject=subject, h_file=h_file)
                 lesson.save()
                 context.update(create_table(grade=grade, subject=subject, quater=term))
                 context.update(create_controls(grade=grade, subject=subject, term=term))
