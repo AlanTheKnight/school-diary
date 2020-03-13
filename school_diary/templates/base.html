@@ -49,7 +49,7 @@
             <img class="dropdown-toggle" src="{% static 'user.png' %}" alt="" width="45" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" title="Аккаунт"></button>
             <div class="dropdown-menu" style="margin-top: 0px;">
               <a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Аккаунт</a>
-              <a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+              <a class="dropdown-item" href="{% url 'logout' %}" onclick="clearstorage();"><i class="fas fa-sign-out-alt"></i> Выйти</a>
             </div>
           </div>
           {% else %}
@@ -105,5 +105,8 @@
 </footer>
 <script>
   $('.auto-save').savy('load');
+  function clearstorage(){
+    localStorage.clear();
+  };
 </script>
 </html>
