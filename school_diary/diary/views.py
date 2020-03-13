@@ -17,7 +17,7 @@ import datetime
 TERMS = (
     ((1, 7), (27, 10)),
     ((3, 11), (29, 12)),
-    ((12, 1), (12, 3)),  # FIX ON PRODUCTION
+    ((12, 1), (21, 3)),  # FIX ON PRODUCTION
     ((29, 3), (27, 5))
     )
 
