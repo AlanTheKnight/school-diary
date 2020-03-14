@@ -119,9 +119,9 @@
 
 
                 <tbody>
-                {% for student, small_scope in scope.items %}
+                {% for student, small_scope in scope %}
                     <tr>
-                        <td scope="row" style="width: 20%;">{{ student.first_name }} {{ student.surname }}</td>
+                        <td scope="row" style="width: 20%;">{{ student.surname }} {{ student.first_name }}</td>
                         {% for lk, lesson in lessons.items %}
                             {% with mark=small_scope|lookup:lesson %}
 
