@@ -181,7 +181,7 @@ def create_table(grade, subject, quater):
         lesson.id: lesson for lesson in Lessons.objects.filter(grade=grade, subject=subject, quater=quater).select_related("control").order_by("date").all()
     }
     students = {student.account_id: student for student in
-                Students.objects.filter(grade=grade).order_by("first_name", "surname", "second_name")}
+                Students.objects.filter(grade=grade).order_by("surname", "first_name",  "second_name")}
 
     marks = Marks.objects.filter(
         student__grade_id=grade.id,
@@ -203,6 +203,8 @@ def create_table(grade, subject, quater):
                 scope[student] = {}
             if lesson not in scope[student]:
                 scope[student].update({lesson: None})
+
+    scope = sorted(list(scope.items()), key=lambda student: student[0].surname)
 
     return {
         'is_post': True,
@@ -352,8 +354,8 @@ def diary(request):
                    'grades': Grades.objects.filter(teachers=teacher),
                    # 'controls': controls
                    }
-        if 'subject' in request.session.keys() and 'grade' in request.session.keys() and 'term' in request.session.keys():
-            context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject']), quater=request.session['term']))
+        #if 'subject' in request.session.keys() and 'grade' in request.session.keys() and 'term' in request.session.keys():
+        #    context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject']), quater=request.session['term']))
 
         if request.method == 'POST':
             # If teacher filled in a form with name = 'getgrade' then
