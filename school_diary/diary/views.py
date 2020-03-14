@@ -203,7 +203,7 @@ def create_table(grade, subject, quater):
                 scope[student] = {}
             if lesson not in scope[student]:
                 scope[student].update({lesson: None})
-
+    print('here')
     return {
         'is_post': True,
         'lessons': lessons,
@@ -352,8 +352,8 @@ def diary(request):
                    'grades': Grades.objects.filter(teachers=teacher),
                    # 'controls': controls
                    }
-        if 'subject' in request.session.keys() and 'grade' in request.session.keys() and 'term' in request.session.keys():
-            context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject']), quater=request.session['term']))
+        # if 'subject' in request.session.keys() and 'grade' in request.session.keys() and 'term' in request.session.keys():
+            # context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject']), quater=request.session['term']))
 
         if request.method == 'POST':
             # If teacher filled in a form with name = 'getgrade' then
@@ -398,7 +398,6 @@ def diary(request):
                 grade = Grades.objects.get(id=request.session['grade'])
                 term = request.session['term']
                 subject = Subjects.objects.get(id=request.session['subject'])
-                #
                 comment = request.POST.get('comment')
                 data = request.POST.get('commentdata')
                 student_id = data.split("|")[0]
@@ -532,16 +531,15 @@ def homework(request):
             form = DatePickForm(request.POST)
             if form.is_valid():
                 date = form.cleaned_data['date']
-               
                 lessons = Lessons.objects.filter(date=date, grade=grade, homework__iregex=r'\S+')
-                # if not lessons:
-                #     lessons = Lessons.objects.filter(date=date, grade=grade, h_file__iregex=r'\S+')
+                if not lessons:
+                    lessons = Lessons.objects.filter(date=date, grade=grade, h_file__iregex=r'\S+')
             return render(request, 'homework.html', {'form':form, 'lessons':lessons, 'date':date})
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=6)
     lessons = Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, homework__iregex=r'\S+')
-    # if not lessons:
-    #     lessons = Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, h_file__iregex=r'\S+')
+    if not lessons:
+        lessons = Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, h_file__iregex=r'\S+')
     form = DatePickForm()
     return render(request, 'homework.html', {'form':form, 'lessons':lessons})
 
