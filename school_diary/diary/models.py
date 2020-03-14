@@ -154,7 +154,8 @@ class Controls(models.Model):
         return '{} '.format(self.name)
 
 
-
+def lesson_upload(instanse, filename):
+    return 'homework/{}/{}'.format(instanse.pk, filename)
 
 
 class Lessons(models.Model):
@@ -165,7 +166,7 @@ class Lessons(models.Model):
     subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет')
     grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
     control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')  # As homework or test
-    h_file = models.FileField(null=True, default="None", verbose_name="Файл")
+    h_file = models.FileField(null=True, default="None", verbose_name="Файл", upload_to=lesson_upload)
 
     class Meta:
         verbose_name = "Урок"

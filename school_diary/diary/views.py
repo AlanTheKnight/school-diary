@@ -134,7 +134,8 @@ def lesson_page(request, pk):
                                    term=request.session['term']))
     if request.method == 'POST':
         lesson = Lessons.objects.get(pk=request.POST.get('pk'))
-        lesson.h_file = request.FILES.get('h_file')
+        if request.FILES.get('h_file'):
+            lesson.h_file = request.FILES.get('h_file')
         lesson.date = request.POST.get('date')
         lesson.quater = get_quater_by_date(lesson.date)
         lesson.theme = request.POST.get('theme')
@@ -454,7 +455,7 @@ def diary(request):
                 if len(objs_for_remove) != 0:
                     Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
 
-                print("Added ", len(objs_for_create), " Changed ", len(objs_for_update), " Removed ", len(objs_for_remove))
+                # print("Added ", len(objs_for_create), " Changed ", len(objs_for_update), " Removed ", len(objs_for_remove))
                 # Render table
                 context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=subject, quater=request.session['term']))
                 context.update(create_controls(grade=Grades.objects.get(pk=request.session['grade']), subject=subject, term=request.session['term']))
@@ -533,10 +534,14 @@ def homework(request):
                 date = form.cleaned_data['date']
                
                 lessons = Lessons.objects.filter(date=date, grade=grade, homework__iregex=r'\S+')
+                # if not lessons:
+                #     lessons = Lessons.objects.filter(date=date, grade=grade, h_file__iregex=r'\S+')
             return render(request, 'homework.html', {'form':form, 'lessons':lessons, 'date':date})
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=6)
     lessons = Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, homework__iregex=r'\S+')
+    # if not lessons:
+    #     lessons = Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, h_file__iregex=r'\S+')
     form = DatePickForm()
     return render(request, 'homework.html', {'form':form, 'lessons':lessons})
 

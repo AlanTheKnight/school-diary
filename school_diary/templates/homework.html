@@ -37,6 +37,10 @@
             {% for lesson in lessons %}
             <h5>{{ lesson.subject }}</h5>
             <p>{{ lesson.homework }}</p>
+            {% if lesson.h_file %}
+                <a href="{{ lesson.h_file.url }}">Посмотреть файл загруженный учителем</a>
+            {% endif %}
+
             <hr>
             {% endfor %}
             {% else %}
@@ -56,6 +60,9 @@
             {% for lesson in lessons %}
             <h5><span class="badge badge-secondary" style="display: inline;">{{ lesson.date|date:"d.m, D" }}</span> {{ lesson.subject }}</h5>
             <p>{{ lesson.homework }}</p>
+             {% if lesson.h_file %}
+                <a href="{{ lesson.h_file.url }}">Посмотреть файл загруженный учителем</a>
+             {% endif %}
             <hr>
             {% endfor %}
             {% else %}
