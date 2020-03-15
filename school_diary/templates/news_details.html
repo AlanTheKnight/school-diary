@@ -3,6 +3,8 @@
 
 {% block title %}
 <title>{{ post.title }}</title>
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
 <style>
     .post-image{
         object-fit: scale-down;
@@ -11,8 +13,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5  w-75">
-    <div class="card text-center">
+<div class="container my-5">
+    <div class="card text-center card-75">
         {% if post.image %}
         <img class="card-img-top post-image" src="{{ post.image.url }}" alt="Изображение">
         {% endif %}
