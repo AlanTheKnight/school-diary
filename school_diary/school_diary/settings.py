@@ -112,6 +112,7 @@ if not DEBUG:
             'PASSWORD': 'Forward#Forever2005',
             'HOST': 'localhost',
             'PORT': '',
+            'ATOMIC_REQUESTS': True,
         }
     }
 else:
@@ -184,3 +185,23 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ideasoft.spb@gmail.com'
 EMAIL_HOST_PASSWORD = 'Forward#Forever2005'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': '/home/alan/diary/logs/warning.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+    },
+}
+
