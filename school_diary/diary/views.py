@@ -541,8 +541,6 @@ def homework(request):
                 for lesson in raw_lessons:
                     if lesson.homework or lesson.h_file:
                         lessons.append(lesson)
-                # if not lessons:
-                #     lessons = Lessons.objects.filter(date=date, grade=grade, h_file__iregex=r'\S+')
             return render(request, 'homework.html', {'form':form, 'lessons':lessons, 'date':date})
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=6)
