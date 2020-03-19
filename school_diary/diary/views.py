@@ -12,6 +12,7 @@ from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
 import datetime
+from django_cleanup.signals import cleanup_pre_delete
 
 
 TERMS = (
@@ -82,6 +83,12 @@ def user_profile(request):
         data = Administrators.objects.get(account=request.user)
     if request.user.account_type == 2:
         data = Teachers.objects.get(account=request.user)
+        if request.method == "POST":
+            if 'image-upload' in request.POST:
+                data.avatar = request.FILES.get('avatar')
+                data.save()
+            elif 'image-delete' in request.POST:
+                data.avatar.delete()
     if request.user.account_type == 3:
         data = Students.objects.get(account=request.user)
     context = {'data': data}
