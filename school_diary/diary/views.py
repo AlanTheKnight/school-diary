@@ -303,7 +303,7 @@ def diary(request):
                 n_amount = 0
                 marks_list = []
                 for i in marks:
-                    if i.lesson.control.name == 'Четвертная' or i.lesson.control.name == 'Годовая': # delete Term or Year mark from avg
+                    if i.lesson.control.name == 'Четвертная оценка ' or i.lesson.control.name == 'Годовая оценка ': # delete Term or Year mark from avg
                         continue
 
                     if i.amount != -1:
@@ -498,6 +498,8 @@ def stats(request, id, term):
         marks_list = []
         for i in marks:
             if i.amount != -1:
+                if i.control.name == 'Годовая оценка' or i.control.name == 'Четвертная оценка':
+                    continue
                 marks_list.append(i)
             else:
                 n_amount += 1
