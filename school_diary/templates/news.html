@@ -5,7 +5,7 @@
 <title>Новости</title>
 <style>
     .post-image{
-        object-fit: scale-down;
+        object-fit: cover;
     }
 </style>
 {% endblock %}
@@ -14,24 +14,26 @@
 <div class="container my-5">
 
     {% if news %}
-    <div class="row my-5">
-        {% for post in news %}
-        <div class="col-sm-4 my-3">
-            <div class="card h-100">
-                {% if post.image %}
-                <img class="card-img-top post-image" src="{{ post.image.url }}" alt="Изображение" height="196">
-                {% endif %}
-                <div class="card-body">
-                    <div class="card-title">
-                        <h5>{{ post.title }}</h5>
-                        <p class="text-muted">{{ post.publication_date }}</p>
-                        <a class="btn btn-primary my-2" href="/news/articles/{{ post.slug }}">Подробнее</a>
+    <div class="card my-4">
+        <div class="card-body">
+            <ul class="list-unstyled">
+                {% for post in news %}
+                <li class="media my-2">
+                    <div class="media-body">
+                    <a href="/news/articles/{{ post.slug }}"><h5 class="mt-0">{{ post.title }}</h5></a>
+                    <p class="my-0">От {{ post.author }}</p>
+                    <p class="text-muted my-0">{{ post.publication_date }}</p>
                     </div>
-                </div>
-            </div>
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" class="align-self-center mr-3 post-image" alt="" height="70" width="70">
+                    {% endif %}
+                </li>
+                <hr>
+                {% endfor %}
+            </ul>
         </div>
-        {% endfor %}
     </div>
+    
     {% else %}
     <p class="text-muted text-justify-center">Новостей пока что нет.</p>
     {% endif %}

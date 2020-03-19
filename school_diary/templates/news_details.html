@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load templateLibs %}
 
 {% block title %}
 <title>{{ post.title }}</title>
@@ -16,20 +17,19 @@
 <div class="container my-5">
     <div class="card text-center card-75">
         {% if post.image %}
-        <img class="card-img-top post-image" src="{{ post.image.url }}" alt="Изображение">
+        <img class="card-img-top post-image" src="{{ post.image.url }}" alt="Изображение" height="200">
         {% endif %}
         <div class="card-body">
             <div class="card-title">
-                <h1 class="dispay-4">{{ post.title }}</h1>
+                <h1 class="dispay-4 my-0">{{ post.title }}</h1>
+                <p class="my-0">{{ post.author }}</p>
                 <p class="text-muted">{{ post.publication_date }}</p>
                 <div class="text-left">
-                    {% autoescape off %}
-                    <p>{{ post.content }}</p>
-                    {% endautoescape %}
+                    <p>{{ post.content| markdown | safe }}</p>
                 </div>
             </div>
         </div>
     </div>
-    <p class="my-5 text-muted">Спасибо, что прочитали эту запись. <a class="text-decoration-none" href="/news/1">Перейти к други новостям.</a></p>
+    <p class="my-5 text-muted">Спасибо, что прочитали эту запись. <a class="text-decoration-none" href="{% url 'news' %}">Перейти к другим новостям.</a></p>
 </div>
 {% endblock %}

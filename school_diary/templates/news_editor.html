@@ -4,18 +4,15 @@
 
 {% block title %}
 <title>Создать новость</title>
-<style>
-    .card {
-    margin: 0 auto; /* Added */
-    float: none; /* Added */
-    margin-bottom: 10px; /* Added */
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="card my-5">
+    <div class="card card-75 my-5">
         <div class="card-body">
             <h2 class="card-title">Создать новость</h2>
             <form method="POST" enctype="multipart/form-data">
@@ -25,13 +22,22 @@
                     {{ form.title }}
                 </div>
                 <div class="form-group">
-                    <label for="content">Содержание</label>
-                    {{ form.content }}
-                    <p class="text-muted">При написании новости можно использовать HTML5</p>
+                    <label for="author">Отображаемый автор</label>
+                    {{ form.author }}
                 </div>
                 <div class="form-group">
-                    <label for="image">Изображение</label>
-                    {{ form.image }}
+                    <label for="content">Содержание</label>
+                    {{ form.content }}
+                </div>
+                <div class="form-group">
+                    <div class="custom-file">
+                        {{ form.image }}
+                        <label for="image" class="custom-file-label">Изображение</label>
+                    </div>
+                    <p id="view"></p>
+                    {% if data.image %}
+                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteimagevalue()">Удалить изображение</button>
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label for="slug">Ссылка на новость</label>
@@ -42,4 +48,10 @@
         </div>
     </div>
 </div>
+<script>
+    var simplemde = new SimpleMDE({ element: $("#content")[0], spellChecker:false });
+    function deleteimagevalue() {
+        $('#image').value = '';
+    };
+</script>
 {% endblock %}

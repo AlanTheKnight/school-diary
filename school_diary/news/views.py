@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from .forms import ArticleCreationForm
 from django.contrib.auth.decorators import login_required
 from .decorators import admin_only
+from django.contrib import messages
 
 
 def first_page(request):
@@ -23,7 +24,7 @@ def post(request, url):
     try:
         article = Publications.objects.get(slug=url)
         return render(request, 'news_details.html', {'post':article})
-    except:
+    except Exception as error:
         return render(request, 'error.html', {
             'title': "Статья не найдена",
             'error': "404",
@@ -80,5 +81,5 @@ def news_update(request, id):
         if form.is_valid():
             form.save()
             return redirect('news_dashboard')
-    context = {'form':form}
+    context = {'form':form, 'data':article}
     return render(request, 'news_editor.html', context)
