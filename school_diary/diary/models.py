@@ -88,7 +88,7 @@ class Teachers(models.Model):
     account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     surname = models.CharField(max_length=100, verbose_name="Фамилия")
-    avatar = models.FileField(verbose_name="Файл", blank=True, upload_to=teacher_avatar_upload,  default='/teachers/teachers.png')
+    avatar = models.FileField(verbose_name="Файл", blank=True, upload_to=teacher_avatar_upload,  default='')
     second_name = models.CharField(max_length=100, verbose_name="Отчество", blank=True, default='')
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
 
