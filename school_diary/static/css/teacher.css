@@ -4,11 +4,12 @@
     height: 100%;
     width: 80%;
     background-color: white;
-    
 }
+
 .inp_table:focus{
     outline:none;
 }
+
 .inp_table::-webkit-inner-spin-button {
   display: none;
 }

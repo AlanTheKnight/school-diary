@@ -12,6 +12,7 @@ from .forms import *
 from .decorators import unauthenticated_user, admin_only, allowed_users
 from .models import *
 import datetime
+from django_cleanup.signals import cleanup_pre_delete
 
 
 TERMS = (
@@ -82,6 +83,12 @@ def user_profile(request):
         data = Administrators.objects.get(account=request.user)
     if request.user.account_type == 2:
         data = Teachers.objects.get(account=request.user)
+        if request.method == "POST":
+            if 'image-upload' in request.POST:
+                data.avatar = request.FILES.get('avatar')
+                data.save()
+            elif 'image-delete' in request.POST:
+                data.avatar.delete()
     if request.user.account_type == 3:
         data = Students.objects.get(account=request.user)
     context = {'data': data}
@@ -536,9 +543,11 @@ def homework(request):
             form = DatePickForm(request.POST)
             if form.is_valid():
                 date = form.cleaned_data['date']
-                lessons = Lessons.objects.filter(date=date, grade=grade, homework__iregex=r'\S+')
-                if not lessons:
-                    lessons = Lessons.objects.filter(date=date, grade=grade, h_file__iregex=r'\S+')
+                raw_lessons = Lessons.objects.filter(date=date, grade=grade)
+                lessons = []
+                for lesson in raw_lessons:
+                    if lesson.homework or lesson.h_file:
+                        lessons.append(lesson)
             return render(request, 'homework.html', {'form':form, 'lessons':lessons, 'date':date})
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=6)
