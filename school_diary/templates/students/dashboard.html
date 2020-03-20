@@ -4,17 +4,49 @@
 
 {% block title %}
 <title>Минимумы</title>
-<style>
-	.card {
-	margin: 0 auto;
-	float: none;
-	margin-bottom: 10px;
-	}
-</style>
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container my-5">
+    <div class="my-4">
+        <a class="btn btn-primary" data-toggle="collapse" href="#search" role="button" aria-expanded="false" aria-controls="search">
+            Поиск
+        </a>
+        <a href="{% url 'students_dashboard' %}" class="btn btn-secondary">Все ученики</a>
+        <div class="collapse" id="search">
+            <div class="card-body card card-50">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="first_name">Имя</label>
+                        <input type="text" name="first_name" id="first_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="surname">Фамилия</label>
+                        <input type="text" name="surname" id="surname" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Почта</label>
+                        <input type="text" name="email" id="email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="class">Класс</label>
+                        <select class="form-control" name="class" id="class">
+                            <option value="-2">Любой</option>
+                            <option value="-1">Еще не в классе</option>
+                            {% for class in classes %}
+                            <option value="{{ class.id }}">{{ class }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" type="submit" name="search">Найти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {% if students %}
     <div class="table-responsive">
         <table class="table text-center">
