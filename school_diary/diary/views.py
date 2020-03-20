@@ -539,7 +539,9 @@ def stats(request, id, term):
 def homework(request):
     student = Students.objects.get(account=request.user)
     grade = student.grade
-    print(grade)
+    if grade is None:
+        return render(request, 'access_denied.html', {'message':"""Вы не состоите в классе, попросите Вашего 
+        классного руководителя Вас добавить"""})
     if request.method == "POST":
         if "day" in request.POST:
             form = DatePickForm(request.POST)
@@ -749,6 +751,9 @@ def admin_message(request):
     return render(request, 'admin_messages.html', {'form': form})
 
 
+# STUDENT DASHBOARD ========================
+
+
 @login_required(login_url="/login/")
 @admin_only
 def students_dashboard_first_page(request):
@@ -763,9 +768,22 @@ def students_dashboard(request, page):
     TODO: Test a pagination.
     """
     students = Students.objects.all()
+    classes = Grades.objects.all()
+    if request.method == "POST":
+        fn = request.POST.get('first_name')
+        s = request.POST.get('surname')
+        email = request.POST.get('email')
+        s_class = int(request.POST.get('class'))
+        if fn or s or email or s_class:
+            if s_class == -2:
+                students = students.filter(first_name__icontains=fn, surname__icontains=s, account__email__icontains=email)
+            elif s_class == -1:
+                students = students.filter(first_name__icontains=fn, surname__icontains=s, account__email__icontains=email, grade=None)
+            else:
+                students = students.filter(first_name__icontains=fn, surname__icontains=s, account__email__icontains=email, grade__id=s_class)
     students = Paginator(students, 100)
     students = students.get_page(page)
-    return render(request, 'students/dashboard.html', {'students': students})
+    return render(request, 'students/dashboard.html', {'students': students, 'classes':classes})
 
 
 @login_required(login_url="/login/")
@@ -798,6 +816,9 @@ def students_update(request, id):
             return redirect('students_dashboard')
     form = StudentEditForm(instance=s)
     return render(request, 'students/update.html', {'form': form})
+
+
+# ADMIN DASHBOARD ========================
 
 
 @login_required(login_url="/login/")
@@ -853,7 +874,8 @@ def admins_update(request, id):
     return render(request, 'admins/update.html', {'form': form})
 
 
-# TEACHERS SECTION
+# TEACHERS DASHBOARD ======================
+
 
 @login_required(login_url="/login/")
 @admin_only
