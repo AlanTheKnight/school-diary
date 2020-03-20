@@ -8,6 +8,34 @@
 
 {% block content %}
 <div class="container my-5">
+
+    <div class="my-4">
+        <a class="btn btn-primary" data-toggle="collapse" href="#search" role="button" aria-expanded="false" aria-controls="search">
+            Поиск
+        </a>
+        <a href="{% url 'teachers_dashboard' %}" class="btn btn-secondary">Все учителя</a>
+        <div class="collapse" id="search">
+            <div class="card-body card card-50 my-3">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="first_name">Имя</label>
+                        <input type="text" name="first_name" id="first_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="surname">Фамилия</label>
+                        <input type="text" name="surname" id="surname" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Почта</label>
+                        <input type="text" name="email" id="email" class="form-control">
+                    </div>
+                    <button class="btn btn-primary" type="submit" name="search">Найти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {% if users %}
     <div class="table-responsive">
         <table class="table text-center">
