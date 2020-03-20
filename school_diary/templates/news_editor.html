@@ -49,7 +49,10 @@
     </div>
 </div>
 <script>
+    let isMobile = window.matchMedia("only screen and (max-width: 760px)").matches;
+    if (!isMobile) {
     var simplemde = new SimpleMDE({ element: $("#content")[0], spellChecker:false });
+    };
     function deleteimagevalue() {
         $('#image').value = '';
     };
