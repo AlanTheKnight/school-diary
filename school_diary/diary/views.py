@@ -887,6 +887,11 @@ def teachers_dashboard_first_page(request):
 @admin_only
 def teachers_dashboard(request, page):
     u = Teachers.objects.all()
+    if request.method == "POST":
+        fn = request.POST.get('first_name')
+        s = request.POST.get('surname')
+        email = request.POST.get('email')
+        u = u.filter(first_name__icontains=fn, surname__icontains=s, account__email__icontains=email)
     u = Paginator(u, 50)
     u = u.get_page(page)
     return render(request, 'teachers/dashboard.html', {'users': u})
