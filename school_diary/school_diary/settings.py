@@ -183,11 +183,11 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 # SMTP CONFIGURATIONS
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'ideasoft.spb@gmail.com'
-EMAIL_HOST_PASSWORD = 'Forward#Forever2005'
+EMAIL_HOST_USER = 'ideasoft-spb@yandex.ru'
+EMAIL_HOST_PASSWORD = 'ForwardForever2005'
 
 if not DEBUG:
     LOGGING = {
