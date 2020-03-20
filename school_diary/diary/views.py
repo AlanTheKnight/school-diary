@@ -198,16 +198,28 @@ def create_table(grade, subject, quater):
     )
 
     scope = {}
+    avg = {}
     for mark in marks:
         if students[mark.student_id] not in scope:
             scope[students[mark.student_id]] = {}
         lesson = lessons[mark.lesson_id]
         scope[students[mark.student_id]].update({lesson: mark})
+        if mark.student_id in avg:
+            if mark.amount != -1 and mark.lesson.control.weight != 100:
+                avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
+                avg[mark.student_id][1] += mark.lesson.control.weight
+        else: 
+            avg[mark.student_id] = [0, 0]
+            if mark.amount != -1 and mark.lesson.control.weight != 100:
+                if mark.student.pk == 3: print('added')
+                avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
+                avg[mark.student_id][1] += mark.lesson.control.weight
 
     for sk, student in students.items():
         for lk, lesson in lessons.items():
             if student not in scope:
                 scope[student] = {}
+                avg[student.pk] = [0, 0]
             if lesson not in scope[student]:
                 scope[student].update({lesson: None})
 
@@ -219,7 +231,8 @@ def create_table(grade, subject, quater):
         'lessons': lessons,
         'scope': scope,
         'subject_id': subject.id,
-        'grade_id': grade.id
+        'grade_id': grade.id,
+        'avg':avg
     }
 
 

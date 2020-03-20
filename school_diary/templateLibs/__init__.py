@@ -13,3 +13,10 @@ def lookup(value, arg):
 @stringfilter
 def markdown(value):
     return md.markdown(value, extensions=['markdown.extensions.fenced_code'])
+
+@register.filter(name="average")
+def average(value):
+    if value[1] != 0:
+        return round(value[0] / value[1], 2)
+    else:
+        return "-"
