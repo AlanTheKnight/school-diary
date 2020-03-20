@@ -211,6 +211,7 @@ def create_table(grade, subject, quater):
         else: 
             avg[mark.student_id] = [0, 0]
             if mark.amount != -1 and mark.lesson.control.weight != 100:
+                if mark.student.pk == 3: print('added')
                 avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
                 avg[mark.student_id][1] += mark.lesson.control.weight
 
@@ -218,6 +219,7 @@ def create_table(grade, subject, quater):
         for lk, lesson in lessons.items():
             if student not in scope:
                 scope[student] = {}
+                avg[student.pk] = [0, 0]
             if lesson not in scope[student]:
                 scope[student].update({lesson: None})
 
