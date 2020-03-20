@@ -187,7 +187,7 @@ EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ideasoft-spb@yandex.ru'
-EMAIL_HOST_PASSWORD = 'ForwardForever2005'
+EMAIL_HOST_PASSWORD = 'Forward#Forever2005'
 
 if not DEBUG:
     LOGGING = {
