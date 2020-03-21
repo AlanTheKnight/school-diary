@@ -323,13 +323,11 @@ def diary(request):
                 n_amount = 0
                 marks_list = []
                 for i in marks:
-                    if i.lesson.control.name == 'Четвертная оценка ' or i.lesson.control.name == 'Годовая оценка ': # delete Term or Year mark from avg
-                        continue
-
-                    if i.amount != -1:
-                        marks_list.append(i)
-                    else:
-                        n_amount += 1
+                    if i.lesson.control.weight != 100:
+                        if i.amount != -1:
+                            marks_list.append(i)
+                        else:
+                            n_amount += 1
                 # g_marks = [] TODO create dates
                 # for mark in marks:
                 #     a = 1
@@ -518,7 +516,7 @@ def stats(request, id, term):
         marks_list = []
         for i in marks:
             if i.amount != -1:
-                if i.control.name == 'Годовая оценка' or i.control.name == 'Четвертная оценка':
+                if i.lesson.control.weight == 100:
                     continue
                 marks_list.append(i)
             else:
