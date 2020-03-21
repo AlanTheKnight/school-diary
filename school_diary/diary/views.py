@@ -323,7 +323,7 @@ def diary(request):
                 n_amount = 0
                 marks_list = []
                 for i in marks:
-                    if i.lesson.control.name == 'Четвертная оценка ' or i.lesson.control.name == 'Годовая оценка ': # delete Term or Year mark from avg
+                    if i.lesson.control.name == 'Четвертная оценка' or i.lesson.control.name == 'Годовая оценка': # delete Term or Year mark from avg
                         continue
 
                     if i.amount != -1:
