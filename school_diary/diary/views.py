@@ -157,8 +157,8 @@ def lesson_page(request, pk):
 def get_average(list):
     if len(list) == 0:
         return '-'
-    grades = [i.amount for i in list]
-    return round(sum(grades) / len(list), 2)
+    grades = sum([i.amount for i in list])
+    return round(grades / len(list), 2), grades, len(list)
 
 
 def get_smart_average(list):
@@ -530,6 +530,17 @@ def stats(request, id, term):
         for i in range(5, 1, -1): data.append(marks_amounts.count(i))
         data.append(n_amount)
 
+        needed, needed_mark = 0, 0
+        if avg[0] <= 4.5:
+            needed = 9 * avg[2] - 2 * avg[1] + 1
+            needed_mark = 5
+        if avg[0] <= 3.5:
+            needed = (7 * avg[2] - 2 * avg[1]) // 3 + 1
+            needed_mark = 4
+        if avg[0] <= 2.5:
+            needed = (5 * avg[2] - 2 * avg[1]) // 5 + 1
+            needed_mark = 3
+
         context = {
             'term':term,
             'lessons':lessons,
@@ -537,7 +548,9 @@ def stats(request, id, term):
             'subject':subject,
             'data':data,
             'avg':avg,
-            'smartavg':smart_avg}
+            'smartavg':smart_avg,
+            'needed':needed,
+            'needed_mark':needed_mark}
         return render(request, 'results.html', context)
     return render(request, 'no_marks.html')
     subjects = grade.subjects.all()

@@ -20,3 +20,8 @@ def average(value):
         return round(value[0] / value[1], 2)
     else:
         return "-"
+
+@register.filter(name='minus')
+def minus(value, arg):
+    return value - arg
+    
