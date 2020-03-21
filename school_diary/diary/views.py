@@ -494,6 +494,9 @@ def diary(request):
 def stats(request, id, term):
     student = Students.objects.get(account=request.user)
     grade = student.grade
+    if grade is None:
+            return render(request, 'access_denied.html', {'message':"Вы не состоите в классе.\
+            Попросите Вашего классного руководителя добавить Вас в класс."})
     try:
         subject = Subjects.objects.get(id=id)
     except ObjectDoesNotExist:
@@ -525,7 +528,7 @@ def stats(request, id, term):
         avg = get_average(marks_list)
         smart_avg = get_smart_average(marks_list)
 
-        marks_amounts = [i.amount for i in marks if i.amount != -1]
+        marks_amounts = [i.amount for i in marks if i.amount != -1 and i.lesson.control.weight != 100]
         data = []
         for i in range(5, 1, -1): data.append(marks_amounts.count(i))
         data.append(n_amount)
