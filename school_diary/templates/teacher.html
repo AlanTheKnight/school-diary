@@ -104,7 +104,7 @@
                 <thead class="thead-light">
                     <tr>
                         <th scope="col">Ученики</th>
-                        <th title="Взвешенный средний балл">AVG</th>
+                        <th title="Взвешенный средний балл" style="width:4%;">AVG</th>
                         {% for k, lesson in lessons.items %}
 
                             <th scope="col" {%  if lesson.control.name == 'Четвертная'  %} style="background-color: #e9ecef;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}> {# Need to change id #}
