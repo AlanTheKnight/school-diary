@@ -208,18 +208,21 @@ def create_table(grade, subject, quater):
             if mark.amount != -1 and mark.lesson.control.weight != 100:
                 avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
                 avg[mark.student_id][1] += mark.lesson.control.weight
+                avg[mark.student_id][2] += mark.amount
+                avg[mark.student_id][3] += 1
         else: 
-            avg[mark.student_id] = [0, 0]
+            avg[mark.student_id] = [0, 0, 0, 0]
             if mark.amount != -1 and mark.lesson.control.weight != 100:
-                if mark.student.pk == 3: print('added')
                 avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
                 avg[mark.student_id][1] += mark.lesson.control.weight
+                avg[mark.student_id][2] += mark.amount
+                avg[mark.student_id][3] += 1
 
     for sk, student in students.items():
         for lk, lesson in lessons.items():
             if student not in scope:
                 scope[student] = {}
-                avg[student.pk] = [0, 0]
+                avg[student.pk] = [0, 0, 0, 0]
             if lesson not in scope[student]:
                 scope[student].update({lesson: None})
 
@@ -328,17 +331,6 @@ def diary(request):
                             marks_list.append(i)
                         else:
                             n_amount += 1
-                # g_marks = [] TODO create dates
-                # for mark in marks:
-                #     a = 1
-                #     for date in dates:
-                #         if mark.lesson.date == date:
-                #             a = 0
-                #     if a:
-                #         g_marks.append(None)
-                #     else:
-                #         g_marks.append()
-                # print(g_marks)
                 avg = get_average(marks_list)
                 smart_avg = get_smart_average(marks_list)
                 d.update({s:[avg, smart_avg, marks]})
@@ -503,13 +495,8 @@ def stats(request, id, term):
         return render(request,'error.html', context={'title':'Мы не можем найти то, что Вы ищите.',
                                                      'error':'404',
                                                      'description':'Данный предмет отстуствует.'})
-    #return HttpResponse(subject.name)
     lessons = Lessons.objects.filter(grade=grade, subject=subject, quater=term)
-    #return HttpResponse(len(lessons))
     marks = []
-    #for i in lessons:
-        #try: marks.append(Marks.objects.get(student=student, lesson=i))
-        #except: pass
     marks = student.marks_set.filter(subject=subject, lesson__quater=term)
 
     # If student has no marks than send him a page with info.

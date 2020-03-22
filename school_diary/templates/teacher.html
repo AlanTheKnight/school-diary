@@ -104,7 +104,8 @@
                 <thead class="thead-light">
                     <tr>
                         <th scope="col">Ученики</th>
-                        <th title="Взвешенный средний балл" style="width:4%;">AVG</th>
+                        <th title="Среднее арифметическое" style="width:4%;">AVG</th>
+                        <th title="Взвешенный средний балл" style="width:5%;">SM.AVG</th>
                         {% for k, lesson in lessons.items %}
 
                             <th scope="col" {%  if lesson.control.name == 'Четвертная'  %} style="background-color: #e9ecef;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}> {# Need to change id #}
@@ -125,6 +126,9 @@
                         <td scope="row" style="width: 20%;">{{ student.surname }} {{ student.first_name }}</td>
                         <td>
                             {{ avg|lookup:student.pk|average }}
+                        </td>
+                        <td>
+                            {{ avg|lookup:student.pk|smart_average }}
                         </td>
                         {% for lk, lesson in lessons.items %}
                             {% with mark=small_scope|lookup:lesson %}
