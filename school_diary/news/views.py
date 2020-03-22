@@ -80,6 +80,9 @@ def news_update(request, id):
         form = ArticleCreationForm(request.POST, request.FILES, instance=article)
         if form.is_valid():
             form.save()
+            if request.POST.get('deleteimage') is not None:
+                article.image = ''
+                article.save()
             return redirect('news_dashboard')
     context = {'form':form, 'data':article}
     return render(request, 'news_editor.html', context)
