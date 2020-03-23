@@ -135,7 +135,6 @@
 
                                 <td {% if lesson.control.name == 'Четвертная оценка' %} class="quater-mark" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="year-mark" {% endif %}>
                                     <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная оценка' %} class="inp_table select quater-mark" style="background-color: #e9ecef;" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="inp_table select year-mark" style="background-color: rgb(233,236,239);" {% endif %}>
-
                                         <option value="" {% if not mark %}selected{%endif%}></option>
                                         <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
                                         <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</opti+on>
@@ -193,9 +192,12 @@
                                 <textarea name="homework" id="homework" rows="10" class="form-control auto-save"></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="homework">Загрузить файл <small class="text-muted">(не обязательно)</small></label>
-                                <input type='file' name='h_file'>
+                                <div class="custom-file">
+                                    <input type='file' name='h_file' class="custom-file-input" id="homeworkfileinput" onchange="showdeletebutton();">
+                                    <label for="homeworkfileinput" class="custom-file-label">Загрузить файл <small class="text-muted">(не обязательно)</small></label>
+                                </div>
                             </div>
+                            <button class="btn btn-danger btn-sm" id="homeworkfiledeletebutton" style="display: none;" type="button" onclick="deleteinputvalue();">Очистить поле</button>
                             <div class="form-group">
                                 <label for="control">Вид работы</label>
                                 <select name="control" id="control" class="form-control auto-save" required>
@@ -246,17 +248,26 @@
 <script>
     function myfunction(that){
         that.style.backgroundColor = "#d6d6d6";
-    }
+    };
 
     function show_confirm(element){
         var content = element.getAttribute('comment');
         document.getElementById("commenttextfield").value = content;
         document.getElementById("commentdata").value = element.value;
         $("#commentmodal").modal('show');
-    }
+    };
 
     function myfunction(that){
         that.style.backgroundColor = "#d6d6d6";
-    }
+    };
+
+    function showdeletebutton(){
+        $('#homeworkfiledeletebutton').css('display', 'block');
+    };
+
+    function deleteinputvalue(){
+        $('#homeworkfiledeletebutton').css('display', 'none');
+        $('#homeworkfileinput').val('');
+    };
 </script>
 {% endblock %}
