@@ -128,7 +128,7 @@ def teacher_register(request):
 
 
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
-@login_required(login_url="/login/")  # TODO fix bug
+@login_required(login_url="/login/")
 @transaction.atomic
 def lesson_page(request, pk):
     lesson = Lessons.objects.get(pk=pk)
@@ -141,13 +141,13 @@ def lesson_page(request, pk):
                                    term=request.session['term']))
     if request.method == 'POST':
         lesson = Lessons.objects.get(pk=request.POST.get('pk'))
-        if request.FILES.get('h_file'):
-            lesson.h_file = request.FILES.get('h_file')
+        if request.FILES.get('h_file'): lesson.h_file = request.FILES.get('h_file')
         lesson.date = request.POST.get('date')
         lesson.quater = get_quater_by_date(lesson.date)
         lesson.theme = request.POST.get('theme')
         lesson.control = Controls.objects.get(pk=request.POST.get('control'))
         lesson.homework = request.POST.get('homework')
+        if request.POST.get('deletehwfile') is not None: lesson.h_file = ""
         lesson.save()
         return redirect('diary')
 

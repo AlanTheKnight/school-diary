@@ -32,13 +32,17 @@
                 <div class="form-group">
                     <div class="custom-file">
                         {{ form.image }}
-                        <label for="image" class="custom-file-label">Изображение</label>
+                        <label for="imageinput" class="custom-file-label">Изображение</label>
                     </div>
-                    <p id="view"></p>
-                    {% if data.image %}
-                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteimagevalue()">Удалить изображение</button>
-                    {% endif %}
                 </div>
+                <button class="btn btn-danger btn-sm mb-4" id="imagedeletebutton" onclick="delete_image()" style="display: none;" type="button">Очистить это поле</button>
+                {% if data.image %}
+                    <p><a href="{{ data.image.url }}">Выбранное изображение</a></p>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="deleteimage" name="deleteimage" value="1">
+                        <label class="form-check-label" for="deleteimage">Удалить изображение</label>
+                    </div>
+                {% endif %}
                 <div class="form-group">
                     <label for="slug">Ссылка на новость</label>
                     {{ form.slug }}
@@ -53,8 +57,18 @@
     if (!isMobile) {
     var simplemde = new SimpleMDE({ element: $("#content")[0], spellChecker:false });
     };
-    function deleteimagevalue() {
-        $('#image').value = '';
+    function show_delete_button() {
+        var x = document.getElementById("imagedeletebutton");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    };
+    function delete_image() {
+        console.log('OK');
+        $('#image').val('');
+        $('#imagedeletebutton').css('display', 'none');
     };
 </script>
 {% endblock %}
