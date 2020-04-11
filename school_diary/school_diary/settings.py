@@ -22,8 +22,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 config = RawConfigParser()
-config.read('settings.ini')
-SECRET_KEY = config.get('section', 'secret_key_a')
+thisfolder = os.path.dirname(os.path.abspath(__file__))
+initfile = os.path.join(thisfolder, 'settings.ini')
+config.read(initfile)
+SECRET_KEY = config.get('Settings', 'secret_key_a')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -107,15 +109,14 @@ AUTH_USER_MODEL = 'diary.Users'
 WSGI_APPLICATION = 'school_diary.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+# Database# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 if not DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'diarydb',
-            'USER': 'diaryuser',
-            'PASSWORD': 'Forward#Forever2005',
+            'NAME': config.get("DataBase", 'name'),
+            'USER': config.get("DataBase", 'user'),
+            'PASSWORD': config.get('DataBase', 'password'),
             'HOST': 'localhost',
             'PORT': '',
             'ATOMIC_REQUESTS': True,
@@ -190,8 +191,8 @@ EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'ideasoft-spb@yandex.ru'
-EMAIL_HOST_PASSWORD = 'Forward#Forever2005'
+EMAIL_HOST_USER = config.get("Email", 'user')
+EMAIL_HOST_PASSWORD = config.get("Email", 'password')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 if not DEBUG:
