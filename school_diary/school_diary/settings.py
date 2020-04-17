@@ -28,7 +28,7 @@ config.read(initfile)
 SECRET_KEY = config.get('Settings', 'secret_key_a')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config.get("Settings", "debug")
 
 ALLOWED_HOSTS = ['.diary56.ru', '64.227.75.146',]
 
