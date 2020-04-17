@@ -27,7 +27,7 @@
     <div class="card card-50 my-3">
         <div class="card-body">
             <h1 class="card-title text-center">Регистрация нового ученика</h1>
-            <form method="POST">
+            <form method="POST" onsubmit="event.preventDefault; return validateMyForm();">
                 {% csrf_token %}
                 <hr>
                 <p><i class="fas fa-exclamation-circle text-danger"></i>
@@ -63,7 +63,7 @@
                     </div>
                     </div>
                     <div id="message" class="mx-5 my-3">
-                        <p id="letter" class="invalid">Содержит <b>латинские буквы</b></p>
+                        <p id="letter" class="invalid">Содержит <b>буквы</b></p>
                         <p id="number" class="invalid">Содержит минимум <b>1 число</b></p>
                         <p id="length" class="invalid">Содержит минимум <b>8 символов</b></p>
                     </div>

@@ -19,7 +19,7 @@
     <div class="card card-50">
         <div class="card-body">
             <h3 class="card-title text-center">Регистрация нового администратора</h3>
-            <form method="POST" class="my-5 mx-5">
+            <form method="POST" class="my-5 mx-5" onsubmit="event.preventDefault; return validateMyForm();">
                 {% csrf_token %}
                 <div class="form-group">
                     {{ form.email.label }}
@@ -36,10 +36,6 @@
                 <div class="form-group">
                     {{ form.second_name.label }} (необязательно)
                     {{ form.second_name }}
-                </div>
-                <div class="form-group">
-                    {{ form.subjects.label }}
-                    {{ form.subjects }}
                 </div>
                 <div class="form-group">
                     {{ form.password1.label }}
