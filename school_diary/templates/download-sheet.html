@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Экспорт</title>
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% static filename %}" class="btn btn-primary">Скачать таблицу</a>
+    <a href="/empty-backup-folder/" class="btn btn-danger">Удалить все</a>
+</div>
+{% endblock %}
