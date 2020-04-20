@@ -1054,27 +1054,29 @@ def generate_table(request, quarter):
         directory = os.path.join(settings.STATICFILES_DIRS[0], 'results')
     else:
         directory = os.path.join(settings.STATIC_ROOT, 'results')
-    lessons = Lessons.objects.filter(quarter=quarter).order_by('grade', 'date')
-    marks = Marks.objects.all()
+    all_lessons = Lessons.objects.filter(quarter=quarter)
+    all_grades = Grades.objects.all()
+    all_marks = Marks.objects.filter(lesson__quarter=quarter)
     filename = str(datetime.datetime.now().strftime('%d.%m.%Y %I:%M:%S %p')) + '.xlsx'
     file = 'results/' + filename
     workbook = xlsxwriter.Workbook(os.path.join(directory, filename))
-    worksheet = workbook.add_worksheet("Уроки")
     row = 0
-    for lesson in lessons:
-        worksheet.write(row, 0, str(lesson.grade))
-        worksheet.write(row, 1, lesson.date.strftime('%d.%m.%Y'))
-        worksheet.write(row, 2, str(lesson.subject))
-        worksheet.write(row, 3, lesson.theme)
-        worksheet.write(row, 4, lesson.homework)
-        lesson_worksheet = workbook.add_worksheet(str(lesson))
-        row2 = 0
-        for i in marks.filter(lesson=lesson):
-            lesson_worksheet.write(row2, 0, str(i.student.first_name))
-            lesson_worksheet.write(row2, 1, str(i.student.surname))
-            lesson_worksheet.write(row2, 2, str(i.amount))
-            row2 += 1
-        row += 1
+    for grade in all_grades:
+        worksheet = workbook.add_worksheet(str(grade))
+        lessons = all_lessons.filter(grade=grade).order_by('date', 'subject__name')
+        for lesson in lessons:
+            worksheet.write(row, 0, str(lesson.grade))
+            worksheet.write(row, 1, lesson.date.strftime('%d.%m.%Y'))
+            worksheet.write(row, 2, str(lesson.subject))
+            worksheet.write(row, 3, lesson.theme)
+            worksheet.write(row, 4, lesson.homework)
+            marks = all_marks.filter(lesson=lesson).order_by('student__surname', 'student__name')
+            row += 1
+            for mark in marks:
+                worksheet.write(row, 0, mark.student.surname)
+                worksheet.write(row, 1, mark.student.first_name)
+                worksheet.write(row, 2, mark.amount)
+            row += 2
     workbook.close()
     context = {'filename': file}
     return render(request, 'download-sheet.html', context)
