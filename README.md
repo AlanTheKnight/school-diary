@@ -49,3 +49,8 @@ Windows:
     setup.bat
 
 **Attention! Your environment need to be set up so python3 is launched using 'python' command.**
+
+## Screenshots
+
+![Teacher account](https://sun9-13.userapi.com/c856132/v856132311/21cdaf/2UbbgjtKKPs.jpg)
+![Teacher interface](https://sun9-46.userapi.com/c856132/v856132311/21cda5/0hD1H2vYibQ.jpg)
