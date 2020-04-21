@@ -11,7 +11,7 @@ Also it contains some fields for PostgreSQL database. You can ignore this values
     [Section]
     debug = 
 
-Any debug value except an empty one will turn one debug mode.
+Any debug value except an empty one will turn on debug mode.
 
 Then activate your virtual environment and install requirements:
 
