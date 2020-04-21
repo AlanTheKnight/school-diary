@@ -35,7 +35,7 @@ Now you can run server.
     
 Go to http://127.0.0.1:8000/ in your browser and enjoy our diary.
 
-Superuser account let you create other andministrators and teachers. Students register by themself.
+Superuser account let you create other administrators and teachers. Students register by themself.
 
 To automatically create migrations and run the server, use our ```setup.sh``` and ```setup.bat``` files.
 
