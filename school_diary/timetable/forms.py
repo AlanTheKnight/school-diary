@@ -32,9 +32,4 @@ class LessonCreateForm(forms.ModelForm):
 
     class Meta:
         model = Lessons
-        fields = ('connection', 'day', 'number', 'start', 'end', 'subject', 'classroom')
-        widgets = {
-            'number':forms.NumberInput(attrs={'max':'8', 'min':'0'}),
-            'start':forms.TimeInput(attrs={'type':'time'}),
-            'end':forms.TimeInput(attrs={'type':'time'})
-        }
+        fields = ('connection', 'day', 'number', 'subject', 'classroom')

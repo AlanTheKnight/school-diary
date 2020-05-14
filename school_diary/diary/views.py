@@ -3,7 +3,6 @@ import xlsxwriter
 import os
 from functools import reduce
 from shutil import rmtree
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -207,23 +206,21 @@ def create_table(grade, subject, quarter):
     scope = {}
     avg = {}
     for mark in marks:
+        def increase_avg(mark):
+            if mark.amount != -1 and mark.lesson.control.weight != 100:
+                avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
+                avg[mark.student_id][1] += mark.lesson.control.weight
+                avg[mark.student_id][2] += mark.amount
+                avg[mark.student_id][3] += 1
         if students[mark.student_id] not in scope:
             scope[students[mark.student_id]] = {}
         lesson = lessons[mark.lesson_id]
         scope[students[mark.student_id]].update({lesson: mark})
         if mark.student_id in avg:
-            if mark.amount != -1 and mark.lesson.control.weight != 100:
-                avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
-                avg[mark.student_id][1] += mark.lesson.control.weight
-                avg[mark.student_id][2] += mark.amount
-                avg[mark.student_id][3] += 1
+            increase_avg(mark)
         else:
             avg[mark.student_id] = [0, 0, 0, 0]
-            if mark.amount != -1 and mark.lesson.control.weight != 100:
-                avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
-                avg[mark.student_id][1] += mark.lesson.control.weight
-                avg[mark.student_id][2] += mark.amount
-                avg[mark.student_id][3] += 1
+            increase_avg(mark)
 
     for sk, student in students.items():
         for lk, lesson in lessons.items():
@@ -318,12 +315,6 @@ def diary(request):
             d = {}
             max_length, total_missed = 0, 0
 
-            # make list of all dates
-            # lesson_dates = []
-            # for mark in all_marks.order_by('lesson__date'):
-            #     if not (mark.lesson.date in lesson_dates):
-            #         lesson_dates.append(mark.lesson.date)
-
             for s in subjects:
                 marks = all_marks.filter(subject=s.id).order_by('lesson__date')
                 if len(marks) > max_length:
@@ -352,7 +343,6 @@ def diary(request):
                 'max_length': max_length,
                 'total_missed': total_missed,
                 'term': chosen_quarter,
-                # 'dates': lesson_dates
             }
             return render(request, 'marklist.html', context)
 
@@ -363,17 +353,11 @@ def diary(request):
     # If user is teacher
     elif request.user.account_type == 2:
         teacher = Teachers.objects.get(account=request.user)
-        # controls = Controls.objects.all()
-        # controls = term_valid(controls, TERMS)
-        # controls = year_valid(controls)
         context = {'Teacher': teacher,
                    'subjects': teacher.subjects.all(),
                    'grades': Grades.objects.filter(teachers=teacher),
                    # 'controls': controls
                    }
-
-        # if 'subject' in request.session.keys() and 'grade' in request.session.keys() and 'term' in request.session.keys():
-        #    context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=Subjects.objects.get(pk=request.session['subject']), quarter=request.session['term']))
 
         if request.method == 'POST':
             # If teacher filled in a form with name = 'getgrade' then
@@ -475,14 +459,11 @@ def diary(request):
                 if len(objs_for_remove) != 0:
                     Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
 
-                # print("Added ", len(objs_for_create), " Changed ", len(objs_for_update), " Removed ", len(objs_for_remove))
-                # Render table
                 context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=subject,
                                             quarter=request.session['term']))
                 context.update(create_controls(grade=Grades.objects.get(pk=request.session['grade']), subject=subject,
                                                term=request.session['term']))
                 return render(request, 'teacher.html', context)
-                # return redirect(diary)
         else:
             return render(request, 'teacher.html', context)
     else:
@@ -551,9 +532,6 @@ def stats(request, id, term):
             'needed_mark': needed_mark}
         return render(request, 'results.html', context)
     return render(request, 'no_marks.html')
-    subjects = grade.subjects.all()
-    context = {'subjects': subjects}
-    return render(request, 'diary_student.html', context)
 
 
 @login_required(login_url="login")
@@ -1092,7 +1070,6 @@ def empty_backup_folder(request):
     rmtree(directory)
     os.mkdir(directory)
     return redirect('export')
-
 
 @login_required(login_url="/login/")
 @admin_only

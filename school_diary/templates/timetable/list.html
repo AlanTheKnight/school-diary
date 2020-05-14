@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load templateLibs %}
 
 {% block title %}
 <title>Расписание</title>
@@ -33,8 +34,8 @@
                         <td>{{ lesson.number }}</td>
                         <td>{{ lesson.subject }}</td>
                         <td>{{ lesson.classroom }}</td>
-                        <td>{{ lesson.start }}</td>
-                        <td>{{ lesson.end }}</td>
+                        <td>{{ lesson.number.start }}</td>
+                        <td>{{ lesson.number.end }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -75,12 +76,20 @@
     </div>
     {% endif %}
 
+    {% for weekday in data %}
+
+    {% if data|lookup:weekday %}
     <div class="card my-5">
         <div class="card-body">
             <div class="card-title text-center">
-                <h4>Понедельник</h4>
+                {% if weekday == "today" %}
+                <h4>Расписание на сегодня</h4>
+                {% elif weekday == "tomorrow" %}
+                <h4>Расписание на завтра</h4>
+                {% else %}
+                <h4>{{ weekday }}</h4>
+                {% endif %}
             </div>
-            {% if monday %}
             <div class="table-responsive-md">
                 <table class="table-sm table">
                     <thead class="thead-dark">
@@ -92,192 +101,26 @@
                             <th>Конец</th>
                         </tr>
                     </thead>
-                    {% for lesson in monday %}
+                    {% for lesson in data|lookup:weekday %}
                     <tr>
-                        <td>{{ lesson.number }}</td>
+                        <td>{{ lesson.number.n }}</td>
                         <td>{{ lesson.subject }}</td>
                         <td>{{ lesson.classroom }}</td>
-                        <td>{{ lesson.start }}</td>
-                        <td>{{ lesson.end }}</td>
+                        <td>{{ lesson.number.start }}</td>
+                        <td>{{ lesson.number.end }}</td>
                     </tr>
                     {% endfor %}
                 </table>
             </div>
-            {% else %}
-                <p>Расписание на этот день пока не добавлено администраторами.</p>
-            {% endif %}
         </div>
     </div>
+    {% endif %}
+    {% endfor %}
 
-    <div class="card my-5">
-        <div class="card-body">
-            <div class="card-title text-center">
-                <h4>Вторник</h4>
-            </div>
-            {% if tuesday %}
-            <div class="table-responsive-md">
-                <table class="table-sm table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Номер</th>
-                            <th>Предмет</th>
-                            <th>Кабинет</th>
-                            <th>Начало</th>
-                            <th>Конец</th>
-                        </tr>
-                    </thead>
-                    {% for lesson in tuesday %}
-                    <tr>
-                        <td>{{ lesson.number }}</td>
-                        <td>{{ lesson.subject }}</td>
-                        <td>{{ lesson.classroom }}</td>
-                        <td>{{ lesson.start }}</td>
-                        <td>{{ lesson.end }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            {% else %}
-                <p>Расписание на этот день пока не добавлено администраторами.</p>
-            {% endif %}
-        </div>
+    <div class="alert alert-info">
+        Если расписание для Вашего класса неполное, попросите администратора дозаполнить его.
     </div>
     
-    <div class="card my-5">
-        <div class="card-body">
-            <div class="card-title text-center">
-                <h4>Среда</h4>
-            </div>
-            {% if wednesday %}
-            <div class="table-responsive-md">
-                <table class="table-sm table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Номер</th>
-                            <th>Предмет</th>
-                            <th>Кабинет</th>
-                            <th>Начало</th>
-                            <th>Конец</th>
-                        </tr>
-                    </thead>
-                    {% for lesson in wednesday %}
-                    <tr>
-                        <td>{{ lesson.number }}</td>
-                        <td>{{ lesson.subject }}</td>
-                        <td>{{ lesson.classroom }}</td>
-                        <td>{{ lesson.start }}</td>
-                        <td>{{ lesson.end }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            {% else %}
-                <p>Расписание на этот день пока не добавлено администраторами.</p>
-            {% endif %}
-        </div>
-    </div>
-    
-    <div class="card my-5">
-        <div class="card-body">
-            <div class="card-title text-center">
-                <h4>Четверг</h4>
-            </div>
-            {% if thursday %}
-            <div class="table-responsive-md">
-                <table class="table-sm table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Номер</th>
-                            <th>Предмет</th>
-                            <th>Кабинет</th>
-                            <th>Начало</th>
-                            <th>Конец</th>
-                        </tr>
-                    </thead>
-                    {% for lesson in thursday %}
-                    <tr>
-                        <td>{{ lesson.number }}</td>
-                        <td>{{ lesson.subject }}</td>
-                        <td>{{ lesson.classroom }}</td>
-                        <td>{{ lesson.start }}</td>
-                        <td>{{ lesson.end }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            {% else %}
-                <p>Расписание на этот день пока не добавлено администраторами.</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="card my-5">
-        <div class="card-body">
-            <div class="card-title text-center">
-                <h4>Пятница</h4>
-            </div>
-            {% if friday %}
-            <div class="table-responsive-md">
-                <table class="table-sm table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Номер</th>
-                            <th>Предмет</th>
-                            <th>Кабинет</th>
-                            <th>Начало</th>
-                            <th>Конец</th>
-                        </tr>
-                    </thead>
-                    {% for lesson in friday %}
-                    <tr>
-                        <td>{{ lesson.number }}</td>
-                        <td>{{ lesson.subject }}</td>
-                        <td>{{ lesson.classroom }}</td>
-                        <td>{{ lesson.start }}</td>
-                        <td>{{ lesson.end }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            {% else %}
-                <p>Расписание на этот день пока не добавлено администраторами.</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="card my-5">
-        <div class="card-body">
-            <div class="card-title text-center">
-                <h4>Суббота</h4>
-            </div>
-            {% if saturday %}
-            <div class="table-responsive-md">
-                <table class="table-sm table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Номер</th>
-                            <th>Предмет</th>
-                            <th>Кабинет</th>
-                            <th>Начало</th>
-                            <th>Конец</th>
-                        </tr>
-                    </thead>
-                    {% for lesson in saturday %}
-                    <tr>
-                        <td>{{ lesson.number }}</td>
-                        <td>{{ lesson.subject }}</td>
-                        <td>{{ lesson.classroom }}</td>
-                        <td>{{ lesson.start }}</td>
-                        <td>{{ lesson.end }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            {% else %}
-                <p>Расписание на этот день пока не добавлено администраторами.</p>
-            {% endif %}
-        </div>
-    </div>
 
 </div>
 {% endblock %}
