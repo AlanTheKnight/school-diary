@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from urllib.parse import unquote
-from .forms import GetTimeTableForm, LessonCreateForm
+from .forms import GetTimeTableForm, LessonCreateForm, BellCreateForm
 from django.http import HttpResponseRedirect
-from .models import Grades, Lessons
+from .models import Grades, Lessons, BellsTimeTable
 import time
 from .decorators import admin_only
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 
 
 DAYWEEK_NAMES = {
@@ -18,6 +19,11 @@ DAYWEEK_NAMES = {
     6:"Суббота",
     7:"Воскресенье"
 }
+
+SCHOOLS = dict([
+    (1, "Младшая школа"),
+    (2, "Средняя и старшая школа"),
+])
 
 
 def timetable(request):
@@ -164,3 +170,65 @@ List of HTML pages are rendered by these functions:
 - timetable/timetable.html
     Page with class selection.
 """
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_dashboard_first_page(request):
+    return redirect('/timetable/bells/dashboard/1')
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_dashboard(request, page):
+    objects = BellsTimeTable.objects.all() # Replace Model
+    amount = len(objects)
+    objects = Paginator(objects, 100)
+    objects = objects.get_page(page)
+    context = {
+        "objects": objects,
+        "amount": amount,
+        "wiki": "help/",
+        "title": " Расписание звонков",
+        "schools": SCHOOLS
+    }
+    return render(request, 'bells/dashboard.html', context)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_delete(request, pk):
+    obj = BellsTimeTable.objects.get(pk=pk) # Replace model
+    if request.method == "POST":
+        obj.delete()
+        return redirect('bells_dashboard')
+    context = {
+        "object": obj,
+        "help_text": "Вы уверены, что хотите удалить эту запись?"
+    }
+    return render(request, 'bells/delete.html', context)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_update(request, pk):
+    obj = BellsTimeTable.objects.get(pk=pk) # Replace Model
+    if request.method == "POST":
+        form = BellCreateForm(request.POST, instance=obj) # Replace SomeForm
+        if form.is_valid():
+            form.save()
+            return redirect('bells_dashboard')
+    form = BellCreateForm(instance=obj) # Replace SomeForm
+    return render(request, 'bells/create.html', {'form': form, 'title':"Добавить звонок"})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_create(request): # Replace Model
+    if request.method == "POST":
+        form = BellCreateForm(request.POST) # Replace SomeForm
+        if form.is_valid():
+            form.save()
+            return redirect('bells_dashboard')
+    form = BellCreateForm() # Replace SomeForm
+    return render(request, 'bells/create.html', {'form': form, 'title':"Добавить звонок"})
+
