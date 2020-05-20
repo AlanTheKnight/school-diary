@@ -939,13 +939,6 @@ def homepage(request):
     return render(request, 'homepage.html')
 
 
-def social(request):
-    """
-    Return a page with link to gymnasium's social pages.
-    """
-    return render(request, 'social.html')
-
-
 def get_help(request):
     """
     Return a page with help information.

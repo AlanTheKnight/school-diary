@@ -76,7 +76,6 @@ urlpatterns = [
 
     # Main part of a website
     path('', views.homepage, name='homepage'),
-    path('social/', views.social, name='social'),
     path('help/', views.get_help, name='help'),
     path('about/', views.about, name='about'),
     path('error/', views.error404, name='404'),

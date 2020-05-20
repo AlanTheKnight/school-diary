@@ -13,7 +13,7 @@
     <div class="card my-5">
         <div class="card-body">
         <h2 class="card-title">Получить расписание</h2>
-        <form method="POST" class="my-5 mx-5">
+        <form method="POST" class="my-5 mx-lg-5">
             <div class="form-group">
             {% csrf_token %}
             {{ form|crispy }}
