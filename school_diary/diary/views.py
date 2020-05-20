@@ -8,14 +8,14 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.db import transaction
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.conf import settings
 from .forms import *
-from .decorators import unauthenticated_user, admin_only, allowed_users, teacher_only, student_only
-from .models import *
-
+from .decorators import (
+    unauthenticated_user, admin_only, allowed_users,
+    teacher_only, student_only)
+from . import models
+from .functions import get_quarter_by_date
 
 
 TERMS = (
@@ -24,22 +24,6 @@ TERMS = (
     ((12, 1), (21, 3)),  # FIX ON PRODUCTION
     ((29, 3), (27, 5))
 )
-
-
-def get_quarter_by_date(datestring: str) -> int:
-    """
-    Returns a number of a quarter by the date stamp string.
-    If quarter does not exit, return 0 instead.
-    """
-    converted_date = datetime.datetime.strptime(datestring, "%Y-%m-%d").date()
-    year = converted_date.year
-    for i in range(0, 4):
-        start = datetime.date(year, TERMS[i][0][1], TERMS[i][0][0])
-        end = datetime.date(year, TERMS[i][1][1], TERMS[i][1][0])
-        if start <= converted_date <= end:
-            return i + 1
-    else:
-        return 0
 
 
 @unauthenticated_user
@@ -87,11 +71,11 @@ def user_profile(request):
     User profile page (diary56.ru/profile/)
     """
     if request.user.account_type == 0:
-        data = Users.objects.get(email=request.user)
+        data = models.Users.objects.get(email=request.user)
     if request.user.account_type == 1:
-        data = Administrators.objects.get(account=request.user)
+        data = models.Administrators.objects.get(account=request.user)
     if request.user.account_type == 2:
-        data = Teachers.objects.get(account=request.user)
+        data = models.Teachers.objects.get(account=request.user)
         if request.method == "POST":
             if 'image-upload' in request.POST:
                 data.avatar = request.FILES.get('avatar')
@@ -99,7 +83,7 @@ def user_profile(request):
             elif 'image-delete' in request.POST:
                 data.avatar.delete()
     if request.user.account_type == 3:
-        data = Students.objects.get(account=request.user)
+        data = models.Students.objects.get(account=request.user)
     context = {'data': data}
     return render(request, 'profile.html', context)
 
@@ -140,16 +124,16 @@ def teacher_register(request):
 @login_required(login_url="/login/")
 @transaction.atomic
 def lesson_page(request, pk):
-    lesson = Lessons.objects.get(pk=pk)
+    lesson = models.Lessons.objects.get(pk=pk)
 
     context = {
         'lesson': lesson,
     }
-    context.update(create_controls(grade=Grades.objects.get(pk=request.session['grade']),
-                                   subject=Subjects.objects.get(pk=request.session['subject']),
+    context.update(create_controls(grade=models.Grades.objects.get(pk=request.session['grade']),
+                                   subject=models.Subjects.objects.get(pk=request.session['subject']),
                                    term=request.session['term']))
     if request.method == 'POST':
-        lesson = Lessons.objects.get(pk=request.POST.get('pk'))
+        lesson = models.Lessons.objects.get(pk=request.POST.get('pk'))
         if request.FILES.get('h_file'): lesson.h_file = request.FILES.get('h_file')
         lesson.date = request.POST.get('date')
         lesson.quarter = get_quarter_by_date(lesson.date)
@@ -185,7 +169,7 @@ def get_smart_average(list):
 @login_required(login_url='/login/')
 @allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
 def delete_lesson(request, pk):
-    lesson = Lessons.objects.get(pk=pk)
+    lesson = models.Lessons.objects.get(pk=pk)
     if request.method == "POST":
         lesson.delete()
         return redirect('diary')
@@ -195,13 +179,13 @@ def delete_lesson(request, pk):
 def create_table(grade, subject, quarter):
     lessons = {
         lesson.id: lesson for lesson in
-        Lessons.objects.filter(grade=grade, subject=subject, quarter=quarter).select_related("control").order_by(
+        models.Lessons.objects.filter(grade=grade, subject=subject, quarter=quarter).select_related("control").order_by(
             "date").all()
     }
     students = {student.account_id: student for student in
-                Students.objects.filter(grade=grade).order_by("surname", "first_name", "second_name")}
+                models.Students.objects.filter(grade=grade).order_by("surname", "first_name", "second_name")}
 
-    marks = Marks.objects.filter(
+    marks = models.Marks.objects.filter(
         student__grade_id=grade.id,
         lesson__grade_id=grade.id,
         lesson__subject_id=subject.id,
@@ -283,7 +267,7 @@ def create_controls(grade, subject, term):
     controls = Controls.objects.all()
     controls = term_valid(controls, TERMS)
     controls = year_valid(controls)
-    lessons = Lessons.objects.filter(grade=grade, subject=subject, quarter=term).all()
+    lessons = models.Lessons.objects.filter(grade=grade, subject=subject, quarter=term).all()
     for lesson in lessons:
         if lesson.control.name == 'Четвертная оценка':
             controls = controls.exclude(name='Четвертная оценка')
@@ -304,7 +288,7 @@ def diary(request):
 
     # If user is student
     elif request.user.account_type == 3:
-        student = Students.objects.get(account=request.user)
+        student = models.Students.objects.get(account=request.user)
         grade = student.grade
         if grade is None:
             return render(request, 'access_denied.html', {'message': "Вы не состоите в классе.\
@@ -316,7 +300,8 @@ def diary(request):
             chosen_quarter = int(request.POST.get('term'))
             subjects = grade.subjects.all()
             all_marks = student.marks_set.filter(lesson__quarter=chosen_quarter)
-            if not all_marks: return render(request, 'no_marks.html')
+            if not all_marks:
+                return render(request, 'no_marks.html')
             d = {}
             max_length, total_missed = 0, 0
 
@@ -357,10 +342,10 @@ def diary(request):
 
     # If user is teacher
     elif request.user.account_type == 2:
-        teacher = Teachers.objects.get(account=request.user)
+        teacher = models.Teachers.objects.get(account=request.user)
         context = {'Teacher': teacher,
                    'subjects': teacher.subjects.all(),
-                   'grades': Grades.objects.filter(teachers=teacher),
+                   'grades': models.Grades.objects.filter(teachers=teacher),
                    # 'controls': controls
                    }
 
@@ -368,7 +353,7 @@ def diary(request):
             # If teacher filled in a form with name = 'getgrade' then
             # build a table with marks for all students and render it.
             if 'getgrade' in request.POST:
-                subject = Subjects.objects.get(name=request.POST.get('subject'))
+                subject = models.Subjects.objects.get(name=request.POST.get('subject'))
                 grade = request.POST.get('grade')
                 request.session['subject'] = subject.id
                 term = int(request.POST.get('term'))
@@ -376,7 +361,7 @@ def diary(request):
                 number = int(grade[0:-1])
                 letter = grade[-1]
                 try:
-                    grade = Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
+                    grade = models.Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
                     request.session['grade'] = grade.id
                 except ObjectDoesNotExist:
                     messages.error(request, 'Ошибка')
@@ -392,12 +377,14 @@ def diary(request):
                 theme = request.POST.get('theme')
                 homework = request.POST.get('homework')
                 control = Controls.objects.get(id=request.POST.get('control'))
-                grade = Grades.objects.get(id=request.session['grade'])
-                subject = Subjects.objects.get(id=request.session['subject'])
+                grade = models.Grades.objects.get(id=request.session['grade'])
+                subject = models.Subjects.objects.get(id=request.session['subject'])
                 term = request.session['term']
                 h_file = request.FILES.get('h_file')
-                lesson = Lessons.objects.create(date=date, h_file=h_file, quarter=quarter, theme=theme, homework=homework,
-                                                control=control, grade=grade, subject=subject)
+                lesson = models.Lessons.objects.create(
+                    date=date, h_file=h_file, quarter=quarter,
+                    theme=theme, homework=homework,
+                    control=control, grade=grade, subject=subject)
                 lesson.save()
                 context.update(create_table(grade=grade, subject=subject, quarter=term))
                 context.update(create_controls(grade=grade, subject=subject, term=term))
@@ -405,16 +392,16 @@ def diary(request):
 
             elif 'addcomment' in request.POST:
                 # Get data from session
-                grade = Grades.objects.get(id=request.session['grade'])
+                grade = models.Grades.objects.get(id=request.session['grade'])
                 term = request.session['term']
-                subject = Subjects.objects.get(id=request.session['subject'])
+                subject = models.Subjects.objects.get(id=request.session['subject'])
                 comment = request.POST.get('comment')
                 data = request.POST.get('commentdata')
                 student_id = data.split("|")[0]
                 lesson_id = data.split("|")[1]
-                student = Students.objects.get(account=student_id)
-                lesson = Lessons.objects.get(id=lesson_id)
-                mark = Marks.objects.get(student=student, lesson=lesson)
+                student = models.Students.objects.get(account=student_id)
+                lesson = models.Lessons.objects.get(id=lesson_id)
+                mark = models.Marks.objects.get(student=student, lesson=lesson)
                 mark.comment = comment
                 mark.save()
                 context.update(create_table(grade=grade, subject=subject, quarter=term))
@@ -427,9 +414,9 @@ def diary(request):
                     for k in dict(request.POST)
                     if k.startswith('mark_')
                 }
-                subject = Subjects.objects.get(id=request.POST.get('subject_id'))
+                subject = models.Subjects.objects.get(id=request.POST.get('subject_id'))
 
-                marks_raw = Marks.objects.select_for_update().filter(
+                marks_raw = models.Marks.objects.select_for_update().filter(
                     student__grade_id=request.POST.get('grade_id'),
                     lesson__grade_id=request.POST.get('grade_id'),
                     lesson__subject_id=subject.id
@@ -447,7 +434,7 @@ def diary(request):
                         objs_for_update.append(marks_in_db[k])
 
                 objs_for_create = [
-                    Marks(lesson_id=k[1], student_id=k[0], amount=int(v), subject=subject)
+                    models.Marks(lesson_id=k[1], student_id=k[0], amount=int(v), subject=subject)
                     for k, v in marks_dict.items()
                     if v != "" and k not in marks_in_db.keys()
                 ]
@@ -457,16 +444,16 @@ def diary(request):
                     for k, v in marks_dict.items()
                     if v == "" and k in marks_in_db
                 ]
-                Marks.objects.bulk_update(objs_for_update, ['amount'])
+                models.Marks.objects.bulk_update(objs_for_update, ['amount'])
 
-                Marks.objects.bulk_create(objs_for_create)
+                models.Marks.objects.bulk_create(objs_for_create)
 
                 if len(objs_for_remove) != 0:
-                    Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
+                    models.Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
 
-                context.update(create_table(grade=Grades.objects.get(pk=request.session['grade']), subject=subject,
+                context.update(create_table(grade=models.Grades.objects.get(pk=request.session['grade']), subject=subject,
                                             quarter=request.session['term']))
-                context.update(create_controls(grade=Grades.objects.get(pk=request.session['grade']), subject=subject,
+                context.update(create_controls(grade=models.Grades.objects.get(pk=request.session['grade']), subject=subject,
                                                term=request.session['term']))
                 return render(request, 'teacher.html', context)
         else:
@@ -478,18 +465,18 @@ def diary(request):
 @login_required(login_url="login")
 @allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
 def stats(request, id, term):
-    student = Students.objects.get(account=request.user)
+    student = models.Students.objects.get(account=request.user)
     grade = student.grade
     if grade is None:
         return render(request, 'access_denied.html', {'message': "Вы не состоите в классе.\
             Попросите Вашего классного руководителя добавить Вас в класс."})
     try:
-        subject = Subjects.objects.get(id=id)
+        subject = models.Subjects.objects.get(id=id)
     except ObjectDoesNotExist:
         return render(request, 'error.html', context={'title': 'Мы не можем найти то, что Вы ищите.',
                                                       'error': '404',
                                                       'description': 'Данный предмет отстуствует.'})
-    lessons = Lessons.objects.filter(grade=grade, subject=subject, quarter=term)
+    lessons = models.Lessons.objects.filter(grade=grade, subject=subject, quarter=term)
     marks = []
     marks = student.marks_set.filter(subject=subject, lesson__quarter=term)
 
@@ -540,19 +527,19 @@ def stats(request, id, term):
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
+@student_only
 def homework(request):
-    student = Students.objects.get(account=request.user)
+    student = models.Students.objects.get(account=request.user)
     grade = student.grade
     if grade is None:
-        return render(request, 'access_denied.html', {'message': """Вы не состоите в классе, попросите Вашего 
+        return render(request, 'access_denied.html', {'message': """Вы не состоите в классе, попросите Вашего
         классного руководителя Вас добавить"""})
     if request.method == "POST":
         if "day" in request.POST:
             form = DatePickForm(request.POST)
             if form.is_valid():
                 date = form.cleaned_data['date']
-                raw_lessons = Lessons.objects.filter(date=date, grade=grade)
+                raw_lessons = models.Lessons.objects.filter(date=date, grade=grade)
                 lessons = []
                 for lesson in raw_lessons:
                     if lesson.homework or lesson.h_file:
@@ -560,24 +547,24 @@ def homework(request):
             return render(request, 'homework.html', {'form': form, 'lessons': lessons, 'date': date})
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=6)
-    lessons = Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, homework__iregex=r'\S+')
+    lessons = models.Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, homework__iregex=r'\S+')
     if not lessons:
-        lessons = Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, h_file__iregex=r'\S+')
+        lessons = models.Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, h_file__iregex=r'\S+')
     form = DatePickForm()
     return render(request, 'homework.html', {'form': form, 'lessons': lessons})
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@teacher_only
 def add_student_page(request):
     """
     Page where teachers can add students to their grade.
     """
     try:
-        grade = Grades.objects.get(main_teacher=request.user.id)
+        grade = models.Grades.objects.get(main_teacher=request.user.id)
     except ObjectDoesNotExist:
         return render(request, 'access_denied.html', {'message': "Вы не классный руководитель."})
-    students = Students.objects.filter(grade=grade)
+    students = models.Students.objects.filter(grade=grade)
 
     if request.method == "POST":
         form = AddStudentToGradeForm(request.POST)
@@ -586,7 +573,7 @@ def add_student_page(request):
             fn = request.POST.get('first_name').strip()
             s = request.POST.get('surname').strip()
             if fn or s or email:
-                search = Students.objects.filter(first_name__icontains=fn, surname__icontains=s,
+                search = models.Students.objects.filter(first_name__icontains=fn, surname__icontains=s,
                                                  account__email__icontains=email)
             else:
                 search = []
@@ -599,16 +586,16 @@ def add_student_page(request):
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@teacher_only
 def add_student(request, i):
     """
     Function defining the process of adding new student to a grade and confirming it.
     """
-    u = Users.objects.get(email=i)
-    s = Students.objects.get(account=u)
+    u = models.Users.objects.get(email=i)
+    s = models.Students.objects.get(account=u)
     if request.method == "POST":
         try:
-            grade = Grades.objects.get(main_teacher=request.user.id)
+            grade = models.Grades.objects.get(main_teacher=request.user.id)
             s.grade = grade
             s.save()
             return redirect('add_student_page')
@@ -620,13 +607,13 @@ def add_student(request, i):
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@teacher_only
 def create_grade_page(request):
     if request.method == "POST":
         form = GradeCreationForm(request.POST)
         if form.is_valid():
             grade = form.save()
-            mt = Teachers.objects.get(account=request.user)
+            mt = models.Teachers.objects.get(account=request.user)
             grade.main_teacher = mt
             grade.save()
             return redirect('my_grade')
@@ -636,14 +623,14 @@ def create_grade_page(request):
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@teacher_only
 def my_grade(request):
     """
     Page with information about teacher's grade.
     """
-    me = Teachers.objects.get(account=request.user)
+    me = models.Teachers.objects.get(account=request.user)
     try:
-        grade = Grades.objects.get(main_teacher=me)
+        grade = models.Grades.objects.get(main_teacher=me)
     except ObjectDoesNotExist:
         grade = None
     context = {'grade': grade}
@@ -651,15 +638,15 @@ def my_grade(request):
 
 
 def view_students_marks(request):
-    me = Teachers.objects.get(account=request.user)
+    me = models.Teachers.objects.get(account=request.user)
     if request.method == "POST":
         term = int(request.POST.get('term'))
     else:
         term = get_quarter_by_date(str(datetime.date.today()))
 
     try:
-        grade = Grades.objects.get(main_teacher=me)
-        students = Students.objects.filter(grade=grade)
+        grade = models.Grades.objects.get(main_teacher=me)
+        students = models.Students.objects.filter(grade=grade)
         context = {
             'students': students,
             'term': term,
@@ -671,15 +658,15 @@ def view_students_marks(request):
 
 def get_class_or_access_denied(teacher):
     try:
-        my_class = Grades.objects.get(main_teacher=teacher)
+        my_class = models.Grades.objects.get(main_teacher=teacher)
         return my_class
     except ObjectDoesNotExist:
         return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
 
 
 def students_marks(request, pk, term):
-    student = Students.objects.get(account=pk)
-    me = Teachers.objects.get(account=request.user)
+    student = models.Students.objects.get(account=pk)
+    me = models.Teachers.objects.get(account=request.user)
     my_class = get_class_or_access_denied(me)
 
     subjects = my_class.subjects.all()
@@ -719,16 +706,16 @@ def students_marks(request, pk, term):
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@teacher_only
 def delete_student(request, i):
     """
     Function defining the process of deleting a student from a grade and confirming it.
     """
-    u = Users.objects.get(email=i)
-    s = Students.objects.get(account=u)
+    u = models.Users.objects.get(email=i)
+    s = models.Students.objects.get(account=u)
     if request.method == "POST":
         try:
-            grade = Grades.objects.get(main_teacher=request.user.id)
+            grade = models.Grades.objects.get(main_teacher=request.user.id)
             s.grade = None
             s.save()
             return redirect('add_student_page')
@@ -739,7 +726,7 @@ def delete_student(request, i):
         return render(request, 'grades/delete_student_confirm.html', {'s': s})
 
 
-@allowed_users(allowed_roles=['teachers', 'students'], message="Вы не зарегистрированы как учитель или ученик.")
+@teacher_only
 @login_required(login_url="login")
 def admin_message(request):
     """
@@ -762,6 +749,7 @@ def homepage(request):
 
 def get_help(request):
     return render(request, 'docs.html')
+
 
 def about(request):
     return render(request, 'about_us.html', {})
@@ -789,9 +777,9 @@ def error500(request):
 @login_required(login_url="login")
 @teacher_only
 def mygradesettings(request):
-    me = Teachers.objects.get(account=request.user)
+    me = models.Teachers.objects.get(account=request.user)
     try:
-        grade = Grades.objects.get(main_teacher=me)
+        grade = models.Grades.objects.get(main_teacher=me)
         if request.method == "POST":
             form = ClassSettingsForm(request.POST, instance=grade)
             if form.is_valid():
@@ -803,9 +791,6 @@ def mygradesettings(request):
         return render(request, 'access_denied.html', {'message': 'Вы не классный руководитель.'})
 
 
-
-
-
 @login_required(login_url="/login/")
 @admin_only
 def generate_table(request, quarter):
@@ -813,9 +798,9 @@ def generate_table(request, quarter):
         directory = os.path.join(settings.STATICFILES_DIRS[0], 'results')
     else:
         directory = os.path.join(settings.STATIC_ROOT, 'results')
-    all_lessons = Lessons.objects.filter(quarter=quarter)
-    all_grades = Grades.objects.all()
-    all_marks = Marks.objects.filter(lesson__quarter=quarter)
+    all_lessons = models.Lessons.objects.filter(quarter=quarter)
+    all_grades = models.Grades.objects.all()
+    all_marks = models.Marks.objects.filter(lesson__quarter=quarter)
     filename = str(datetime.datetime.now().strftime('%d.%m.%Y %I:%M:%S %p')) + '.xlsx'
     file = 'results/' + filename
     workbook = xlsxwriter.Workbook(os.path.join(directory, filename))
