@@ -10,7 +10,8 @@ from django.db import transaction
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.conf import settings
-from .forms import *
+from django.core.exceptions import ObjectDoesNotExist
+from . import forms
 from .decorators import (
     unauthenticated_user, admin_only, allowed_users,
     teacher_only, student_only)
@@ -32,15 +33,15 @@ def user_register(request):
     New student registration.
     """
     if request.method == 'POST':
-        form = StudentSignUpForm(request.POST)
+        form = forms.StudentSignUpForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Учётная запись была создана успешно.")
             return redirect('/login')
     if request.POST:
-        form = StudentSignUpForm(request.POST)
+        form = forms.StudentSignUpForm(request.POST)
     else:
-        form = StudentSignUpForm()
+        form = forms.StudentSignUpForm()
     return render(request, 'registration.html', {'form': form, 'error': 0})
 
 
@@ -55,7 +56,7 @@ def user_login(request):
             return redirect("/")
         else:
             messages.info(request, 'Неправильный адрес электронной почты или пароль.')
-    form = UsersLogin()
+    form = forms.UsersLogin()
     context = {'form': form}
     return render(request, 'login.html', context)
 
@@ -92,15 +93,15 @@ def user_profile(request):
 @admin_only
 def admin_register(request):
     if request.method == 'POST':
-        form = AdminSignUpForm(request.POST)
+        form = forms.AdminSignUpForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Новый аккаунт администратора был создан успешно.")
             return redirect('/login/')
     if request.POST:
-        form = AdminSignUpForm(request.POST)
+        form = forms.AdminSignUpForm(request.POST)
     else:
-        form = AdminSignUpForm()
+        form = forms.AdminSignUpForm()
     return render(request, 'registration_admin.html', {'form': form, 'error': 0})
 
 
@@ -108,15 +109,15 @@ def admin_register(request):
 @admin_only
 def teacher_register(request):
     if request.method == 'POST':
-        form = TeacherSignUpForm(request.POST)
+        form = forms.TeacherSignUpForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Новый аккаунт учителя был создан успешно.")
             return redirect('/login/')
     if request.POST:
-        form = TeacherSignUpForm(request.POST)
+        form = forms.TeacherSignUpForm(request.POST)
     else:
-        form = TeacherSignUpForm()
+        form = forms.TeacherSignUpForm()
     return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
 
 
@@ -134,13 +135,15 @@ def lesson_page(request, pk):
                                    term=request.session['term']))
     if request.method == 'POST':
         lesson = models.Lessons.objects.get(pk=request.POST.get('pk'))
-        if request.FILES.get('h_file'): lesson.h_file = request.FILES.get('h_file')
+        if request.FILES.get('h_file'):
+            lesson.h_file = request.FILES.get('h_file')
         lesson.date = request.POST.get('date')
         lesson.quarter = get_quarter_by_date(lesson.date)
         lesson.theme = request.POST.get('theme')
-        lesson.control = Controls.objects.get(pk=request.POST.get('control'))
+        lesson.control = models.Controls.objects.get(pk=request.POST.get('control'))
         lesson.homework = request.POST.get('homework')
-        if request.POST.get('deletehwfile') is not None: lesson.h_file = ""
+        if request.POST.get('deletehwfile') is not None:
+            lesson.h_file = ""
         lesson.save()
         return redirect('diary')
 
@@ -264,7 +267,7 @@ def term_valid(controls, terms):
 
 
 def create_controls(grade, subject, term):
-    controls = Controls.objects.all()
+    controls = models.Controls.objects.all()
     controls = term_valid(controls, TERMS)
     controls = year_valid(controls)
     lessons = models.Lessons.objects.filter(grade=grade, subject=subject, quarter=term).all()
@@ -376,7 +379,7 @@ def diary(request):
                 quarter = get_quarter_by_date(date)
                 theme = request.POST.get('theme')
                 homework = request.POST.get('homework')
-                control = Controls.objects.get(id=request.POST.get('control'))
+                control = models.Controls.objects.get(id=request.POST.get('control'))
                 grade = models.Grades.objects.get(id=request.session['grade'])
                 subject = models.Subjects.objects.get(id=request.session['subject'])
                 term = request.session['term']
@@ -498,7 +501,8 @@ def stats(request, id, term):
 
         marks_amounts = [i.amount for i in marks if i.amount != -1 and i.lesson.control.weight != 100]
         data = []
-        for i in range(5, 1, -1): data.append(marks_amounts.count(i))
+        for i in range(5, 1, -1):
+            data.append(marks_amounts.count(i))
         data.append(n_amount)
 
         needed, needed_mark = 0, 0
@@ -536,7 +540,7 @@ def homework(request):
         классного руководителя Вас добавить"""})
     if request.method == "POST":
         if "day" in request.POST:
-            form = DatePickForm(request.POST)
+            form = forms.DatePickForm(request.POST)
             if form.is_valid():
                 date = form.cleaned_data['date']
                 raw_lessons = models.Lessons.objects.filter(date=date, grade=grade)
@@ -550,7 +554,7 @@ def homework(request):
     lessons = models.Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, homework__iregex=r'\S+')
     if not lessons:
         lessons = models.Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, h_file__iregex=r'\S+')
-    form = DatePickForm()
+    form = forms.DatePickForm()
     return render(request, 'homework.html', {'form': form, 'lessons': lessons})
 
 
@@ -567,20 +571,24 @@ def add_student_page(request):
     students = models.Students.objects.filter(grade=grade)
 
     if request.method == "POST":
-        form = AddStudentToGradeForm(request.POST)
+        form = forms.AddStudentToGradeForm(request.POST)
         if form.is_valid:
             email = request.POST.get('email')
             fn = request.POST.get('first_name').strip()
             s = request.POST.get('surname').strip()
             if fn or s or email:
-                search = models.Students.objects.filter(first_name__icontains=fn, surname__icontains=s,
-                                                 account__email__icontains=email)
+                search = models.Students.objects.filter(
+                    first_name__icontains=fn, surname__icontains=s,
+                    account__email__icontains=email)
             else:
                 search = []
-            context = {'form': form, 'search': search, 'grade': grade, 'students': students}
+            context = {
+                'form': form, 'search': search,
+                'grade': grade, 'students': students
+            }
             return render(request, 'grades/add_student.html', context)
 
-    form = AddStudentToGradeForm()
+    form = forms.AddStudentToGradeForm()
     context = {'form': form, 'grade': grade, 'students': students}
     return render(request, 'grades/add_student.html', context)
 
@@ -610,14 +618,14 @@ def add_student(request, i):
 @teacher_only
 def create_grade_page(request):
     if request.method == "POST":
-        form = GradeCreationForm(request.POST)
+        form = forms.GradeCreationForm(request.POST)
         if form.is_valid():
             grade = form.save()
             mt = models.Teachers.objects.get(account=request.user)
             grade.main_teacher = mt
             grade.save()
             return redirect('my_grade')
-    form = GradeCreationForm()
+    form = forms.GradeCreationForm()
     context = {'form': form}
     return render(request, 'grades/add_grade.html', context)
 
@@ -656,7 +664,7 @@ def view_students_marks(request):
         return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
 
 
-def get_class_or_access_denied(teacher):
+def get_class_or_access_denied(request, teacher):
     try:
         my_class = models.Grades.objects.get(main_teacher=teacher)
         return my_class
@@ -667,7 +675,7 @@ def get_class_or_access_denied(teacher):
 def students_marks(request, pk, term):
     student = models.Students.objects.get(account=pk)
     me = models.Teachers.objects.get(account=request.user)
-    my_class = get_class_or_access_denied(me)
+    my_class = get_class_or_access_denied(request, me)
 
     subjects = my_class.subjects.all()
     all_marks = student.marks_set.filter(lesson__quarter=term)
@@ -715,7 +723,6 @@ def delete_student(request, i):
     s = models.Students.objects.get(account=u)
     if request.method == "POST":
         try:
-            grade = models.Grades.objects.get(main_teacher=request.user.id)
             s.grade = None
             s.save()
             return redirect('add_student_page')
@@ -733,13 +740,13 @@ def admin_message(request):
     Send a message to an admin.
     """
     if request.method == "POST":
-        form = AdminMessageCreationForm(request.POST)
+        form = forms.AdminMessageCreationForm(request.POST)
         if form.is_valid():
             m = form.save()
             m.sender = request.user
             m.save()
             return redirect('profile')
-    form = AdminMessageCreationForm()
+    form = forms.AdminMessageCreationForm()
     return render(request, 'admin_messages.html', {'form': form})
 
 
@@ -771,9 +778,6 @@ def error500(request):
     })
 
 
-
-
-
 @login_required(login_url="login")
 @teacher_only
 def mygradesettings(request):
@@ -781,11 +785,11 @@ def mygradesettings(request):
     try:
         grade = models.Grades.objects.get(main_teacher=me)
         if request.method == "POST":
-            form = ClassSettingsForm(request.POST, instance=grade)
+            form = forms.ClassSettingsForm(request.POST, instance=grade)
             if form.is_valid():
                 form.save()
                 return redirect('my_grade')
-        form = ClassSettingsForm(instance=grade)
+        form = forms.ClassSettingsForm(instance=grade)
         return render(request, 'grades/class_settings.html', {'form': form})
     except ObjectDoesNotExist:
         return render(request, 'access_denied.html', {'message': 'Вы не классный руководитель.'})
