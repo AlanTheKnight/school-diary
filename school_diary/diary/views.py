@@ -12,9 +12,8 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.conf import settings
-
 from .forms import *
-from .decorators import unauthenticated_user, admin_only, allowed_users
+from .decorators import unauthenticated_user, admin_only, allowed_users, teacher_only, student_only
 from .models import *
 
 
@@ -45,6 +44,9 @@ def get_quarter_by_date(datestring: str) -> int:
 
 @unauthenticated_user
 def user_register(request):
+    """
+    New student registration.
+    """
     if request.method == 'POST':
         form = StudentSignUpForm(request.POST)
         if form.is_valid():
@@ -66,7 +68,7 @@ def user_login(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect("/")
+            return redirect("/")
         else:
             messages.info(request, 'Неправильный адрес электронной почты или пароль.')
     form = UsersLogin()
@@ -81,6 +83,9 @@ def user_logout(request):
 
 @login_required(login_url="/login/")
 def user_profile(request):
+    """
+    User profile page (diary56.ru/profile/)
+    """
     if request.user.account_type == 0:
         data = Users.objects.get(email=request.user)
     if request.user.account_type == 1:
@@ -106,7 +111,7 @@ def admin_register(request):
         form = AdminSignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Новый администратор был создан успешно.")
+            messages.success(request, "Новый аккаунт администратора был создан успешно.")
             return redirect('/login/')
     if request.POST:
         form = AdminSignUpForm(request.POST)
@@ -122,7 +127,7 @@ def teacher_register(request):
         form = TeacherSignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Новый учитель был создан успешно.")
+            messages.success(request, "Новый аккаунт учителя был создан успешно.")
             return redirect('/login/')
     if request.POST:
         form = TeacherSignUpForm(request.POST)
@@ -751,199 +756,15 @@ def admin_message(request):
     return render(request, 'admin_messages.html', {'form': form})
 
 
-# STUDENT DASHBOARD ========================
-
-
-@login_required(login_url="/login/")
-@admin_only
-def students_dashboard_first_page(request):
-    return redirect('/students/dashboard/1')
-
-
-@login_required(login_url="/login/")
-@admin_only
-def students_dashboard(request, page):
-    """
-    Send a dashboard with up to 100 students.
-    TODO: Test a pagination.
-    """
-    students = Students.objects.all()
-    classes = Grades.objects.all()
-    if request.method == "POST":
-        fn = request.POST.get('first_name')
-        s = request.POST.get('surname')
-        email = request.POST.get('email')
-        s_class = int(request.POST.get('class'))
-        if fn or s or email or s_class:
-            if s_class == -2:
-                students = students.filter(first_name__icontains=fn, surname__icontains=s,
-                                           account__email__icontains=email)
-            elif s_class == -1:
-                students = students.filter(first_name__icontains=fn, surname__icontains=s,
-                                           account__email__icontains=email, grade=None)
-            else:
-                students = students.filter(first_name__icontains=fn, surname__icontains=s,
-                                           account__email__icontains=email, grade__id=s_class)
-    students = Paginator(students, 100)
-    students = students.get_page(page)
-    return render(request, 'students/dashboard.html', {'students': students, 'classes': classes})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def students_delete(request, id):
-    """
-    Delete a student.
-    """
-    u = Users.objects.get(email=id)
-    s = Students.objects.get(account=u)
-    if request.method == "POST":
-        u.delete()
-        s.delete()
-        return redirect('students_dashboard')
-    return render(request, 'students/delete.html', {'s': s})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def students_update(request, id):
-    """
-    Edit student's account info.
-    """
-    u = Users.objects.get(email=id)
-    s = Students.objects.get(account=u)
-    if request.method == "POST":
-        form = StudentEditForm(request.POST, instance=s)
-        if form.is_valid():
-            form.save()
-            return redirect('students_dashboard')
-    form = StudentEditForm(instance=s)
-    return render(request, 'students/update.html', {'form': form})
-
-
-# ADMIN DASHBOARD ========================
-
-
-@login_required(login_url="/login/")
-@admin_only
-def admins_dashboard_first_page(request):
-    """
-    Redirect user to the first page of admin dashboard.
-    """
-    return redirect('/admins/dashboard/1')
-
-
-@login_required(login_url="/login/")
-@admin_only
-def admins_dashboard(request, page):
-    """
-    Send dashboard with up to 100 administrators
-    """
-    u = Administrators.objects.all()
-    u = Paginator(u, 100)
-    u = u.get_page(page)
-    return render(request, 'admins/dashboard.html', {'users': u})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def admins_delete(request, id):
-    """
-    Delete an admin.
-    """
-    u = Users.objects.get(email=id)
-    s = Administrators.objects.get(account=u)
-    if request.method == "POST":
-        u.delete()
-        s.delete()
-        return redirect('admins_dashboard')
-    return render(request, 'admins/delete.html', {'s': s})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def admins_update(request, id):
-    """
-    Edit admin's info.
-    """
-    u = Users.objects.get(email=id)
-    s = Administrators.objects.get(account=u)
-    if request.method == "POST":
-        form = AdminsEditForm(request.POST, instance=s)
-        if form.is_valid():
-            form.save()
-            return redirect('admins_dashboard')
-    form = AdminsEditForm(instance=s)
-    return render(request, 'admins/update.html', {'form': form})
-
-
-# TEACHERS DASHBOARD ======================
-
-
-@login_required(login_url="/login/")
-@admin_only
-def teachers_dashboard_first_page(request):
-    return redirect('/teachers/dashboard/1')
-
-
-@login_required(login_url="/login/")
-@admin_only
-def teachers_dashboard(request, page):
-    u = Teachers.objects.all()
-    if request.method == "POST":
-        fn = request.POST.get('first_name')
-        s = request.POST.get('surname')
-        email = request.POST.get('email')
-        u = u.filter(first_name__icontains=fn, surname__icontains=s, account__email__icontains=email)
-    u = Paginator(u, 50)
-    u = u.get_page(page)
-    return render(request, 'teachers/dashboard.html', {'users': u})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def teachers_delete(request, id):
-    """
-    Delete a teacher.
-    """
-    u = Users.objects.get(email=id)
-    s = Teachers.objects.get(account=u)
-    if request.method == "POST":
-        u.delete()
-        s.delete()
-        return redirect('teachers_dashboard')
-    return render(request, 'teachers/delete.html', {'s': s})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def teachers_update(request, id):
-    """
-    Edit teachers's account info.
-    """
-    u = Users.objects.get(email=id)
-    s = Teachers.objects.get(account=u)
-    if request.method == "POST":
-        form = TeacherEditForm(request.POST, instance=s)
-        if form.is_valid():
-            form.save()
-            return redirect('teachers_dashboard')
-    form = TeacherEditForm(instance=s)
-    return render(request, 'teachers/update.html', {'form': form})
-
-
 def homepage(request):
-    """
-    Return a homepage.
-    """
     return render(request, 'homepage.html')
 
 
 def get_help(request):
-    """
-    Return a page with help information.
-    """
     return render(request, 'docs.html')
+
+def about(request):
+    return render(request, 'about_us.html', {})
 
 
 def error404(request):
@@ -962,43 +783,11 @@ def error500(request):
     })
 
 
-@login_required(login_url="/login/")
-@admin_only
-def messages_dashboard_first_page(request):
-    """
-    Redirect user to the first page of admin dashboard.
-    """
-    return redirect('/messages/dashboard/1')
 
-
-@login_required(login_url="/login/")
-@admin_only
-def messages_dashboard(request, page):
-    u = AdminMessages.objects.all()
-    u = Paginator(u, 100)
-    u = u.get_page(page)
-    return render(request, 'messages/dashboard.html', {'users': u})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def messages_delete(request, pk):
-    s = AdminMessages.objects.get(id=pk)
-    if request.method == "POST":
-        s.delete()
-        return redirect('messages_dashboard')
-    return render(request, 'messages/delete.html', {'s': s})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def messages_view(request, pk):
-    s = AdminMessages.objects.get(id=pk)
-    return render(request, 'messages/view.html', {'s': s})
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@teacher_only
 def mygradesettings(request):
     me = Teachers.objects.get(account=request.user)
     try:
@@ -1014,8 +803,7 @@ def mygradesettings(request):
         return render(request, 'access_denied.html', {'message': 'Вы не классный руководитель.'})
 
 
-def about(request):
-    return render(request, 'about_us.html', {})
+
 
 
 @login_required(login_url="/login/")
@@ -1063,6 +851,7 @@ def empty_backup_folder(request):
     rmtree(directory)
     os.mkdir(directory)
     return redirect('export')
+
 
 @login_required(login_url="/login/")
 @admin_only

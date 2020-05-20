@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'minimum.apps.MinimumConfig',
     'diary.apps.DiaryConfig',
     'news.apps.NewsConfig',
+    'admin_panel',
     'django_cleanup',
     'debug_toolbar',
 ]
