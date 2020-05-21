@@ -224,3 +224,11 @@ class AdminMessages(models.Model):
 
     def __str__(self):
         return self.subject
+
+
+class Quaters(models.Model):
+    number = models.IntegerField(verbose_name="Четверть", choices=(
+        (1, "I"), (2, "II"), (3, "III"), (4, "IV")
+    ))
+    begin = models.DateField(verbose_name="Начало четверти")
+    end = models.DateField(verbose_name="Конец четверти")

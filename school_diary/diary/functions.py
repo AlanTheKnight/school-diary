@@ -21,7 +21,8 @@ def term_valid(controls, terms):
     a = 0
     for i in range(1, 5):
         # FIX OPTIMIZATION:
-        # If delta between today and the end of the quarter lower than 14 days, I allow setting quarter marks.
+        # If delta between today and the end of the quarter lower than 14 days,
+        # I allow setting quarter marks.
         delta = datetime.date(year, terms[i - 1][1][1], terms[i - 1][1][0]) - datetime.date.today()
         if delta.days < 14:
             a = 1
