@@ -278,6 +278,178 @@ def create_controls(grade, subject, term):
             controls = controls.exclude(name='Годовая оценка')
     return {'controls': controls}
 
+def students_diary(request):
+    student = models.Students.objects.get(account=request.user)
+    grade = student.grade
+    if grade is None:
+        return render(request, 'access_denied.html', {'message': "Вы не состоите в классе.\
+        Попросите Вашего классного руководителя добавить Вас в класс."})
+    if 'selected' in request.POST:
+        subject = request.POST.get('subject')
+        return redirect('/diary/{}'.format(subject))
+    elif 'all' in request.POST:
+        chosen_quarter = int(request.POST.get('term'))
+        subjects = grade.subjects.all()
+        all_marks = student.marks_set.filter(lesson__quarter=chosen_quarter)
+        if not all_marks:
+            return render(request, 'no_marks.html')
+        d = {}
+        max_length, total_missed = 0, 0
+
+        for s in subjects:
+            marks = all_marks.filter(subject=s.id).order_by('lesson__date')
+            if len(marks) > max_length:
+                max_length = len(marks)
+
+            n_amount = 0
+            marks_list = []
+            for i in marks:
+                if i.lesson.control.weight != 100:
+                    if i.amount != -1:
+                        marks_list.append(i)
+                    else:
+                        n_amount += 1
+            avg = get_average(marks_list)
+            smart_avg = get_smart_average(marks_list)
+            d.update({s: [avg, smart_avg, marks]})
+
+            total_missed += n_amount
+
+        for subject in d:
+            d[subject].append(range(max_length - len(d[subject][2])))
+
+        context = {
+            'student': student,
+            'd': d,
+            'max_length': max_length,
+            'total_missed': total_missed,
+            'term': chosen_quarter,
+        }
+        return render(request, 'marklist.html', context)
+
+    subjects = grade.subjects.all()
+    context = {'subjects': subjects}
+    return render(request, 'diary_student.html', context)
+
+
+def teachers_diary(request):
+    teacher = models.Teachers.objects.get(account=request.user)
+    context = {'Teacher': teacher,
+               'subjects': teacher.subjects.all(),
+               'grades': models.Grades.objects.filter(teachers=teacher),
+               # 'controls': controls
+               }
+
+    if request.method == 'POST':
+        # If teacher filled in a form with name = 'getgrade' then
+        # build a table with marks for all students and render it.
+        if 'getgrade' in request.POST:
+            subject = models.Subjects.objects.get(name=request.POST.get('subject'))
+            grade = request.POST.get('grade')
+            request.session['subject'] = subject.id
+            term = int(request.POST.get('term'))
+            request.session['term'] = int(term)
+            number = int(grade[0:-1])
+            letter = grade[-1]
+            try:
+                grade = models.Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
+                request.session['grade'] = grade.id
+            except ObjectDoesNotExist:
+                messages.error(request, 'Ошибка')
+                return render(request, 'teacher.html', context)
+            context.update(create_table(grade, subject, term))
+
+            context.update(create_controls(grade=grade, subject=subject, term=term))
+            return render(request, 'teacher.html', context)
+
+        elif 'createlesson' in request.POST:
+            date = request.POST.get('date')
+            quarter = get_quarter_by_date(date)
+            theme = request.POST.get('theme')
+            homework = request.POST.get('homework')
+            control = models.Controls.objects.get(id=request.POST.get('control'))
+            grade = models.Grades.objects.get(id=request.session['grade'])
+            subject = models.Subjects.objects.get(id=request.session['subject'])
+            term = request.session['term']
+            h_file = request.FILES.get('h_file')
+            lesson = models.Lessons.objects.create(
+                date=date, h_file=h_file, quarter=quarter,
+                theme=theme, homework=homework,
+                control=control, grade=grade, subject=subject)
+            lesson.save()
+            context.update(create_table(grade=grade, subject=subject, quarter=term))
+            context.update(create_controls(grade=grade, subject=subject, term=term))
+            return render(request, 'teacher.html', context)
+
+        elif 'addcomment' in request.POST:
+            # Get data from session
+            grade = models.Grades.objects.get(id=request.session['grade'])
+            term = request.session['term']
+            subject = models.Subjects.objects.get(id=request.session['subject'])
+            comment = request.POST.get('comment')
+            data = request.POST.get('commentdata')
+            student_id = data.split("|")[0]
+            lesson_id = data.split("|")[1]
+            student = models.Students.objects.get(account=student_id)
+            lesson = models.Lessons.objects.get(id=lesson_id)
+            mark = models.Marks.objects.get(student=student, lesson=lesson)
+            mark.comment = comment
+            mark.save()
+            context.update(create_table(grade=grade, subject=subject, quarter=term))
+            context.update(create_controls(grade=grade, subject=subject, term=term))
+            return render(request, 'teacher.html', context)
+        else:
+            # Save marks block
+            marks_dict = {
+                tuple(map(int, k.replace("mark_", "").split("|"))): str(request.POST[k])
+                for k in dict(request.POST)
+                if k.startswith('mark_')
+            }
+            subject = models.Subjects.objects.get(id=request.POST.get('subject_id'))
+
+            marks_raw = models.Marks.objects.select_for_update().filter(
+                student__grade_id=request.POST.get('grade_id'),
+                lesson__grade_id=request.POST.get('grade_id'),
+                lesson__subject_id=subject.id
+            )
+
+            marks_in_db = {
+                (x.student_id, x.lesson_id): x
+                for x in marks_raw
+            }
+
+            objs_for_update = []
+            for k, v in marks_dict.items():
+                if v != "" and k in marks_in_db.keys() and marks_in_db[k].amount != int(v):
+                    marks_in_db[k].amount = int(v)
+                    objs_for_update.append(marks_in_db[k])
+
+            objs_for_create = [
+                models.Marks(lesson_id=k[1], student_id=k[0], amount=int(v), subject=subject)
+                for k, v in marks_dict.items()
+                if v != "" and k not in marks_in_db.keys()
+            ]
+
+            objs_for_remove = [
+                Q(id=marks_in_db[k].id)
+                for k, v in marks_dict.items()
+                if v == "" and k in marks_in_db
+            ]
+            models.Marks.objects.bulk_update(objs_for_update, ['amount'])
+
+            models.Marks.objects.bulk_create(objs_for_create)
+
+            if len(objs_for_remove) != 0:
+                models.Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
+
+            context.update(create_table(grade=models.Grades.objects.get(pk=request.session['grade']), subject=subject,
+                                        quarter=request.session['term']))
+            context.update(
+                create_controls(grade=models.Grades.objects.get(pk=request.session['grade']), subject=subject,
+                                term=request.session['term']))
+            return render(request, 'teacher.html', context)
+    else:
+        return render(request, 'teacher.html', context)
 
 @login_required(login_url="/login/")
 def diary(request):
@@ -291,176 +463,11 @@ def diary(request):
 
     # If user is student
     elif request.user.account_type == 3:
-        student = models.Students.objects.get(account=request.user)
-        grade = student.grade
-        if grade is None:
-            return render(request, 'access_denied.html', {'message': "Вы не состоите в классе.\
-            Попросите Вашего классного руководителя добавить Вас в класс."})
-        if 'selected' in request.POST:
-            subject = request.POST.get('subject')
-            return redirect('/diary/{}'.format(subject))
-        elif 'all' in request.POST:
-            chosen_quarter = int(request.POST.get('term'))
-            subjects = grade.subjects.all()
-            all_marks = student.marks_set.filter(lesson__quarter=chosen_quarter)
-            if not all_marks:
-                return render(request, 'no_marks.html')
-            d = {}
-            max_length, total_missed = 0, 0
-
-            for s in subjects:
-                marks = all_marks.filter(subject=s.id).order_by('lesson__date')
-                if len(marks) > max_length:
-                    max_length = len(marks)
-
-                n_amount = 0
-                marks_list = []
-                for i in marks:
-                    if i.lesson.control.weight != 100:
-                        if i.amount != -1:
-                            marks_list.append(i)
-                        else:
-                            n_amount += 1
-                avg = get_average(marks_list)
-                smart_avg = get_smart_average(marks_list)
-                d.update({s: [avg, smart_avg, marks]})
-
-                total_missed += n_amount
-
-            for subject in d:
-                d[subject].append(range(max_length - len(d[subject][2])))
-
-            context = {
-                'student': student,
-                'd': d,
-                'max_length': max_length,
-                'total_missed': total_missed,
-                'term': chosen_quarter,
-            }
-            return render(request, 'marklist.html', context)
-
-        subjects = grade.subjects.all()
-        context = {'subjects': subjects}
-        return render(request, 'diary_student.html', context)
+        students_diary(request)
 
     # If user is teacher
     elif request.user.account_type == 2:
-        teacher = models.Teachers.objects.get(account=request.user)
-        context = {'Teacher': teacher,
-                   'subjects': teacher.subjects.all(),
-                   'grades': models.Grades.objects.filter(teachers=teacher),
-                   # 'controls': controls
-                   }
-
-        if request.method == 'POST':
-            # If teacher filled in a form with name = 'getgrade' then
-            # build a table with marks for all students and render it.
-            if 'getgrade' in request.POST:
-                subject = models.Subjects.objects.get(name=request.POST.get('subject'))
-                grade = request.POST.get('grade')
-                request.session['subject'] = subject.id
-                term = int(request.POST.get('term'))
-                request.session['term'] = int(term)
-                number = int(grade[0:-1])
-                letter = grade[-1]
-                try:
-                    grade = models.Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
-                    request.session['grade'] = grade.id
-                except ObjectDoesNotExist:
-                    messages.error(request, 'Ошибка')
-                    return render(request, 'teacher.html', context)
-                context.update(create_table(grade, subject, term))
-
-                context.update(create_controls(grade=grade, subject=subject, term=term))
-                return render(request, 'teacher.html', context)
-
-            elif 'createlesson' in request.POST:
-                date = request.POST.get('date')
-                quarter = get_quarter_by_date(date)
-                theme = request.POST.get('theme')
-                homework = request.POST.get('homework')
-                control = models.Controls.objects.get(id=request.POST.get('control'))
-                grade = models.Grades.objects.get(id=request.session['grade'])
-                subject = models.Subjects.objects.get(id=request.session['subject'])
-                term = request.session['term']
-                h_file = request.FILES.get('h_file')
-                lesson = models.Lessons.objects.create(
-                    date=date, h_file=h_file, quarter=quarter,
-                    theme=theme, homework=homework,
-                    control=control, grade=grade, subject=subject)
-                lesson.save()
-                context.update(create_table(grade=grade, subject=subject, quarter=term))
-                context.update(create_controls(grade=grade, subject=subject, term=term))
-                return render(request, 'teacher.html', context)
-
-            elif 'addcomment' in request.POST:
-                # Get data from session
-                grade = models.Grades.objects.get(id=request.session['grade'])
-                term = request.session['term']
-                subject = models.Subjects.objects.get(id=request.session['subject'])
-                comment = request.POST.get('comment')
-                data = request.POST.get('commentdata')
-                student_id = data.split("|")[0]
-                lesson_id = data.split("|")[1]
-                student = models.Students.objects.get(account=student_id)
-                lesson = models.Lessons.objects.get(id=lesson_id)
-                mark = models.Marks.objects.get(student=student, lesson=lesson)
-                mark.comment = comment
-                mark.save()
-                context.update(create_table(grade=grade, subject=subject, quarter=term))
-                context.update(create_controls(grade=grade, subject=subject, term=term))
-                return render(request, 'teacher.html', context)
-            else:
-                # Save marks block
-                marks_dict = {
-                    tuple(map(int, k.replace("mark_", "").split("|"))): str(request.POST[k])
-                    for k in dict(request.POST)
-                    if k.startswith('mark_')
-                }
-                subject = models.Subjects.objects.get(id=request.POST.get('subject_id'))
-
-                marks_raw = models.Marks.objects.select_for_update().filter(
-                    student__grade_id=request.POST.get('grade_id'),
-                    lesson__grade_id=request.POST.get('grade_id'),
-                    lesson__subject_id=subject.id
-                )
-
-                marks_in_db = {
-                    (x.student_id, x.lesson_id): x
-                    for x in marks_raw
-                }
-
-                objs_for_update = []
-                for k, v in marks_dict.items():
-                    if v != "" and k in marks_in_db.keys() and marks_in_db[k].amount != int(v):
-                        marks_in_db[k].amount = int(v)
-                        objs_for_update.append(marks_in_db[k])
-
-                objs_for_create = [
-                    models.Marks(lesson_id=k[1], student_id=k[0], amount=int(v), subject=subject)
-                    for k, v in marks_dict.items()
-                    if v != "" and k not in marks_in_db.keys()
-                ]
-
-                objs_for_remove = [
-                    Q(id=marks_in_db[k].id)
-                    for k, v in marks_dict.items()
-                    if v == "" and k in marks_in_db
-                ]
-                models.Marks.objects.bulk_update(objs_for_update, ['amount'])
-
-                models.Marks.objects.bulk_create(objs_for_create)
-
-                if len(objs_for_remove) != 0:
-                    models.Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
-
-                context.update(create_table(grade=models.Grades.objects.get(pk=request.session['grade']), subject=subject,
-                                            quarter=request.session['term']))
-                context.update(create_controls(grade=models.Grades.objects.get(pk=request.session['grade']), subject=subject,
-                                               term=request.session['term']))
-                return render(request, 'teacher.html', context)
-        else:
-            return render(request, 'teacher.html', context)
+        teachers_diary(request)
     else:
         redirect('/')
 
