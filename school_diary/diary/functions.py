@@ -4,6 +4,7 @@ This function don't return render
 
 import datetime
 from . import models
+
 TERMS = (
     ((1, 7), (27, 10)),
     ((3, 11), (29, 12)),
@@ -145,3 +146,13 @@ def create_controls(grade, subject, term):
         if lesson.control.name == 'Годовая оценка':
             controls = controls.exclude(name='Годовая оценка')
     return {'controls': controls}
+
+def check_if_teacher_has_class(teacher):
+    if teacher.grades_set.all():
+        return True
+    return False
+
+
+def get_needed_mark(average):
+    pass
+

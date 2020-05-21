@@ -42,7 +42,8 @@ LITERAS = [
 
 class Users(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField('Почта', unique=True)
-    account_type = models.IntegerField(verbose_name="Тип аккаунта", default=3, choices=TYPES)
+    account_type = models.IntegerField(
+        verbose_name="Тип аккаунта", default=3, choices=TYPES)
     is_active = models.BooleanField('Активный', default=True)
     is_staff = models.BooleanField('Администратор', default=False)
 
@@ -69,7 +70,9 @@ class Users(AbstractBaseUser, PermissionsMixin):
 
 
 class Subjects(models.Model):
-    name = models.CharField(max_length=50, verbose_name="Название", unique=True)
+    name = models.CharField(
+        max_length=50, verbose_name="Название",
+        unique=True)
 
     class Meta:
         ordering = ['name']
@@ -85,11 +88,17 @@ def teacher_avatar_upload(instanse, filename):
 
 
 class Teachers(models.Model):
-    account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
+    account = models.OneToOneField(
+        Users, on_delete=models.CASCADE,
+        verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     surname = models.CharField(max_length=100, verbose_name="Фамилия")
-    avatar = models.FileField(verbose_name="Файл", blank=True, upload_to=teacher_avatar_upload,  default='')
-    second_name = models.CharField(max_length=100, verbose_name="Отчество", blank=True, default='')
+    avatar = models.FileField(
+        verbose_name="Файл", blank=True,
+        upload_to=teacher_avatar_upload, default='')
+    second_name = models.CharField(
+        max_length=100, verbose_name="Отчество",
+        blank=True, default='')
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
 
     class Meta:
@@ -98,15 +107,21 @@ class Teachers(models.Model):
         verbose_name_plural = "Учителя"
 
     def __str__(self):
-        return '{} {} {}'.format(self.surname, self.first_name, self.second_name)
+        return '{} {} {}'.format(
+            self.surname, self.first_name, self.second_name)
 
 
 class Grades(models.Model):
     number = models.IntegerField(choices=GRADES, verbose_name="Класс")
-    letter = models.CharField(max_length=2, choices=LITERAS, verbose_name="Буква")
-    teachers = models.ManyToManyField(Teachers, verbose_name="Учителя", related_name="subjects_chosen")
+    letter = models.CharField(
+        max_length=2, choices=LITERAS, verbose_name="Буква")
+    teachers = models.ManyToManyField(
+        Teachers, verbose_name="Учителя",
+        related_name="subjects_chosen")
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
-    main_teacher = models.ForeignKey(Teachers, verbose_name='Классный руководитель', on_delete=models.SET_NULL, null=True, default=None)
+    main_teacher = models.ForeignKey(
+        Teachers, verbose_name='Классный руководитель',
+        on_delete=models.SET_NULL, null=True, default=None)
 
     class Meta:
         ordering = ['number', 'letter']
