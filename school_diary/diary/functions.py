@@ -13,55 +13,6 @@ TERMS = (
 )
 
 
-def term_valid(controls, terms):
-    """
-    check dates to term marks
-    """
-    year = datetime.date.today().year
-    a = 0
-    for i in range(1, 5):
-        # FIX OPTIMIZATION:
-        # If delta between today and the end of the quarter lower than 14 days,
-        # I allow setting quarter marks.
-        delta = datetime.date(year, terms[i - 1][1][1], terms[i - 1][1][0]) - datetime.date.today()
-        if delta.days < 14:
-            a = 1
-            break
-    if not a:
-        return controls.exclude(name='Четвертная оценка')
-    else:
-        return controls
-
-
-def get_quarter_by_date(datestring: str) -> int:
-    """
-    Returns a number of a quarter by the date stamp string.
-    If quarter does not exit, return 0 instead.
-    """
-    converted_date = datetime.datetime.strptime(datestring, "%Y-%m-%d").date()
-    year = converted_date.year
-    for i in range(0, 4):
-        start = datetime.date(year, TERMS[i][0][1], TERMS[i][0][0])
-        end = datetime.date(year, TERMS[i][1][1], TERMS[i][1][0])
-        if start <= converted_date <= end:
-            return i + 1
-    else:
-        return 0
-
-
-def year_valid(controls):
-    """
-    check date to year mark
-    """
-    # OPTIMIZATION: The same gist as in term_valid(): use timedelta to know the days
-    year = datetime.date.today().year
-    delta = datetime.date(year, TERMS[3][1][1], TERMS[3][1][0]) - datetime.date.today()
-    if delta.days < 14:
-        return controls
-    else:
-        return controls.exclude(name='Годовая оценка')
-
-
 def get_average(list):
     if len(list) == 0:
         return '-'
@@ -138,7 +89,7 @@ def create_table(grade, subject, quarter):
 
 def create_controls(grade, subject, term):
     controls = models.Controls.objects.all()
-    controls = term_valid(controls, TERMS)
+    controls = term_valid(controls)
     controls = year_valid(controls)
     lessons = models.Lessons.objects.filter(grade=grade, subject=subject, quarter=term).all()
     for lesson in lessons:
@@ -148,12 +99,53 @@ def create_controls(grade, subject, term):
             controls = controls.exclude(name='Годовая оценка')
     return {'controls': controls}
 
+
 def check_if_teacher_has_class(teacher):
     if teacher.grades_set.all():
         return True
     return False
 
 
-def get_needed_mark(average):
-    pass
+def get_current_quarter() -> int:
+    """
+    Return current quarter, 0 if now is holidays' time.
+    """
+    today = datetime.date.today()
+    for quarter in models.Quarters.objects.all():
+        if quarter.start <= today <= quarter.end:
+            return quarter
+    return 0
 
+
+def term_valid(controls):
+    """
+    Check if teacher can create lesson with quarter mark control.
+    """
+    for q in models.Quarters.objects.all():
+        delta = q.end - datetime.date.today()
+        if delta.days < 14:
+            return controls
+    return controls.exclude(name='Четвертная оценка')
+
+
+def get_quarter_by_date(datestring: str) -> int:
+    """
+    Return a number of quarter by a date stamp string.
+    If quarter does not exist, return 0 instead.
+    """
+    converted_date = datetime.datetime.strptime(datestring, "%Y-%m-%d").date()
+    for q in models.Quarters.objects.all():
+        if q.start <= converted_date <= q.end:
+            return q.number
+    return 0
+
+
+def year_valid(controls):
+    """
+    Check if teacher can create lesson with year mark control.
+    """
+    fourth = models.Quarters.get(number=4)
+    delta = fourth - datetime.date.today()
+    if delta.days < 14:
+        return controls
+    return controls.exclude(name='Годовая оценка')

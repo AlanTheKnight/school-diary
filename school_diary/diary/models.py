@@ -133,12 +133,15 @@ class Grades(models.Model):
 
 
 class Students(models.Model):
-    account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
+    account = models.OneToOneField(
+        Users, on_delete=models.CASCADE,
+        verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(verbose_name="Имя", max_length=100)
     surname = models.CharField(verbose_name="Фамилия", max_length=100)
     second_name = models.CharField(verbose_name="Отчество", max_length=100, blank=True, default="")
-    grade = models.ForeignKey(Grades, on_delete=models.SET_NULL, null=True, default=None, verbose_name="Класс",
-                              blank=True)
+    grade = models.ForeignKey(
+        Grades, on_delete=models.SET_NULL, null=True, default=None,
+        verbose_name="Класс", blank=True)
 
     class Meta:
         ordering = ['grade', 'surname', 'first_name', 'second_name']
@@ -150,7 +153,9 @@ class Students(models.Model):
 
 
 class Administrators(models.Model):
-    account = models.OneToOneField(Users, on_delete=models.CASCADE, verbose_name="Пользователь", primary_key=True)
+    account = models.OneToOneField(
+        Users, on_delete=models.CASCADE,
+        verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(verbose_name="Имя", max_length=100)
     surname = models.CharField(verbose_name="Фамилия", max_length=100)
     second_name = models.CharField(verbose_name="Отчество", max_length=100, blank=True, default="")
@@ -166,6 +171,7 @@ class Administrators(models.Model):
 class Controls(models.Model):
     name = models.CharField(max_length=120, verbose_name='Вид работы')
     weight = models.IntegerField(verbose_name=' Коэффицент', default=1)
+    
     class Meta:
         verbose_name = "Вид работы"
         verbose_name_plural = "Виды работ"
@@ -185,8 +191,10 @@ class Lessons(models.Model):
     theme = models.CharField(max_length=120, verbose_name='Тема')
     subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет')
     grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
-    control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')  # As homework or test
-    h_file = models.FileField(null=True, default="None", verbose_name="Файл", upload_to=lesson_upload)
+    control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')
+    h_file = models.FileField(
+        null=True, default="None", 
+        verbose_name="Файл", upload_to=lesson_upload)
 
     class Meta:
         verbose_name = "Урок"
@@ -201,8 +209,10 @@ class Marks(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
     amount = models.IntegerField(verbose_name="Балл", null=True, default=None)
     lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок')
-    subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет', null=True, default=None)
+    subject = models.ForeignKey(
+        Subjects, on_delete=models.PROTECT, verbose_name='Предмет', null=True, default=None)
     comment = models.TextField(blank=True, verbose_name='комментарий', default="")
+    
     class Meta():
         verbose_name_plural = "Оценки"
         ordering = ['lesson']
@@ -215,8 +225,9 @@ class AdminMessages(models.Model):
     date = models.DateTimeField(verbose_name="Время отправки", auto_now_add=True)
     subject = models.CharField(verbose_name="Тема сообщения", max_length=100)
     content = models.TextField(verbose_name="Текст сообщения", max_length=4000)
-    sender = models.ForeignKey(Users, on_delete=models.CASCADE, verbose_name="Отправитель", null=True, default=None)
-    
+    sender = models.ForeignKey(
+        Users, on_delete=models.CASCADE, verbose_name="Отправитель", null=True, default=None)
+
     class Meta:
         verbose_name = "Сообщение администратору"
         verbose_name_plural = "Сообщения администратору"
@@ -226,7 +237,7 @@ class AdminMessages(models.Model):
         return self.subject
 
 
-class Quaters(models.Model):
+class Quarters(models.Model):
     number = models.IntegerField(verbose_name="Четверть", choices=(
         (1, "I"), (2, "II"), (3, "III"), (4, "IV")
     ))
