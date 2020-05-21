@@ -9,10 +9,10 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from . import forms
 from .decorators import (
-    unauthenticated_user, admin_only, allowed_users,
+    unauthenticated_user, admin_only,
     teacher_only, student_only)
 from . import models
-from .functions import *
+from . import functions
 
 
 @unauthenticated_user
@@ -123,7 +123,7 @@ def lesson_page(request, pk):
     context = {
         'lesson': lesson,
     }
-    context.update(create_controls(grade=models.Grades.objects.get(
+    context.update(functions.create_controls(grade=models.Grades.objects.get(
         pk=request.session['grade']),
         subject=models.Subjects.objects.get(
             pk=request.session['subject']), term=request.session['term']
@@ -134,7 +134,7 @@ def lesson_page(request, pk):
         if request.FILES.get('h_file'):
             lesson.h_file = request.FILES.get('h_file')
         lesson.date = request.POST.get('date')
-        lesson.quarter = get_quarter_by_date(lesson.date)
+        lesson.quarter = functions.get_quarter_by_date(lesson.date)
         lesson.theme = request.POST.get('theme')
         lesson.control = models.Controls.objects.get(
             pk=request.POST.get('control'))
@@ -188,8 +188,8 @@ def students_diary(request):
                         marks_list.append(i)
                     else:
                         n_amount += 1
-            avg = get_average(marks_list)
-            smart_avg = get_smart_average(marks_list)
+            avg = functions.get_average(marks_list)
+            smart_avg = functions.get_smart_average(marks_list)
             d.update({s: [avg, smart_avg, marks]})
 
             total_missed += n_amount
@@ -231,19 +231,20 @@ def teachers_diary(request):
             number = int(grade[0:-1])
             letter = grade[-1]
             try:
-                grade = models.Grades.objects.get(number=number, subjects=subject, letter=letter, teachers=teacher)
+                grade = models.Grades.objects.get(
+                    number=number, subjects=subject, letter=letter, teachers=teacher)
                 request.session['grade'] = grade.id
             except ObjectDoesNotExist:
                 messages.error(request, 'Ошибка')
                 return render(request, 'teacher.html', context)
-            context.update(create_table(grade, subject, term))
+            context.update(functions.create_table(grade, subject, term))
 
-            context.update(create_controls(grade=grade, subject=subject, term=term))
+            context.update(functions.create_controls(grade=grade, subject=subject, term=term))
             return render(request, 'teacher.html', context)
 
         elif 'createlesson' in request.POST:
             date = request.POST.get('date')
-            quarter = get_quarter_by_date(date)
+            quarter = functions.get_quarter_by_date(date)
             theme = request.POST.get('theme')
             homework = request.POST.get('homework')
             control = models.Controls.objects.get(id=request.POST.get('control'))
@@ -256,8 +257,8 @@ def teachers_diary(request):
                 theme=theme, homework=homework,
                 control=control, grade=grade, subject=subject)
             lesson.save()
-            context.update(create_table(grade=grade, subject=subject, quarter=term))
-            context.update(create_controls(grade=grade, subject=subject, term=term))
+            context.update(functions.create_table(grade=grade, subject=subject, quarter=term))
+            context.update(functions.create_controls(grade=grade, subject=subject, term=term))
             return render(request, 'teacher.html', context)
 
         elif 'addcomment' in request.POST:
@@ -274,8 +275,8 @@ def teachers_diary(request):
             mark = models.Marks.objects.get(student=student, lesson=lesson)
             mark.comment = comment
             mark.save()
-            context.update(create_table(grade=grade, subject=subject, quarter=term))
-            context.update(create_controls(grade=grade, subject=subject, term=term))
+            context.update(functions.create_table(grade=grade, subject=subject, quarter=term))
+            context.update(functions.create_controls(grade=grade, subject=subject, term=term))
             return render(request, 'teacher.html', context)
         else:
             # Save marks block
@@ -321,30 +322,30 @@ def teachers_diary(request):
             if len(objs_for_remove) != 0:
                 models.Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
 
-            context.update(create_table(grade=models.Grades.objects.get(pk=request.session['grade']), subject=subject,
-                                        quarter=request.session['term']))
-            context.update(
-                create_controls(grade=models.Grades.objects.get(pk=request.session['grade']), subject=subject,
-                                term=request.session['term']))
+            context.update(functions.create_table(
+                grade=models.Grades.objects.get(pk=request.session['grade']),
+                subject=subject,
+                quarter=request.session['term']))
+            context.update(functions.create_controls(
+                grade=models.Grades.objects.get(pk=request.session['grade']),
+                subject=subject,
+                term=request.session['term']))
             return render(request, 'teacher.html', context)
     else:
         return render(request, 'teacher.html', context)
 
-      
+
 @login_required(login_url="/login/")
 def diary(request):
     """
     Main function for displaying diary pages to admins/teachers/students.
     """
-
     # If user is admin
     if request.user.account_type == 0 or request.user.account_type == 1:
         return render(request, 'diary_admin_main.html')
-
     # If user is student
     elif request.user.account_type == 3:
         return students_diary(request)
-
     # If user is teacher
     elif request.user.account_type == 2:
         return teachers_diary(request)
@@ -353,7 +354,7 @@ def diary(request):
 
 
 @login_required(login_url="login")
-@allowed_users(allowed_roles=['students'], message="Доступ к этой странице имеют только ученики.")
+@student_only
 def stats(request, id, term):
     student = models.Students.objects.get(account=request.user)
     grade = student.grade
@@ -386,10 +387,12 @@ def stats(request, id, term):
             else:
                 n_amount += 1
 
-        avg = get_average(marks_list)
-        smart_avg = get_smart_average(marks_list)
+        avg = functions.get_average(marks_list)
+        smart_avg = functions.get_smart_average(marks_list)
 
-        marks_amounts = [i.amount for i in marks if i.amount != -1 and i.lesson.control.weight != 100]
+        marks_amounts = [
+            i.amount for i in marks if i.amount != -1 and i.lesson.control.weight != 100
+        ]
         data = []
         for i in range(5, 1, -1):
             data.append(marks_amounts.count(i))
@@ -438,12 +441,15 @@ def homework(request):
                 for lesson in raw_lessons:
                     if lesson.homework or lesson.h_file:
                         lessons.append(lesson)
-            return render(request, 'homework.html', {'form': form, 'lessons': lessons, 'date': date})
+                context = {'form': form, 'lessons': lessons, 'date': date}
+                return render(request, 'homework.html', context)
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=6)
-    lessons = models.Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, homework__iregex=r'\S+')
+    lessons = models.Lessons.objects.filter(
+        date__range=[start_date, end_date], grade=grade, homework__iregex=r'\S+')
     if not lessons:
-        lessons = models.Lessons.objects.filter(date__range=[start_date, end_date], grade=grade, h_file__iregex=r'\S+')
+        lessons = models.Lessons.objects.filter(
+            date__range=[start_date, end_date], grade=grade, h_file__iregex=r'\S+')
     form = forms.DatePickForm()
     return render(request, 'homework.html', {'form': form, 'lessons': lessons})
 
@@ -540,33 +546,30 @@ def view_students_marks(request):
     if request.method == "POST":
         term = int(request.POST.get('term'))
     else:
-        term = get_quarter_by_date(str(datetime.date.today()))
+        term = functions.get_quarter_by_date(str(datetime.date.today()))
 
-    try:
-        grade = models.Grades.objects.get(main_teacher=me)
-        students = models.Students.objects.filter(grade=grade)
+    class_ = functions.check_if_teacher_has_class(me)
+    if class_:
+        students = models.Students.objects.filter(grade=class_)
         context = {
             'students': students,
             'term': term,
         }
         return render(request, 'grades/grade_marks.html', context)
-    except ObjectDoesNotExist:
-        return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
-
-
-def get_class_or_access_denied(request, teacher):
-    try:
-        my_class = models.Grades.objects.get(main_teacher=teacher)
-        return my_class
-    except ObjectDoesNotExist:
-        return render(request, 'access_denied.html', {'message': 'Вы не являетесь классным руководителем.'})
+    else:
+        return render(request, 'access_denied.html', {
+                'message': 'Вы не являетесь классным руководителем.'
+            })
 
 
 def students_marks(request, pk, term):
     student = models.Students.objects.get(account=pk)
     me = models.Teachers.objects.get(account=request.user)
-    my_class = get_class_or_access_denied(request, me)
-
+    my_class = functions.check_if_teacher_has_class(me)
+    if not my_class:
+        return render(request, 'access_denied.html', {
+                'message': 'Вы не являетесь классным руководителем.'
+            })
     subjects = my_class.subjects.all()
     all_marks = student.marks_set.filter(lesson__quarter=term)
     if not all_marks:
@@ -587,8 +590,8 @@ def students_marks(request, pk, term):
             else:
                 n_amount += 1
 
-        avg = get_average(marks_list)
-        smart_avg = get_smart_average(marks_list)
+        avg = functions.get_average(marks_list)
+        smart_avg = functions.get_smart_average(marks_list)
         d.update({s: [avg, smart_avg, marks]})
         total_missed += n_amount
 
@@ -644,14 +647,13 @@ def admin_message(request):
 @teacher_only
 def mygradesettings(request):
     me = models.Teachers.objects.get(account=request.user)
-    try:
-        grade = models.Grades.objects.get(main_teacher=me)
+    class_ = functions.check_if_teacher_has_class(me)
+    if class_:
         if request.method == "POST":
-            form = forms.ClassSettingsForm(request.POST, instance=grade)
+            form = forms.ClassSettingsForm(request.POST, instance=class_)
             if form.is_valid():
                 form.save()
                 return redirect('my_grade')
-        form = forms.ClassSettingsForm(instance=grade)
+        form = forms.ClassSettingsForm(instance=class_)
         return render(request, 'grades/class_settings.html', {'form': form})
-    except ObjectDoesNotExist:
-        return render(request, 'access_denied.html', {'message': 'Вы не классный руководитель.'})
+    return render(request, 'access_denied.html', {'message': 'Вы не классный руководитель.'})

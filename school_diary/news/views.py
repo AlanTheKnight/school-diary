@@ -1,12 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import Publications
-from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator
 from .forms import ArticleCreationForm
-from django.contrib.auth.decorators import login_required
 from .decorators import admin_only
-from django.contrib import messages
 
 
 def first_page(request):
@@ -21,15 +18,16 @@ def get_posts(request, page):
     Page where posts are displayed.
     """
     news = Publications.objects.all()
-    if request.method == "POST": # Posts search
+    if request.method == "POST":  # Posts search
         search_text = request.POST.get("search_text")
         news = news.filter(title__icontains=search_text)
         search = True
-        return render(request, 'news_list.html', {'news':news, "search":search, "search_text":search_text})
-    search = False    
-    news = Paginator(news, 10) # 10 posts per page.
+        context = {'news': news, "search": search, "search_text": search_text}
+        return render(request, 'news_list.html', context)
+    search = False
+    news = Paginator(news, 10)  # 10 posts per page.
     news = news.get_page(page)
-    return render(request, 'news_list.html', {'news':news, "search":search})
+    return render(request, 'news_list.html', {'news': news, "search": search})
 
 
 def post(request, url):
@@ -38,8 +36,8 @@ def post(request, url):
     """
     try:
         article = Publications.objects.get(slug=url)
-        return render(request, 'news_post.html', {'post':article})
-    except Exception as error:
+        return render(request, 'news_post.html', {'post': article})
+    except Exception:
         return render(request, 'error.html', {
             'title': "Статья не найдена",
             'error': "404",
@@ -60,7 +58,7 @@ def create_post(request):
             return redirect('/news/')
     else:
         form = ArticleCreationForm()
-        return render(request, 'news_editor.html', {'form':form})
+        return render(request, 'news_editor.html', {'form': form})
 
 
 @login_required(login_url="/login/")
@@ -70,9 +68,9 @@ def dashboard(request, page):
     Dashboard for posts.
     """
     news = Publications.objects.all()
-    news = Paginator(news, 100) # 100 posts per page
+    news = Paginator(news, 100)  # 100 posts per page
     news = news.get_page(page)
-    return render(request, 'news_dashboard.html', {'news':news})
+    return render(request, 'news_dashboard.html', {'news': news})
 
 
 @login_required(login_url="/login/")
@@ -94,7 +92,7 @@ def news_delete(request, id):
     if request.method == "POST":
         article.delete()
         return redirect('/news/dashboard')
-    context = {'item':article}
+    context = {'item': article}
     return render(request, 'news_delete.html', context)
 
 
@@ -105,7 +103,7 @@ def news_update(request, id):
     Page where post can be edited.
     """
     article = Publications.objects.get(id=id)
-    # Oh shit, PyCharm, I'm sorry for overriding "id". 
+    # Oh shit, PyCharm, I'm sorry for overriding "id".
     form = ArticleCreationForm(instance=article)
     if request.method == 'POST':
         form = ArticleCreationForm(request.POST, request.FILES, instance=article)
@@ -115,5 +113,5 @@ def news_update(request, id):
                 article.image = ''
                 article.save()
             return redirect('news_dashboard')
-    context = {'form':form, 'data':article}
+    context = {'form': form, 'data': article}
     return render(request, 'news_editor.html', context)

@@ -13,14 +13,18 @@ TERMS = (
 )
 
 
-def get_average(list):
-    if len(list) == 0:
+def get_average(marks_list):
+    """
+    Calculate the average for Marks QuerySet.
+    Return a tuple of average, marks' sum and total marks amount.
+    """
+    if len(marks_list) == 0:
         return '-'
-    grades = sum([i.amount for i in list])
-    return round(grades / len(list), 2), grades, len(list)
+    grades = sum([i.amount for i in marks_list])
+    return round(grades / len(marks_list), 2), grades, len(marks_list)
 
 
-def get_smart_average(list):
+def get_smart_average(list) -> float:
     if len(list) == 0:
         return "-"
     s = 0
@@ -30,6 +34,18 @@ def get_smart_average(list):
         s += weight * i.amount
         w += weight
     return round(s / w, 2)
+
+
+def increase_avg(mark, avg):
+    """
+    Adds mark to average list ignoring year & quarter
+    marks and lesson missing marks.
+    """
+    if mark.amount != -1 and mark.lesson.control.weight != 100:
+        avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
+        avg[mark.student_id][1] += mark.lesson.control.weight
+        avg[mark.student_id][2] += mark.amount
+        avg[mark.student_id][3] += 1
 
 
 def create_table(grade, subject, quarter):
@@ -55,21 +71,15 @@ def create_table(grade, subject, quarter):
     scope = {}
     avg = {}
     for mark in marks:
-        def increase_avg(mark):
-            if mark.amount != -1 and mark.lesson.control.weight != 100:
-                avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
-                avg[mark.student_id][1] += mark.lesson.control.weight
-                avg[mark.student_id][2] += mark.amount
-                avg[mark.student_id][3] += 1
         if students[mark.student_id] not in scope:
             scope[students[mark.student_id]] = {}
         lesson = lessons[mark.lesson_id]
         scope[students[mark.student_id]].update({lesson: mark})
         if mark.student_id in avg:
-            increase_avg(mark)
+            increase_avg(mark, avg)
         else:
             avg[mark.student_id] = [0, 0, 0, 0]
-            increase_avg(mark)
+            increase_avg(mark, avg)
 
     for sk, student in students.items():
         for lk, lesson in lessons.items():
@@ -106,8 +116,12 @@ def create_controls(grade, subject, term):
 
 
 def check_if_teacher_has_class(teacher):
+    """
+    Check if teacher has a class. If does, return
+    Grades object. Otherwise, return False.
+    """
     if teacher.grades_set.all():
-        return True
+        return teacher.grades_set.all()[0]
     return False
 
 
