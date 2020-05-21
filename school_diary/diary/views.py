@@ -1,8 +1,5 @@
 import datetime
-import xlsxwriter
-import os
 from functools import reduce
-from shutil import rmtree
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -229,8 +226,6 @@ def create_table(grade, subject, quarter):
             avg[mark.student_id] = [0, 0, 0, 0]
             increase_avg(mark)
 
-    print(avg)
-    
     for sk, student in students.items():
         for lk, lesson in lessons.items():
             if student not in scope:
@@ -272,7 +267,8 @@ def term_valid(controls, terms):
     a = 0
     for i in range(1, 5):
         # FIX OPTIMIZATION:
-        # If delta between today and the end of the quarter lower than 14 days, I allow setting quarter marks.
+        # If delta between today and the end of the quarter lower than 14 days,
+        # I allow setting quarter marks.
         delta = datetime.date(year, terms[i - 1][1][1], terms[i - 1][1][0]) - datetime.date.today()
         if delta.days < 14:
             a = 1
@@ -493,9 +489,12 @@ def stats(request, id, term):
     try:
         subject = models.Subjects.objects.get(id=id)
     except ObjectDoesNotExist:
-        return render(request, 'error.html', context={'title': 'Мы не можем найти то, что Вы ищите.',
-                                                      'error': '404',
-                                                      'description': 'Данный предмет отстуствует.'})
+        context = {
+            'title': 'Мы не можем найти то, что Вы ищите.',
+            'error': '404',
+            'description': 'Данный предмет отстуствует.'
+        }
+        return render(request, 'error.html', context)
     lessons = models.Lessons.objects.filter(grade=grade, subject=subject, quarter=term)
     marks = []
     marks = student.marks_set.filter(subject=subject, lesson__quarter=term)
@@ -765,34 +764,6 @@ def admin_message(request):
             return redirect('profile')
     form = forms.AdminMessageCreationForm()
     return render(request, 'admin_messages.html', {'form': form})
-
-
-def homepage(request):
-    return render(request, 'homepage.html')
-
-
-def get_help(request):
-    return render(request, 'docs.html')
-
-
-def about(request):
-    return render(request, 'about_us.html', {})
-
-
-def error404(request):
-    return render(request, 'error.html', {
-        'error': "404",
-        'title': "Страница не найдена.",
-        "description": "Мы не можем найти страницу, которую Вы ищите."
-    })
-
-
-def error500(request):
-    return render(request, 'error.html', {
-        'error': "500",
-        'title': "Что-то пошло не так",
-        "description": "Мы работаем над этим."
-    })
 
 
 @login_required(login_url="login")

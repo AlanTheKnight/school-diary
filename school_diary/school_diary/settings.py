@@ -30,10 +30,10 @@ SECRET_KEY = config.get('Settings', 'secret_key_a')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config.get("Settings", "debug")
 
-ALLOWED_HOSTS = ['.diary56.ru', '64.227.75.146',]
+ALLOWED_HOSTS = ['.diary56.ru', '64.227.75.146']
 
 if DEBUG:
-   ALLOWED_HOSTS.extend(['127.0.0.1', 'localhost'])
+    ALLOWED_HOSTS.extend(['127.0.0.1', 'localhost'])
 
 # Application definition
 
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'diary.apps.DiaryConfig',
     'news.apps.NewsConfig',
     'admin_panel',
+    'pages',
     'django_cleanup',
     'debug_toolbar',
 ]
@@ -66,7 +67,7 @@ studied.
 
 diary [NOT ACTIVATED] - using this app students can get their marks, homework,
 personal statistics, etc.
-[TO ACTIVATE] 
+[TO ACTIVATE]
 - Go to ./urls.py and uncomment 9th line
 - Add needed links to homepage.html and base.html
 """
@@ -99,7 +100,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            'libraries': { 'templateLibs': 'templateLibs'},
+            'libraries': {'templateLibs': 'templateLibs'},
         },
     },
 ]
@@ -175,8 +176,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-if not DEBUG: STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-else: STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+else:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -215,4 +218,3 @@ if not DEBUG:
             },
         },
     }
-    

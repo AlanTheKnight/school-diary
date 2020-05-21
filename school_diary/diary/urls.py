@@ -29,17 +29,20 @@ urlpatterns = [
     path('send-message-to-admin/', views.admin_message, name="message_to_admin"),
 
     # Reset password
-    path('reset_password/', auth_views.PasswordResetView.as_view(template_name="password_reset/reset.html",
-                                                                 email_template_name='email/email_template.html'),
-         name="reset_password"),
-    path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(template_name="password_reset/done.html"),
-         name="password_reset_done"),
-    path('reset/<uidb64>/<token>/',
-         auth_views.PasswordResetConfirmView.as_view(template_name="password_reset/confirm.html"),
-         name="password_reset_confirm"),
-    path('reset_password_complete/',
-         auth_views.PasswordResetCompleteView.as_view(template_name="password_reset/complete.html"),
-         name="password_reset_complete"),
+    path(
+        'reset_password/', auth_views.PasswordResetView.as_view(
+            template_name="password_reset/reset.html",
+            email_template_name='email/email_template.html'),
+        name="reset_password"),
+    path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(
+        template_name="password_reset/done.html"),
+        name="password_reset_done"),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
+        template_name="password_reset/confirm.html"),
+        name="password_reset_confirm"),
+    path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(
+        template_name="password_reset/complete.html"),
+        name="password_reset_complete"),
 
     # Main diary part
     path('diary/lesson/<int:pk>', views.lesson_page, name='lesson-page'),
@@ -48,18 +51,9 @@ urlpatterns = [
     path('diary/<int:id>/<int:term>/', views.stats, name='statistics'),
     path('diary/homework/', views.homework, name='homework'),
 
-    # Main part of a website
-    path('', views.homepage, name='homepage'),
-    path('help/', views.get_help, name='help'),
-    path('about/', views.about, name='about'),
-    path('error/', views.error404, name='404'),
-
-    
-
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    
     import debug_toolbar
     urlpatterns.append(path('__debug__/', include(debug_toolbar.urls)))
