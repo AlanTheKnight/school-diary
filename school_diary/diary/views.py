@@ -9,7 +9,6 @@ from django.db.models import Q
 from django.db import transaction
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from . import forms
 from .decorators import (
@@ -55,7 +54,8 @@ def user_login(request):
             login(request, user)
             return redirect("/")
         else:
-            messages.info(request, 'Неправильный адрес электронной почты или пароль.')
+            messages.info(
+                request, 'Неправильный адрес электронной почты или пароль.')
     form = forms.UsersLogin()
     context = {'form': form}
     return render(request, 'login.html', context)
@@ -96,13 +96,15 @@ def admin_register(request):
         form = forms.AdminSignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Новый аккаунт администратора был создан успешно.")
+            messages.success(
+                request, "Новый аккаунт администратора был создан успешно.")
             return redirect('/login/')
     if request.POST:
         form = forms.AdminSignUpForm(request.POST)
     else:
         form = forms.AdminSignUpForm()
-    return render(request, 'registration_admin.html', {'form': form, 'error': 0})
+    context = {'form': form, 'error': 0}
+    return render(request, 'registration_admin.html', context)
 
 
 @login_required(login_url="/login/")
@@ -112,16 +114,18 @@ def teacher_register(request):
         form = forms.TeacherSignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Новый аккаунт учителя был создан успешно.")
+            messages.success(
+                request, "Новый аккаунт учителя был создан успешно.")
             return redirect('/login/')
     if request.POST:
         form = forms.TeacherSignUpForm(request.POST)
     else:
         form = forms.TeacherSignUpForm()
-    return render(request, 'registration_teacher.html', {'form': form, 'error': 0})
+    context = {'form': form, 'error': 0}
+    return render(request, 'registration_teacher.html', context)
 
 
-@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@teacher_only
 @login_required(login_url="/login/")
 @transaction.atomic
 def lesson_page(request, pk):
@@ -130,9 +134,12 @@ def lesson_page(request, pk):
     context = {
         'lesson': lesson,
     }
-    context.update(create_controls(grade=models.Grades.objects.get(pk=request.session['grade']),
-                                   subject=models.Subjects.objects.get(pk=request.session['subject']),
-                                   term=request.session['term']))
+    context.update(create_controls(grade=models.Grades.objects.get(
+        pk=request.session['grade']),
+        subject=models.Subjects.objects.get(
+            pk=request.session['subject']), term=request.session['term']
+        )
+    )
     if request.method == 'POST':
         lesson = models.Lessons.objects.get(pk=request.POST.get('pk'))
         if request.FILES.get('h_file'):
@@ -140,7 +147,8 @@ def lesson_page(request, pk):
         lesson.date = request.POST.get('date')
         lesson.quarter = get_quarter_by_date(lesson.date)
         lesson.theme = request.POST.get('theme')
-        lesson.control = models.Controls.objects.get(pk=request.POST.get('control'))
+        lesson.control = models.Controls.objects.get(
+            pk=request.POST.get('control'))
         lesson.homework = request.POST.get('homework')
         if request.POST.get('deletehwfile') is not None:
             lesson.h_file = ""
@@ -170,7 +178,7 @@ def get_smart_average(list):
 
 
 @login_required(login_url='/login/')
-@allowed_users(allowed_roles=['teachers'], message="Вы не зарегистрированы как учитель.")
+@teacher_only
 def delete_lesson(request, pk):
     lesson = models.Lessons.objects.get(pk=pk)
     if request.method == "POST":
@@ -182,11 +190,17 @@ def delete_lesson(request, pk):
 def create_table(grade, subject, quarter):
     lessons = {
         lesson.id: lesson for lesson in
-        models.Lessons.objects.filter(grade=grade, subject=subject, quarter=quarter).select_related("control").order_by(
+        models.Lessons.objects.filter(
+            grade=grade,
+            subject=subject,
+            quarter=quarter).select_related("control").order_by(
             "date").all()
     }
-    students = {student.account_id: student for student in
-                models.Students.objects.filter(grade=grade).order_by("surname", "first_name", "second_name")}
+    students = {
+        student.account_id: student for student in
+        models.Students.objects.filter(grade=grade).order_by(
+                    "surname", "first_name", "second_name")
+    }
 
     marks = models.Marks.objects.filter(
         student__grade_id=grade.id,
@@ -202,6 +216,7 @@ def create_table(grade, subject, quarter):
             if mark.amount != -1 and mark.lesson.control.weight != 100:
                 avg[mark.student_id][0] += mark.amount * mark.lesson.control.weight
                 avg[mark.student_id][1] += mark.lesson.control.weight
+                # TODO: Fix
                 avg[mark.student_id][2] += mark.amount
                 avg[mark.student_id][3] += 1
         if students[mark.student_id] not in scope:
@@ -214,6 +229,8 @@ def create_table(grade, subject, quarter):
             avg[mark.student_id] = [0, 0, 0, 0]
             increase_avg(mark)
 
+    print(avg)
+    
     for sk, student in students.items():
         for lk, lesson in lessons.items():
             if student not in scope:
@@ -793,59 +810,3 @@ def mygradesettings(request):
         return render(request, 'grades/class_settings.html', {'form': form})
     except ObjectDoesNotExist:
         return render(request, 'access_denied.html', {'message': 'Вы не классный руководитель.'})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def generate_table(request, quarter):
-    if settings.DEBUG:
-        directory = os.path.join(settings.STATICFILES_DIRS[0], 'results')
-    else:
-        directory = os.path.join(settings.STATIC_ROOT, 'results')
-    all_lessons = models.Lessons.objects.filter(quarter=quarter)
-    all_grades = models.Grades.objects.all()
-    all_marks = models.Marks.objects.filter(lesson__quarter=quarter)
-    filename = str(datetime.datetime.now().strftime('%d.%m.%Y %I:%M:%S %p')) + '.xlsx'
-    file = 'results/' + filename
-    workbook = xlsxwriter.Workbook(os.path.join(directory, filename))
-    row = 0
-    for grade in all_grades:
-        worksheet = workbook.add_worksheet(str(grade))
-        lessons = all_lessons.filter(grade=grade).order_by('date', 'subject__name')
-        for lesson in lessons:
-            worksheet.write(row, 0, str(lesson.grade))
-            worksheet.write(row, 1, lesson.date.strftime('%d.%m.%Y'))
-            worksheet.write(row, 2, str(lesson.subject))
-            worksheet.write(row, 3, lesson.theme)
-            worksheet.write(row, 4, lesson.homework)
-            marks = all_marks.filter(lesson=lesson).order_by('student__surname', 'student__name')
-            row += 1
-            for mark in marks:
-                worksheet.write(row, 0, mark.student.surname)
-                worksheet.write(row, 1, mark.student.first_name)
-                worksheet.write(row, 2, mark.amount)
-            row += 2
-    workbook.close()
-    context = {'filename': file}
-    return render(request, 'download-sheet.html', context)
-
-
-@login_required(login_url="/login/")
-@admin_only
-def empty_backup_folder(request):
-    if settings.DEBUG:
-        directory = os.path.join(settings.STATICFILES_DIRS[0], 'results')
-    else:
-        directory = os.path.join(settings.STATIC_ROOT, 'results')
-    rmtree(directory)
-    os.mkdir(directory)
-    return redirect('export')
-
-
-@login_required(login_url="/login/")
-@admin_only
-def export_page(request):
-    if request.method == "POST":
-        quarter = request.POST.get('quarter')
-        return redirect('/export/{}'.format(quarter))
-    return render(request, 'export.html')

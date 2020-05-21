@@ -54,9 +54,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('error/', views.error404, name='404'),
 
-    path('export/', views.export_page, name='export'),
-    path('export/<int:quarter>/', views.generate_table, name='download sheet'),
-    path('empty-backup-folder/', views.empty_backup_folder),
+    
 
 ]
 

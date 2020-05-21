@@ -1,3 +1,14 @@
+import datetime
+
+
+TERMS = (
+    ((1, 7), (27, 10)),
+    ((3, 11), (29, 12)),
+    ((12, 1), (21, 3)),  # FIX ON PRODUCTION
+    ((29, 3), (27, 5))
+)
+
+
 def get_quarter_by_date(datestring: str) -> int:
     """
     Returns a number of a quarter by the date stamp string.
@@ -12,4 +23,13 @@ def get_quarter_by_date(datestring: str) -> int:
             return i + 1
     else:
         return 0
-        
+
+
+def check_if_teacher_has_class(teacher):
+    if teacher.grades_set.all():
+        return True
+    return False
+
+
+def get_needed_mark(average):
+    pass

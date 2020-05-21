@@ -25,4 +25,8 @@ urlpatterns = [
     path('messages/dashboard/<int:page>', views.messages_dashboard),
     path('messages/delete/<int:pk>', views.messages_delete, name='messages_delete'),
     path('messages/view/<int:pk>', views.messages_view, name='messages_view'),
+
+    path('export/', views.export_page, name='export'),
+    path('export/<int:quarter>/', views.generate_table, name='download sheet'),
+    path('empty-backup-folder/', views.empty_backup_folder),
 ]
