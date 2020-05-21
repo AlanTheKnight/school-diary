@@ -39,7 +39,7 @@
                 {% for lesson in lessons %}
                     <tr>
                         <td class="text-center">{{ lesson.day }}</td>
-                        <td class="text-center">{{ lesson.number }}</td>
+                        <td class="text-center">{{ lesson.number.n }}</td>
                         <td class="text-center">{{ lesson.subject }}</td>
                         <td class="text-center">{{ lesson.classroom }}</td>
                         <td class="text-center"><a class="btn btn-sm btn-primary text-" href="{% url 'timetable_update' lesson.id %}"><i class="fas fa-edit"></i></a></td>

@@ -1,9 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load templateLibs %}
 
 {% block title %}
 <title></title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<style>
+    .colored {
+        background-color: rgb(216, 216, 216);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -15,7 +21,7 @@
         <thead>
             <th scope="col" class="text-left">Дата</th>
             {% for lesson in lessons %}
-                <th scope="col"><span data-toggle="tooltip" data-placement="top" title="{{ lesson.control }}">{{ lesson.date|date:'d.m, D' }}</span></th>
+                <th scope="col" {% if lesson.control.weight == 100 %} class="colored"{% endif %}><span data-toggle="tooltip" data-placement="top" title="{{ lesson.control }}">{{ lesson.date|date:'d.m, D' }}</span></th>
             {% endfor %}
         </thead>
         <tbody>
@@ -42,7 +48,7 @@
     <div class="container w-75">
         <p>Оценки за эту четверть:</p>
         <canvas id="MyChart"></canvas>
-        <p>Средний балл: {{ avg }}</p>
+        <p>Средний балл: {{ avg.0 }}</p>
         <p class="text-muted" style="margin-top: -20px;"><small>
             Получен из среднего арифметического оценок.
         </small></p>
@@ -50,6 +56,13 @@
         <p class="text-muted" style="margin-top: -20px;"><small>
             Получен с помощью системы весов для каждого вида работы.
         </small></p>
+        <p>Всего оценок: {{ avg.2 }}</p>
+        {% if needed %}
+        <p>Вам нужно получить еще {{ needed }} "5", чтобы в четверти было "{{ needed_mark }}"</p>
+        <p class="text-muted" style="margin-top: -20px;"><small>
+            Данное значение показывает, сколько еще пятерок необходимо, чтобы среднее арифметическое было выше {{ needed_mark|minus:0.5 }}.
+        </small></p>
+        {% endif %}
     </div>
     <script>
         let ctx = document.getElementById('MyChart').getContext('2d');

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title></title>
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="quarter">Четверть</label>
+            <select id="quarter" name="quarter" class="form-control">
+                <option value="1">I</option>
+                <option value="2">II</option>
+                <option value="3">III</option>
+                <option value="4">IV</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Сгенерировать</button>
+    </form>
+
+</div>
+{% endblock %}

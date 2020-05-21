@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from configparser import RawConfigParser
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,10 +21,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '+v1knn6@t0$k_uh8s%by=k_47y*68oba&@f19k6w95geqa9-a1'
+config = RawConfigParser()
+thisfolder = os.path.dirname(os.path.abspath(__file__))
+initfile = os.path.join(thisfolder, 'settings.ini')
+config.read(initfile)
+SECRET_KEY = config.get('Settings', 'secret_key_a')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config.get("Settings", "debug")
 
 ALLOWED_HOSTS = ['.diary56.ru', '64.227.75.146',]
 
@@ -44,6 +49,7 @@ INSTALLED_APPS = [
     'minimum.apps.MinimumConfig',
     'diary.apps.DiaryConfig',
     'news.apps.NewsConfig',
+    'admin_panel',
     'django_cleanup',
     'debug_toolbar',
 ]
@@ -104,15 +110,14 @@ AUTH_USER_MODEL = 'diary.Users'
 WSGI_APPLICATION = 'school_diary.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+# Database# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 if not DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'diarydb',
-            'USER': 'diaryuser',
-            'PASSWORD': 'Forward#Forever2005',
+            'NAME': config.get("DataBase", 'name'),
+            'USER': config.get("DataBase", 'user'),
+            'PASSWORD': config.get('DataBase', 'password'),
             'HOST': 'localhost',
             'PORT': '',
             'ATOMIC_REQUESTS': True,
@@ -146,11 +151,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# INTERNAL_IPS = [
-#     # ...
-#     '127.0.0.1',
-#     # ...
-# ]
+INTERNAL_IPS = [
+    # ...
+    '127.0.0.1',
+    # ...
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -187,8 +192,8 @@ EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'ideasoft-spb@yandex.ru'
-EMAIL_HOST_PASSWORD = 'Forward#Forever2005'
+EMAIL_HOST_USER = config.get("Email", 'user')
+EMAIL_HOST_PASSWORD = config.get("Email", 'password')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 if not DEBUG:

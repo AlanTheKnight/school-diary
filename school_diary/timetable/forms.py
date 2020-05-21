@@ -1,5 +1,5 @@
 from django import forms
-from .models import Lessons
+from .models import Lessons, BellsTimeTable
 
 
 class GetTimeTableForm(forms.Form):
@@ -32,9 +32,16 @@ class LessonCreateForm(forms.ModelForm):
 
     class Meta:
         model = Lessons
-        fields = ('connection', 'day', 'number', 'start', 'end', 'subject', 'classroom')
+        fields = ('connection', 'day', 'number', 'subject', 'classroom')
+
+
+class BellCreateForm(forms.ModelForm):
+    class Meta:
+        model = BellsTimeTable
+        fields = ('school', 'n', 'start', 'end')
         widgets = {
-            'number':forms.NumberInput(attrs={'max':'8', 'min':'0'}),
-            'start':forms.TimeInput(attrs={'type':'time'}),
-            'end':forms.TimeInput(attrs={'type':'time'})
+            'school': forms.Select(attrs={'class': 'form-control', 'id': 'school'}),
+            'n': forms.NumberInput(attrs={'class': 'form-control', 'id': 'n', 'max':"9", 'min':"1"}),
+            'start': forms.TimeInput(attrs={'class': 'form-control', 'id': 'start', 'type':'time'}),
+            'end': forms.TimeInput(attrs={'class': 'form-control', 'id': 'end', 'type':'time'}),
         }

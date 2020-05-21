@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from urllib.parse import unquote
-from .forms import GetTimeTableForm, LessonCreateForm
+from .forms import GetTimeTableForm, LessonCreateForm, BellCreateForm
 from django.http import HttpResponseRedirect
-from .models import Grades, Lessons
+from .models import Grades, Lessons, BellsTimeTable
 import time
 from .decorators import admin_only
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 
 
 DAYWEEK_NAMES = {
@@ -18,6 +19,11 @@ DAYWEEK_NAMES = {
     6:"Суббота",
     7:"Воскресенье"
 }
+
+SCHOOLS = dict([
+    (1, "Младшая школа"),
+    (2, "Средняя и старшая школа"),
+])
 
 
 def timetable(request):
@@ -36,6 +42,7 @@ def timetable(request):
 
 
 def output(request, grade, litera):
+    data = {}
     """Shows the timetable depending on the url."""
     CURRENT_DAY = time.localtime().tm_wday + 1
     # If current day isn't sunday, users will see timetable for today.
@@ -48,28 +55,18 @@ def output(request, grade, litera):
         my_class = str(class_number) + class_letter
         my_grade = Grades.objects.get(number=class_number, letter=class_letter)
         all_lessons = Lessons.objects.filter(connection=my_grade.id)
-        if CURRENT_DAY != 7: lessons_list_today = all_lessons.filter(day=current_day_name)
-        else: lessons_list_today = []
-        if CURRENT_DAY != 6: lessons_list_tomorrow = all_lessons.filter(day=next_day_name)
-        else: lessons_list_tomorrow = []
-        lessons_list_monday = all_lessons.filter(day="Понедельник")
-        lessons_list_tuesday = all_lessons.filter(day="Вторник")
-        lessons_list_wednesday = all_lessons.filter(day="Среда")
-        lessons_list_thursday = all_lessons.filter(day="Четверг")
-        lessons_list_friday = all_lessons.filter(day="Пятница")
-        lessons_list_saturday = all_lessons.filter(day="Суббота")
+        if CURRENT_DAY != 7: data["today"] = all_lessons.filter(day=current_day_name)
+        else: data["today"] = []
+        if CURRENT_DAY != 6: data["tomorrow"] = all_lessons.filter(day=next_day_name)
+        else: data["tomorrow"] = []
+        for weekday in DAYWEEK_NAMES.values():
+            data[weekday] = all_lessons.filter(day=weekday)
         return render(request, 'timetable/list.html', {
             'current_weekday': current_day_name,
-            'today': lessons_list_today,
-            'tomorrow': lessons_list_tomorrow,
-            'my_grade': my_class,
-            'monday': lessons_list_monday,
-            'tuesday': lessons_list_tuesday,
-            'wednesday': lessons_list_wednesday,
-            'thursday': lessons_list_thursday,
-            'friday': lessons_list_friday,
-            'saturday': lessons_list_saturday})
+            'data':data,
+            'my_grade': my_class})
     except Exception as error:
+        print(error)
         return render(request, 'error.html', {
             'error': "404", 
             'title': "Расписание не найдено", 
@@ -157,3 +154,81 @@ def delete_lesson(request, id):
         return redirect('/timetable/dashboard')
     context = {'item':lesson}
     return render(request, 'timetable/lesson_delete.html', context)
+
+"""
+List of HTML pages are rendered by these functions:
+- timetable/lesson_delete.html
+    Page with lesson deleting confirmation.
+- timetable/create.html
+    Page where admin creates a new lesson.
+- timetable/dashboard.html
+    Page where admins can edit lessons.
+- timetable/download.html
+    Page with links to timetable download.
+- timetable/list.html
+    Page where timetable is displayed.
+- timetable/timetable.html
+    Page with class selection.
+"""
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_dashboard_first_page(request):
+    return redirect('/timetable/bells/dashboard/1')
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_dashboard(request, page):
+    objects = BellsTimeTable.objects.all() # Replace Model
+    amount = len(objects)
+    objects = Paginator(objects, 100)
+    objects = objects.get_page(page)
+    context = {
+        "objects": objects,
+        "amount": amount,
+        "wiki": "help/",
+        "title": " Расписание звонков",
+        "schools": SCHOOLS
+    }
+    return render(request, 'bells/dashboard.html', context)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_delete(request, pk):
+    obj = BellsTimeTable.objects.get(pk=pk) # Replace model
+    if request.method == "POST":
+        obj.delete()
+        return redirect('bells_dashboard')
+    context = {
+        "object": obj,
+        "help_text": "Вы уверены, что хотите удалить эту запись?"
+    }
+    return render(request, 'bells/delete.html', context)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_update(request, pk):
+    obj = BellsTimeTable.objects.get(pk=pk) # Replace Model
+    if request.method == "POST":
+        form = BellCreateForm(request.POST, instance=obj) # Replace SomeForm
+        if form.is_valid():
+            form.save()
+            return redirect('bells_dashboard')
+    form = BellCreateForm(instance=obj) # Replace SomeForm
+    return render(request, 'bells/create.html', {'form': form, 'title':"Добавить звонок"})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_create(request): # Replace Model
+    if request.method == "POST":
+        form = BellCreateForm(request.POST) # Replace SomeForm
+        if form.is_valid():
+            form.save()
+            return redirect('bells_dashboard')
+    form = BellCreateForm() # Replace SomeForm
+    return render(request, 'bells/create.html', {'form': form, 'title':"Добавить звонок"})
+

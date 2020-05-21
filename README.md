@@ -2,29 +2,55 @@
 
 ## Setting up project on your computer
 
-Download or clone this repository, open it in terminal and run:
+Download or clone this repository.
 
-Linux:
+Send an email to ideasoft-spb@yandex.com asking the permission to run our website. 
+We will send you back and email with .ini file you need to copy to the folder where settings.py is located. After that, change some values in .ini file and set 'user' and 'password' values in 'Email' section - these are login and password for email account (we use Yandex, probably you will need to change port in settings.py). 
+Also it contains some fields for PostgreSQL database. You can ignore this values until you'll want to turn debug mode to false. Debug mode is also located in .ini file ('Settings' section contains debug and secret_key variables). To change debug to False, specify an empty value:
 
-    chmod +x just_installed.sh
-    ./just_installed.sh
+    [Section]
+    debug = 
 
-Windows:
+Any debug value except an empty one will turn on debug mode.
 
-    just_installed.bat
+Then activate your virtual environment and install requirements:
 
-This script is going to install all libraries you need, ask you to create a
-superuser, then run the server.
-If you have already set up the repository, setup.sh and setup.bat scripts are
-going to be usefull: automatically make migrations, migrate and run the server:
+    python -m pip install -r requirements.txt
+    
+Make migrations to database:
+
+    python manage.py makemigrations
+    python manage.py migrate
+    
+Before you will run server, create superuser account:
+
+    python manage.py createsuperuser
+    Email: your_email@email.com
+    Account type: 0
+    Password: somerandompassword
+    
+Now you can run server.
+
+    python manage.py runserver
+    
+Go to http://127.0.0.1:8000/ in your browser and enjoy our diary.
+
+Superuser account let you create other administrators and teachers. Students register by themself.
+
+To automatically create migrations and run the server, use our ```setup.sh``` and ```setup.bat``` files.
 
 Linux:
 
     chmod +x setup.sh
     ./setup.sh
-
+    
 Windows:
 
     setup.bat
 
 **Attention! Your environment need to be set up so python3 is launched using 'python' command.**
+
+## Screenshots
+
+![Teacher account](https://sun9-13.userapi.com/c856132/v856132311/21cdaf/2UbbgjtKKPs.jpg)
+![Teacher interface](https://sun9-46.userapi.com/c856132/v856132311/21cda5/0hD1H2vYibQ.jpg)

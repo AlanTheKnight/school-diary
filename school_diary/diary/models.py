@@ -165,7 +165,7 @@ def lesson_upload(instanse, filename):
 
 class Lessons(models.Model):
     date = models.DateField(verbose_name='Дата')
-    quater = models.SmallIntegerField(verbose_name='Четверть', null=True, default=None)
+    quarter = models.SmallIntegerField(verbose_name='Четверть', null=True, default=None)
     homework = models.TextField(blank=True, verbose_name='ДЗ')
     theme = models.CharField(max_length=120, verbose_name='Тема')
     subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет')

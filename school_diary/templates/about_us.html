@@ -10,7 +10,79 @@
 
 {% block content %}
 <div class="container my-5">
-    <h1>О нашем проекте</h1>
+    <h1>О дневнике</h1>
     <hr>
+    <h2>Команда</h2>
+    <p>
+        Дневник сделан командой IdeaSoft в рамках проекта <a href="https://itsolschool.ru">"Школа IT-решений"</a>, 
+        проходившего в ГФМЛ№30.
+    </p>
+    <div class="row py-4">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-4 text-center">
+            <img src="{% static 'pashs-ba.jpg' %}" alt="Павел Бардин" width="280px">
+            <p class="my-1">Павел Бардин, школа №289</p>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-4 text-center">
+            <img src="{% static 'alantheknight.jpg' %}" alt="Максим Гусев" width="280px">
+            <p class="my-1">Максим Гусев, гимназия №56</p>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-4 text-center">
+            <img src="{% static 'velutb.png' %}" alt="Марк Ефремов" width="280px">
+            <p class="my-1">Марк Ефремов, гимназия №610</p>
+        </div>
+    </div>
+    <hr>
+    <h2>Использованные языки, инструменты и ресурсы</h2>
+    <div class="row py-4">
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://python.org"><img src="{% static 'instruments/python.png' %}" alt="Python" title="Python" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://github.com"><img src="{% static 'instruments/github.png' %}" alt="GitHub" title="GitHub" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://djangoproject.com"><img src="{% static 'instruments/django.png' %}" alt="Django" title="Django" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <img src="{% static 'instruments/javascript.png' %}" alt="JS" title="JS" width="128">
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <img src="{% static 'instruments/html.png' %}" alt="HTML" title="HTML" width="128">
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <img src="{% static 'instruments/css.png' %}" alt="CSS" title="CSS" width="128">
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 py-4">
+            <a href="https://getbootstrap.com"><img src="{% static 'instruments/bootstrap.png' %}" alt="Bootstrap" title="Bootstrap" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://git-scm.com"><img src="{% static 'instruments/git.png' %}" alt="Git" title="Git" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://gunicorn.org"><img src="{% static 'instruments/gunicorn.png' %}" alt="Gunicorn" title="Gunicorn" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://nginx.org"><img src="{% static 'instruments/nginx.png' %}" alt="Nginx" title="Nginx" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://telegram.org"><img src="{% static 'instruments/telegram.png' %}" alt="Telegram" title="Telegram" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://code.visualstudio.com"><img src="{% static 'instruments/vscode.png' %}" alt="VSCode" title="VSCode" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://www.jetbrains.com/ru-ru/pycharm/"><img src="{% static 'instruments/pycharm.png' %}" alt="PyCharm" title="PyCharm" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://flaticon.com"><img src="{% static 'instruments/flaticon.png' %}" alt="FlatIcon" title="FlatIcon" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://fontawesome.com"><img src="{% static 'instruments/font_awesome.png' %}" alt="Font Awesome" title="Font Awesome" width="128"></a>
+        </div>
+        <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
+            <a href="https://postgresql.org"><img src="{% static 'instruments/sql.png' %}" alt="PostgreSQL" title="PostgreSQL" width="128"></a>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

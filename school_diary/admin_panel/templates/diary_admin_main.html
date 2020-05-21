@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Панель администратора</title>
+{% endblock %}
+
+{% block css %}
+<style>
+    table a {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1>Панель администратора</h1>
+
+    <table class="table my-5 table-borderless table-hover">
+        <tbody>
+            <tr class="bg-dark text-white">
+                <td colspan="2" class="text-center">
+                    Пользователи
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 3%;">
+                    <i class="fas fa-user" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="{% url 'admins_dashboard' %}">Администраторы</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="fas fa-user" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="{% url 'teachers_dashboard' %}">Учителя</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="fas fa-user" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="{% url 'students_dashboard' %}">Ученики</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="fas fa-comment" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="{% url 'messages_dashboard' %}">Сообщения от пользователей</a>
+                </td>
+            </tr>
+            <tr class="bg-dark text-white">
+                <td colspan="2" class="text-center">
+                    Новостной блок
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="fas fa-newspaper" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="{% url 'news_dashboard' %}">Новости</a>
+                </td>
+            </tr>
+            <tr class="bg-dark text-white">
+                <td colspan="2" class="text-center">
+                    Расписание
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="fas fa-clock" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="{% url 'timetable_dashboard' %}">Расписание</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="fas fa-bell" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="{% url 'bells_dashboard' %}">Звонки</a>
+                </td>
+            </tr>
+            <tr class="bg-dark text-white">
+                <td colspan="2" class="text-center">
+                    Минимумы
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="fas fa-file" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="{% url 'minimum_dashboard' %}">Минимумы</a>
+                </td>
+            </tr>
+            <tr class="bg-dark text-white">
+                <td colspan="2" class="text-center">
+                    Дневник
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="fas fa-download" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="/export">Выгрузка оценок</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="fas fa-users" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="#">Классы</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <i class="fas fa-table" style="color: black;"></i>
+                </td>
+                <td>
+                    <a href="#">Оценки</a>
+                </td>
+            </tr>
+        </tbody>
+        
+    </table>
+    <div class="alert alert-secondary">
+        <i class="fas fa-info px-3"></i>Вы можете перейти в <a href="/admin">расширенную версию</a> панели
+    </div>
+    <div class="alert alert-secondary">
+        <i class="fas fa-question px-3"></i>Узнать как пользоваться панелью
+    </div>
+
+</div>
+{% endblock %}

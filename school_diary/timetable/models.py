@@ -10,6 +10,11 @@ DAYS = [
     ("Суббота", "Суббота")
 ]
 
+SCHOOLS = [
+    (1, "Младшая школа"),
+    (2, "Средняя и старшая школа"),
+]
+
 
 LITERAS = [
     ("А", "А"),
@@ -52,12 +57,25 @@ class Grades(models.Model):
         return str(self.number) + self.letter
 
 
+class BellsTimeTable(models.Model):
+    school = models.IntegerField(choices=SCHOOLS, verbose_name="Школа")
+    n = models.IntegerField(verbose_name="Номер урока")
+    start = models.TimeField(verbose_name="Начало урока")
+    end = models.TimeField(verbose_name="Конец урока")
+
+    class Meta:
+        ordering = ['school', 'n']
+        verbose_name = "Звонок"
+        verbose_name_plural = "Звонки"
+
+    def __str__(self):
+        return "Урок N{} - {}".format(self.n, dict(SCHOOLS)[self.school])
+
+
 class Lessons(models.Model):
     connection = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name="У какого класса урок")
     day = models.CharField(max_length=11, choices=DAYS, verbose_name="День недели", blank=False)
-    number = models.IntegerField(verbose_name="Номер урока", validators=[MinValueValidator(0), MaxValueValidator(8)])
-    start = models.TimeField(verbose_name="Начало урока")
-    end = models.TimeField(verbose_name="Конец урока")
+    number = models.ForeignKey(BellsTimeTable, on_delete=models.CASCADE, verbose_name="Номер урока")
     subject = models.CharField(max_length=50, verbose_name="Предмет")
     classroom = models.CharField(max_length=50 ,verbose_name="Кабинет")
     
@@ -69,6 +87,6 @@ class Lessons(models.Model):
 
     def __str__(self):
         if self.day != "Вторник":
-            return str(self.number) + "й урок в " + self.day.lower() + " у " + str(self.connection)
+            return str(self.number.n) + "й урок в " + self.day.lower() + " у " + str(self.connection)
         else:
-            return str(self.number) + "й урок во " + self.day.lower() + " у " + str(self.connection)
+            return str(self.number.n) + "й урок во " + self.day.lower() + " у " + str(self.connection)
