@@ -1,17 +1,10 @@
 from django.urls import path, include
-from django.contrib.auth import views as auth_views
+
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    # Authorization and login
-    path('register/', views.user_register, name='register'),
-    path('login/', views.user_login, name='login'),
-    path('logout/', views.user_logout, name='logout'),
-    path('profile/', views.user_profile, name='profile'),
-    path('registerteacher', views.teacher_register, name="teacher_register"),
-
     # Students and grades
     path('add-student/', views.add_student_page, name="add_student_page"),
     path('add-student/<str:i>/', views.add_student, name="add_student"),
@@ -22,29 +15,6 @@ urlpatterns = [
     path('view_marks/<int:pk>/<int:term>', views.students_marks, name='view_marks'),
     path('mygradesettings', views.mygradesettings, name='grade-settings'),
 
-    path('admins/create', views.admin_register, name='admins_create'),
-    path('teachers/create/', views.teacher_register, name='teachers_create'),
-
-    # Admin messages
-    path('send-message-to-admin/', views.admin_message, name="message_to_admin"),
-
-    # Reset password
-    path(
-        'reset_password/', auth_views.PasswordResetView.as_view(
-            template_name="password_reset/reset.html",
-            email_template_name='email/email_template.html'),
-        name="reset_password"),
-    path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(
-        template_name="password_reset/done.html"),
-        name="password_reset_done"),
-    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
-        template_name="password_reset/confirm.html"),
-        name="password_reset_confirm"),
-    path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(
-        template_name="password_reset/complete.html"),
-        name="password_reset_complete"),
-
-    # Main diary part
     path('diary/lesson/<int:pk>', views.lesson_page, name='lesson-page'),
     path('diary/lesson/<int:pk>/delete', views.delete_lesson, name='diary_lesson_delete'),
     path('diary/', views.diary, name='diary'),

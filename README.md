@@ -54,3 +54,14 @@ Windows:
 
 ![Teacher account](https://sun9-13.userapi.com/c856132/v856132311/21cdaf/2UbbgjtKKPs.jpg)
 ![Teacher interface](https://sun9-46.userapi.com/c856132/v856132311/21cda5/0hD1H2vYibQ.jpg)
+
+## Code styling
+
+- It's highly recommended using a linter, for example, *flake8*.
+- Lines maximal length is 99 symbols (comments and docstrings are 79).
+- Follow [PEP8](https://pep8.org)
+- Indent using 4 spaces
+
+## Other recommendations
+
+- Using ```{% url %}``` is better than using simple links because the address can be changed easily without changing any code.

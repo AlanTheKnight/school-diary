@@ -168,3 +168,24 @@ def year_valid(controls):
     if delta.days < 14:
         return controls
     return controls.exclude(name='Годовая оценка')
+
+
+def each_contains(d: dict, elements: list) -> bool:
+    """
+    Check if each element from list is in dictionary.
+    """
+    for el in elements:
+        if el not in d:
+            return False
+    return True
+
+
+def update_context(context, class_, term, subject):
+    context.update(create_table(
+        grade=class_,
+        subject=subject,
+        quarter=term))
+    context.update(create_controls(
+        grade=class_,
+        subject=subject,
+        term=term))

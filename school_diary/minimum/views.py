@@ -14,7 +14,8 @@ def minimum(request):
             chosen_subject = form.cleaned_data['subject']
             chosen_term = form.cleaned_data['term']
             try:
-                minimum = Documents.objects.get(grade=chosen_grade, term=chosen_term, subject=chosen_subject)
+                minimum = Documents.objects.get(
+                    grade=chosen_grade, term=chosen_term, subject=chosen_subject)
                 return render(request, 'minimum_download.html', {'minimum': minimum})
             except:
                 return render(request, 'error.html', {
@@ -39,7 +40,7 @@ def dashboard(request, page):
     minimums = Documents.objects.all()
     minumums = Paginator(minimums, 20)
     minimums = minumums.page(page)
-    return render(request, 'minimum/dashboard.html', {'minimums':minimums})
+    return render(request, 'minimum/dashboard.html', {'minimums': minimums})
 
 
 @login_required(login_url='/login/')
@@ -52,7 +53,7 @@ def update(request, id):
             form.save()
             return redirect('/minimum/dashboard/1')
     form = MinimumCreationForm(instance=m)
-    return render(request, 'minimum/update.html', {'form':form, })
+    return render(request, 'minimum/update.html', {'form': form, })
 
 
 @login_required(login_url='/login/')
@@ -62,7 +63,7 @@ def delete(request, id):
     if request.method == "POST":
         m.delete()
         return redirect('/minimum/dashboard/1')
-    return render(request, 'minimum/delete.html', {'m':m})
+    return render(request, 'minimum/delete.html', {'m': m})
 
 
 @login_required(login_url='/login/')
@@ -74,4 +75,4 @@ def create(request):
             form.save()
             return redirect('minimum_dashboard')
     form = MinimumCreationForm()
-    return render(request, 'minimum/create.html', {'form':form})
+    return render(request, 'minimum/create.html', {'form': form})

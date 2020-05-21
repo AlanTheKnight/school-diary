@@ -22,26 +22,26 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <a class="navbar-brand" href="/" title="Главная страница">
+      <a class="navbar-brand" href="{% url 'homepage' %}" title="Главная страница">
         <img src="{% static 'bober.png' %}" width="40" height="40" class="d-inline-block align-center" alt="">
         Гимназия 56
       </a>
       <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="/timetable">Расписание</a>
+            <a class="nav-link" href="{% url 'timetable' %}">Расписание</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/diary">Дневник</a>
+            <a class="nav-link" href="{% url 'diary' %}">Дневник</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/minimum">Минимум</a>
+            <a class="nav-link" href="{% url 'minimum' %}">Минимум</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/news">Новости</a>
+            <a class="nav-link" href="{% url 'news' %}">Новости</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/help" tabindex="-1" aria-disabled="true">Помощь</a>
+            <a class="nav-link" href="{% url 'help' %} tabindex="-1" aria-disabled="true">Помощь</a>
           </li>
         </ul>
           {% if user.is_authenticated %}
@@ -53,8 +53,8 @@
             </div>
           </div>
           {% else %}
-              <a href="/login/" class="btn btn-outline-success mx-1">Войти</a>
-              <a href="/register/" class="btn btn-success">Зарегистрироваться</a>
+              <a href="{% url 'login' %}" class="btn btn-outline-success mx-1">Войти</a>
+              <a href="{% url 'register' %}" class="btn btn-success">Зарегистрироваться</a>
           {% endif %}
         </div>
     </div>
@@ -70,25 +70,25 @@
     <div>
       <div class="row">
         <div class="col-4">
-          <a href="/" class="text-decoration-none">Главная</a>
+          <a href="{% url 'homepage' %}" class="text-decoration-none">Главная</a>
         </div>
         <div class="col-4">
-          <a href="/timetable" class="text-decoration-none">Расписание</a>
+          <a href="{% url 'timetable' %}" class="text-decoration-none">Расписание</a>
         </div>
         <div class="col-4">
-          <a href="/diary/" class="text-decoration-none">Дневник</a>
+          <a href="{% url 'diary' %}" class="text-decoration-none">Дневник</a>
         </div>
         <div class="col-4">
-          <a href="/minimum" class="text-decoration-none">Минимум</a>
+          <a href="{% url 'minimum' %}" class="text-decoration-none">Минимум</a>
         </div>
         <div class="col-4">
-          <a href="/news" class="text-decoration-none">Новости</a>
+          <a href="{% url 'news' %}" class="text-decoration-none">Новости</a>
         </div>
         <div class="col-4">
-          <a href="/about/" class="text-decoration-none">О проекте</a>
+          <a href="{% url 'about' %}" class="text-decoration-none">О проекте</a>
         </div>
         <div class="col-4">
-          <a href="/help/" class="text-decoration-none">Помощь</a>
+          <a href="{% url 'help' %}" class="text-decoration-none">Помощь</a>
         </div>
         <div class="col-4">
           <a href="https://school56.org" class="text-decoration-none">Сайт гимназии</a>

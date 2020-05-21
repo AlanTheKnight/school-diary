@@ -16,7 +16,7 @@
 
     {% if search %}
     <p class="text-muted text-center">Показаны новости по запросу "{{ search_text }}"</p>
-    <a href="/news" class="btn btn-primary">Отмена</a>
+    <a href="{% url 'news' %} class="btn btn-primary">Отмена</a>
     {% endif %}
 
     <!--Search-->

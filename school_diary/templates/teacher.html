@@ -86,7 +86,7 @@
         </div>
     </div>
 
-        {% if request.method == 'POST' %}
+        
         <form method="POST" >
         {% csrf_token %}
         <input hidden name="subject_id" value="{{ subject_id }}"/>
@@ -165,7 +165,6 @@
         {% endif %}
 
         </form>
-        {% endif %}
 
         <div class="modal fade" id="lessonmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">

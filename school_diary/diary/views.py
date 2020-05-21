@@ -1,6 +1,5 @@
 import datetime
 from functools import reduce
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.db import transaction
@@ -8,121 +7,21 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from . import forms
-from .decorators import (
-    unauthenticated_user, admin_only,
-    teacher_only, student_only)
+from .decorators import teacher_only, student_only
 from . import models
 from . import functions
-
-
-@unauthenticated_user
-def user_register(request):
-    """
-    New student registration.
-    """
-    if request.method == 'POST':
-        form = forms.StudentSignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Учётная запись была создана успешно.")
-            return redirect('/login')
-    if request.POST:
-        form = forms.StudentSignUpForm(request.POST)
-    else:
-        form = forms.StudentSignUpForm()
-    return render(request, 'registration.html', {'form': form, 'error': 0})
-
-
-@unauthenticated_user
-def user_login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect("/")
-        else:
-            messages.info(
-                request, 'Неправильный адрес электронной почты или пароль.')
-    form = forms.UsersLogin()
-    context = {'form': form}
-    return render(request, 'login.html', context)
-
-
-def user_logout(request):
-    logout(request)
-    return redirect('/login/')
-
-
-@login_required(login_url="/login/")
-def user_profile(request):
-    """
-    User profile page (diary56.ru/profile/)
-    """
-    if request.user.account_type == 0:
-        data = models.Users.objects.get(email=request.user)
-    if request.user.account_type == 1:
-        data = models.Administrators.objects.get(account=request.user)
-    if request.user.account_type == 2:
-        data = models.Teachers.objects.get(account=request.user)
-        if request.method == "POST":
-            if 'image-upload' in request.POST:
-                data.avatar = request.FILES.get('avatar')
-                data.save()
-            elif 'image-delete' in request.POST:
-                data.avatar.delete()
-    if request.user.account_type == 3:
-        data = models.Students.objects.get(account=request.user)
-    context = {'data': data}
-    return render(request, 'profile.html', context)
-
-
-@login_required(login_url="/login/")
-@admin_only
-def admin_register(request):
-    if request.method == 'POST':
-        form = forms.AdminSignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(
-                request, "Новый аккаунт администратора был создан успешно.")
-            return redirect('/login/')
-    if request.POST:
-        form = forms.AdminSignUpForm(request.POST)
-    else:
-        form = forms.AdminSignUpForm()
-    context = {'form': form, 'error': 0}
-    return render(request, 'registration_admin.html', context)
-
-
-@login_required(login_url="/login/")
-@admin_only
-def teacher_register(request):
-    if request.method == 'POST':
-        form = forms.TeacherSignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(
-                request, "Новый аккаунт учителя был создан успешно.")
-            return redirect('/login/')
-    if request.POST:
-        form = forms.TeacherSignUpForm(request.POST)
-    else:
-        form = forms.TeacherSignUpForm()
-    context = {'form': form, 'error': 0}
-    return render(request, 'registration_teacher.html', context)
 
 
 @teacher_only
 @login_required(login_url="/login/")
 @transaction.atomic
 def lesson_page(request, pk):
+    """
+    Page where teachers can edit lesson.
+    """
     lesson = models.Lessons.objects.get(pk=pk)
-
-    context = {
-        'lesson': lesson,
-    }
+    context = {'lesson': lesson}
+    # Filling up available controls.
     context.update(functions.create_controls(grade=models.Grades.objects.get(
         pk=request.session['grade']),
         subject=models.Subjects.objects.get(
@@ -220,26 +119,19 @@ def teachers_diary(request):
                }
 
     if request.method == 'POST':
-        # If teacher filled in a form with name = 'getgrade' then
-        # build a table with marks for all students and render it.
+
         if 'getgrade' in request.POST:
             subject = models.Subjects.objects.get(name=request.POST.get('subject'))
             grade = request.POST.get('grade')
-            request.session['subject'] = subject.id
-            term = int(request.POST.get('term'))
-            request.session['term'] = int(term)
             number = int(grade[0:-1])
             letter = grade[-1]
-            try:
-                grade = models.Grades.objects.get(
-                    number=number, subjects=subject, letter=letter, teachers=teacher)
-                request.session['grade'] = grade.id
-            except ObjectDoesNotExist:
-                messages.error(request, 'Ошибка')
-                return render(request, 'teacher.html', context)
-            context.update(functions.create_table(grade, subject, term))
-
-            context.update(functions.create_controls(grade=grade, subject=subject, term=term))
+            grade = models.Grades.objects.get(
+                number=number, subjects=subject, letter=letter, teachers=teacher)
+            term = int(request.POST.get('term'))
+            request.session['subject'] = subject.id  # Save data to session
+            request.session['term'] = int(term)
+            request.session['grade'] = grade.id
+            functions.update_context(context, grade, term, subject)
             return render(request, 'teacher.html', context)
 
         elif 'createlesson' in request.POST:
@@ -257,8 +149,7 @@ def teachers_diary(request):
                 theme=theme, homework=homework,
                 control=control, grade=grade, subject=subject)
             lesson.save()
-            context.update(functions.create_table(grade=grade, subject=subject, quarter=term))
-            context.update(functions.create_controls(grade=grade, subject=subject, term=term))
+            functions.update_context(context, grade, term, subject)
             return render(request, 'teacher.html', context)
 
         elif 'addcomment' in request.POST:
@@ -280,58 +171,54 @@ def teachers_diary(request):
             return render(request, 'teacher.html', context)
         else:
             # Save marks block
+            term_ = request.session['term']
+            grade_ = models.Grades.objects.get(id=request.session['grade'])
+
             marks_dict = {
                 tuple(map(int, k.replace("mark_", "").split("|"))): str(request.POST[k])
                 for k in dict(request.POST)
                 if k.startswith('mark_')
             }
             subject = models.Subjects.objects.get(id=request.POST.get('subject_id'))
-
             marks_raw = models.Marks.objects.select_for_update().filter(
                 student__grade_id=request.POST.get('grade_id'),
                 lesson__grade_id=request.POST.get('grade_id'),
                 lesson__subject_id=subject.id
             )
-
             marks_in_db = {
                 (x.student_id, x.lesson_id): x
                 for x in marks_raw
             }
-
             objs_for_update = []
             for k, v in marks_dict.items():
                 if v != "" and k in marks_in_db.keys() and marks_in_db[k].amount != int(v):
                     marks_in_db[k].amount = int(v)
                     objs_for_update.append(marks_in_db[k])
-
             objs_for_create = [
                 models.Marks(lesson_id=k[1], student_id=k[0], amount=int(v), subject=subject)
                 for k, v in marks_dict.items()
                 if v != "" and k not in marks_in_db.keys()
             ]
-
             objs_for_remove = [
                 Q(id=marks_in_db[k].id)
                 for k, v in marks_dict.items()
                 if v == "" and k in marks_in_db
             ]
             models.Marks.objects.bulk_update(objs_for_update, ['amount'])
-
             models.Marks.objects.bulk_create(objs_for_create)
-
             if len(objs_for_remove) != 0:
                 models.Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
 
-            context.update(functions.create_table(
-                grade=models.Grades.objects.get(pk=request.session['grade']),
-                subject=subject,
-                quarter=request.session['term']))
-            context.update(functions.create_controls(
-                grade=models.Grades.objects.get(pk=request.session['grade']),
-                subject=subject,
-                term=request.session['term']))
+            functions.update_context(context, grade_, term_, subject)
             return render(request, 'teacher.html', context)
     else:
+        
+        if functions.each_contains(request.session, ['grade', 'term', 'subject']):
+            term_ = request.session['term']
+            grade_ = models.Grades.objects.get(id=request.session['grade'])
+            subject_ = models.Subjects.objects.get(id=request.session['subject'])
+            functions.update_context(context, grade_, term_, subject_)
+            print(context)
         return render(request, 'teacher.html', context)
 
 
@@ -342,7 +229,7 @@ def diary(request):
     """
     # If user is admin
     if request.user.account_type == 0 or request.user.account_type == 1:
-        return render(request, 'diary_admin_main.html')
+        return redirect('admin_panel')
     # If user is student
     elif request.user.account_type == 3:
         return students_diary(request)
@@ -350,7 +237,7 @@ def diary(request):
     elif request.user.account_type == 2:
         return teachers_diary(request)
     else:
-        redirect('/')
+        redirect('homepage')
 
 
 @login_required(login_url="login")
@@ -624,23 +511,6 @@ def delete_student(request, i):
             return render(request, 'access_denied.html', context)
     else:
         return render(request, 'grades/delete_student_confirm.html', {'s': s})
-
-
-@teacher_only
-@login_required(login_url="login")
-def admin_message(request):
-    """
-    Send a message to an admin.
-    """
-    if request.method == "POST":
-        form = forms.AdminMessageCreationForm(request.POST)
-        if form.is_valid():
-            m = form.save()
-            m.sender = request.user
-            m.save()
-            return redirect('profile')
-    form = forms.AdminMessageCreationForm()
-    return render(request, 'admin_messages.html', {'form': form})
 
 
 @login_required(login_url="login")

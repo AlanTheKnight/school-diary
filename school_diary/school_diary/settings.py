@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'news.apps.NewsConfig',
     'admin_panel',
     'pages',
+    'accounts',
     'django_cleanup',
     'debug_toolbar',
 ]

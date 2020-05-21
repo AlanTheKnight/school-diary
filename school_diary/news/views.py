@@ -55,7 +55,7 @@ def create_post(request):
         form = ArticleCreationForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('/news/')
+            return redirect('news')
     else:
         form = ArticleCreationForm()
         return render(request, 'news_editor.html', {'form': form})

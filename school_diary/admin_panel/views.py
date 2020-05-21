@@ -11,13 +11,18 @@ import diary.models as models
 import diary.forms as forms
 
 
+@admin_only
+def admin_panel(request):
+    return render(request, 'admin_panel.html')
+
+
 # Students dashboard
 
 
 @login_required(login_url="/login/")
 @admin_only
 def students_dashboard_first_page(request):
-    return redirect('/students/dashboard/1')
+    return redirect('students_dashboard', page=1)
 
 
 @login_required(login_url="/login/")
@@ -97,7 +102,7 @@ def admins_dashboard_first_page(request):
     """
     Redirect user to the first page of admin dashboard.
     """
-    return redirect('/admins/dashboard/1')
+    return redirect('admins_dashboard', page=1)
 
 
 @login_required(login_url="/login/")
@@ -150,7 +155,7 @@ def admins_update(request, id):
 @login_required(login_url="/login/")
 @admin_only
 def teachers_dashboard_first_page(request):
-    return redirect('/teachers/dashboard/1')
+    return redirect('teachers_dashboard', page=1)
 
 
 @login_required(login_url="/login/")
@@ -208,7 +213,7 @@ def teachers_update(request, id):
 @admin_only
 def messages_dashboard_first_page(request):
     """Redirect a user to the first page of the dashboard."""
-    return redirect('/messages/dashboard/1')
+    return redirect('messages_dashboard', page=1)
 
 
 @login_required(login_url="/login/")
@@ -287,7 +292,7 @@ def empty_backup_folder(request):
         directory = os.path.join(settings.STATIC_ROOT, 'results')
     rmtree(directory)
     os.mkdir(directory)
-    return redirect('export')
+    return redirect('export_marks')
 
 
 @login_required(login_url="/login/")
@@ -295,5 +300,5 @@ def empty_backup_folder(request):
 def export_page(request):
     if request.method == "POST":
         quarter = request.POST.get('quarter')
-        return redirect('/export/{}'.format(quarter))
+        return redirect('export_marks_download', quarter=quarter)
     return render(request, 'export.html')
