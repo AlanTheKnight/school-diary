@@ -35,11 +35,15 @@ def get_smart_average(list):
 def create_table(grade, subject, quarter):
     lessons = {
         lesson.id: lesson for lesson in
-        models.Lessons.objects.filter(grade=grade, subject=subject, quarter=quarter).select_related("control").order_by(
+        models.Lessons.objects.filter(
+            grade=grade, subject=subject, quarter=quarter).select_related("control").order_by(
             "date").all()
     }
-    students = {student.account_id: student for student in
-                models.Students.objects.filter(grade=grade).order_by("surname", "first_name", "second_name")}
+    students = {
+        student.account_id: student for student in
+        models.Students.objects.filter(
+            grade=grade).order_by("surname", "first_name", "second_name")
+    }
 
     marks = models.Marks.objects.filter(
         student__grade_id=grade.id,
@@ -91,6 +95,7 @@ def create_controls(grade, subject, term):
     controls = models.Controls.objects.all()
     controls = term_valid(controls)
     controls = year_valid(controls)
+    print(controls)
     lessons = models.Lessons.objects.filter(grade=grade, subject=subject, quarter=term).all()
     for lesson in lessons:
         if lesson.control.name == 'Четвертная оценка':
@@ -111,9 +116,9 @@ def get_current_quarter() -> int:
     Return current quarter, 0 if now is holidays' time.
     """
     today = datetime.date.today()
-    for quarter in models.Quarters.objects.all():
-        if quarter.start <= today <= quarter.end:
-            return quarter
+    for q in models.Quarters.objects.all():
+        if q.begin <= today <= q.end:
+            return q.number
     return 0
 
 
@@ -135,7 +140,7 @@ def get_quarter_by_date(datestring: str) -> int:
     """
     converted_date = datetime.datetime.strptime(datestring, "%Y-%m-%d").date()
     for q in models.Quarters.objects.all():
-        if q.start <= converted_date <= q.end:
+        if q.begin <= converted_date <= q.end:
             return q.number
     return 0
 
@@ -144,8 +149,8 @@ def year_valid(controls):
     """
     Check if teacher can create lesson with year mark control.
     """
-    fourth = models.Quarters.get(number=4)
-    delta = fourth - datetime.date.today()
+    fourth = models.Quarters.objects.get(number=4)
+    delta = fourth.end - datetime.date.today()
     if delta.days < 14:
         return controls
     return controls.exclude(name='Годовая оценка')

@@ -343,11 +343,11 @@ def diary(request):
 
     # If user is student
     elif request.user.account_type == 3:
-        students_diary(request)
+        return students_diary(request)
 
     # If user is teacher
     elif request.user.account_type == 2:
-        teachers_diary(request)
+        return teachers_diary(request)
     else:
         redirect('/')
 

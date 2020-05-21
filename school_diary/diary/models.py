@@ -243,3 +243,11 @@ class Quarters(models.Model):
     ))
     begin = models.DateField(verbose_name="Начало четверти")
     end = models.DateField(verbose_name="Конец четверти")
+
+    class Meta:
+        verbose_name = "Четверть"
+        verbose_name_plural = "Четверти"
+        ordering = ['number']
+
+    def __str__(self):
+        return "Четверть #{}".format(self.number)

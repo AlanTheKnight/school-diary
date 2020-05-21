@@ -1,38 +1,39 @@
 from django.contrib import admin
-from .models import *
+from . import models
 
 
 admin.site.site_header = "Электронный дневник"
 admin.site.index_title = "Панель администратора"
 
 
-@admin.register(Users)
+@admin.register(models.Users)
 class UsersAdmin(admin.ModelAdmin):
     list_display = ('email', 'account_type')
     list_filter = ('account_type',)
 
 
-@admin.register(Students)
+@admin.register(models.Students)
 class UsersAdmin(admin.ModelAdmin):
     list_display = ('account', 'first_name', 'surname', 'grade')
     list_filter = ('grade',)
 
 
-@admin.register(Administrators)
+@admin.register(models.Administrators)
 class UsersAdmin(admin.ModelAdmin):
     list_display = ('account', 'first_name', 'surname')
 
 
-@admin.register(Teachers)
+@admin.register(models.Teachers)
 class UsersAdmin(admin.ModelAdmin):
     list_display = ('account', 'first_name', 'surname')
     list_filter = ('subjects',)
 
 
-admin.site.register(Grades)
-admin.site.register(Marks)
-admin.site.register(Lessons)
-admin.site.register(AdminMessages)
-admin.site.register(Controls)
-admin.site.register(Subjects)
+admin.site.register(models.Grades)
+admin.site.register(models.Marks)
+admin.site.register(models.Lessons)
+admin.site.register(models.AdminMessages)
+admin.site.register(models.Controls)
+admin.site.register(models.Subjects)
+admin.site.register(models.Quarters)
 
