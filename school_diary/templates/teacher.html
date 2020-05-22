@@ -36,13 +36,7 @@
 {% block content %}
 <div class="container-fluid my-5">
 
-    {% if messages %}
-        <div class="alert alert-danger">
-            {% for message in messages %}
-                {{ message }}
-            {% endfor %}
-        </div>
-    {% endif %}
+    <!--Form for choosing subject, class and quarter. -->
 
     <div class="card card-50 my-5">
         <div class="card-body">
@@ -86,161 +80,162 @@
         </div>
     </div>
 
-        
-        <form method="POST" >
-        {% csrf_token %}
-        <div class="my-3">
-            <button type="submit" class="btn btn-success" name="save_marks">Сохранить изменения</button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
-        </div>
+    <!--Big table form with choosing marks.-->
 
-        {% if lessons %}
+    <form method="POST" >
+    {% csrf_token %}
+    <div class="my-3">
+        <button type="submit" class="btn btn-success" name="save_marks">Сохранить изменения</button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
+    </div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered table-sm ">
+    {% if lessons %}
 
-                <thead class="thead-light">
-                    <tr>
-                        <th scope="col">Ученики</th>
-                        <th title="Среднее арифметическое" style="width:4%;">AVG</th>
-                        <th title="Взвешенный средний балл" style="width:5%;">SM.AVG</th>
-                        {% for k, lesson in lessons.items %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm ">
 
-                            <th scope="col" {%  if lesson.control.name == 'Четвертная'  %} style="background-color: #e9ecef;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}> {# Need to change id #}
-                            
-                                <a href="{% url 'lesson-page' lesson.pk %}">
-                                    <p>{{ lesson.date|date:'d M' }}</p>
-                                    <p></p>{{ lesson.control }}
-                                </a>
-                            </th>
-                        {% endfor %}
-                    </tr>
-                </thead>
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">Ученики</th>
+                    <th title="Среднее арифметическое" style="width:4%;">AVG</th>
+                    <th title="Взвешенный средний балл" style="width:5%;">SM.AVG</th>
+                    {% for k, lesson in lessons.items %}
+
+                        <th scope="col" {%  if lesson.control.name == 'Четвертная'  %} style="background-color: #e9ecef;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}> {# Need to change id #}
+                        
+                            <a href="{% url 'lesson-page' lesson.pk %}">
+                                <p>{{ lesson.date|date:'d M' }}</p>
+                                <p></p>{{ lesson.control }}
+                            </a>
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
 
 
-                <tbody>
-                {% for student, small_scope in scope %}
-                    <tr>
-                        <td scope="row" style="width: 20%;">{{ student.surname }} {{ student.first_name }}</td>
-                        <td>
-                            {{ avg|lookup:student.pk|average }}
-                        </td>
-                        <td>
-                            {{ avg|lookup:student.pk|smart_average }}
-                        </td>
-                        {% for lk, lesson in lessons.items %}
-                            {% with mark=small_scope|lookup:lesson %}
+            <tbody>
+            {% for student, small_scope in scope %}
+                <tr>
+                    <td scope="row" style="width: 20%;">{{ student.surname }} {{ student.first_name }}</td>
+                    <td>
+                        {{ avg|lookup:student.pk|average }}
+                    </td>
+                    <td>
+                        {{ avg|lookup:student.pk|smart_average }}
+                    </td>
+                    {% for lk, lesson in lessons.items %}
+                        {% with mark=small_scope|lookup:lesson %}
 
-                                <td {% if lesson.control.name == 'Четвертная оценка' %} class="quater-mark" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="year-mark" {% endif %}>
-                                    <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная оценка' %} class="inp_table select quater-mark" style="background-color: #e9ecef;" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="inp_table select year-mark" style="background-color: rgb(233,236,239);" {% endif %}>
-                                        <option value="" {% if not mark %}selected{%endif%}></option>
-                                        <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
-                                        <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</opti+on>
-                                        <option value="3" {% if mark and mark.amount == 3 %}selected{% endif %}>3</option>
-                                        <option value="2" {% if mark and mark.amount == 2 %}selected{% endif %}>2</option>
-                                        <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
-                                    </select>
-                                    {% if mark %}
+                            <td {% if lesson.control.name == 'Четвертная оценка' %} class="quater-mark" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="year-mark" {% endif %}>
+                                <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная оценка' %} class="inp_table select quater-mark" style="background-color: #e9ecef;" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="inp_table select year-mark" style="background-color: rgb(233,236,239);" {% endif %}>
+                                    <option value="" {% if not mark %}selected{%endif%}></option>
+                                    <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
+                                    <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</opti+on>
+                                    <option value="3" {% if mark and mark.amount == 3 %}selected{% endif %}>3</option>
+                                    <option value="2" {% if mark and mark.amount == 2 %}selected{% endif %}>2</option>
+                                    <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
+                                </select>
+                                {% if mark %}
 
-                                        <button type="button" {% if lesson.control.name == 'Четвертная оценка'  %} class="quater-mark-select" {%  elif lesson.control.name == 'Годовая оценка'  %} class="year-mark-select" {% else %} class="mark-plus-btn" {% endif %} onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" comment="{{ mark.comment }}" >+</button>
-                                    {% endif %}
-                                </td>
-                            {% endwith %}
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-             </table>
-        </div>
-        <p><small class="text-muted">Серым цветом выделяются поля с оценками, которые Вы изменили. Перед выходом с этой страницы не забудьте сохранить
-            все изменения.<br>Вы можете нажать на дату урока и редактировать информацию о выбранном уроке.
-        </small></p>
-        {% else %}
-        <div class="alert alert-info mt-5">
-            Уроки еще не были добавлены.
-        </div>
-        {% endif %}
+                                    <button type="button" {% if lesson.control.name == 'Четвертная оценка'  %} class="quater-mark-select" {%  elif lesson.control.name == 'Годовая оценка'  %} class="year-mark-select" {% else %} class="mark-plus-btn" {% endif %} onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" comment="{{ mark.comment }}" >+</button>
+                                {% endif %}
+                            </td>
+                        {% endwith %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+    </div>
+    <p><small class="text-muted">Серым цветом выделяются поля с оценками, которые Вы изменили. Перед выходом с этой страницы не забудьте сохранить
+        все изменения.<br>Вы можете нажать на дату урока и редактировать информацию о выбранном уроке.
+    </small></p>
+    {% else %}
+    <div class="alert alert-info mt-5">
+        Уроки еще не были добавлены.
+    </div>
+    {% endif %}
 
-        </form>
+    </form>
 
-        <div class="modal fade" id="lessonmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-              <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="lessonmodalLabel">Создать новый урок</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            {{ form.date.label_tag }}
-                            <div class="input-group mb-3">
-                                {{ form.date }}
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                                </div>
-                                <div class="invalid-feedback">
-                                    {% for error in form.date.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
+    <div class="modal fade" id="lessonmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="lessonmodalLabel">Создать новый урок</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.date.label_tag }}
+                        <div class="input-group mb-3">
+                            {{ form.date }}
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                             </div>
-                            <div class="form-group">
-                                {{ form.theme.label_tag }}
-                                {{ form.theme }}
+                            <div class="invalid-feedback">
+                                {% for error in form.date.errors %}
+                                    {{ error }}
+                                {% endfor %}
                             </div>
-                            <div class="form-group">
-                                {{ form.homework.label_tag }}
-                                {{ form.homework }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.theme.label_tag }}
+                            {{ form.theme }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.homework.label_tag }}
+                            {{ form.homework }}
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-file">
+                                {{ form.h_file }}
+                                <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
                             </div>
-                            <div class="form-group">
-                                <div class="custom-file">
-                                    {{ form.h_file }}
-                                    <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                {{ form.control.label_tag }}
-                                {{ form.control }}
-                            </div>
-                            <a href="{% url 'diary' %}" class="btn btn-secondary">Отменить</a>
-                            <button type="submit" class="btn btn-primary" name="createlesson">Добавить</button>
-                        </form>
-                    </div>
-                    </div>
+                        </div>
+                        <div class="form-group">
+                            {{ form.control.label_tag }}
+                            {{ form.control }}
+                        </div>
+                        <a href="{% url 'diary' %}" class="btn btn-secondary">Отменить</a>
+                        <button type="submit" class="btn btn-primary" name="createlesson">Добавить</button>
+                    </form>
+                </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="modal fade" id="commentmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-              <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="lessonmodalLabel">Добавить комментарий</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="POST">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <label for="comment">Текст комментария</label>
-                                <textarea name="comment" id="commenttextfield" class="form-control" maxlength="400" cols="40" rows=5></textarea>
-                            </div>
-                            <input id="commentdata" type="hidden" name="commentdata" value="">
-                            <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
-                            <button type="submit" class="btn btn-primary" name="addcomment">Создать</button>
-                            </div>
-                        </form>
-                    </div>
-                    </div>
+    <div class="modal fade" id="commentmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="lessonmodalLabel">Добавить комментарий</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="comment">Текст комментария</label>
+                            <textarea name="comment" id="commenttextfield" class="form-control" maxlength="400" cols="40" rows=5></textarea>
+                        </div>
+                        <input id="commentdata" type="hidden" name="commentdata" value="">
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                        <button type="submit" class="btn btn-primary" name="addcomment">Создать</button>
+                        </div>
+                    </form>
+                </div>
                 </div>
             </div>
         </div>
+    </div>
 </div>
 <script>
     'use strict'

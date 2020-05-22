@@ -214,3 +214,15 @@ def create_lesson_form(context):
 def load_to_session(session, **kwargs):
     for i in kwargs:
         session[i] = kwargs[i]
+
+
+def fool_teacher_protection(teacher, lesson: models.Lessons):
+    """
+    Returns False if teacher doesn't have an access to the lesson.
+    """
+    teacher = models.Teachers.objects.get(pk=teacher)
+    classes = models.Grades.objects.filter(main_teacher=teacher)
+    subjects = teacher.subjects.all()
+    if lesson.grade not in classes or lesson.subject not in subjects:
+        return False
+    return True

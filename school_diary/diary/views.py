@@ -26,6 +26,10 @@ def lesson_page(request, pk):
     if not functions.each_contains(request.session, NEEDED_IN_SESSION):
         return redirect('diary')
     lesson = models.Lessons.objects.get(pk=pk)
+    if not functions.fool_teacher_protection(request.user.id, lesson):
+        return render(request, 'access_denied.html', {
+            'message': "Вы не можете удалить этот урок.",
+        })
     form = forms.LessonCreationForm(instance=lesson)
     grade, subject, term = functions.get_session_data(request.session)
     form.fields["control"].queryset = functions.create_controls(grade, subject, term)
@@ -46,7 +50,14 @@ def delete_lesson(request, pk):
     """
     Asks teacher's confirmation and then deletes the selected lesson.
     """
+    if not functions.each_contains(request.session, NEEDED_IN_SESSION):
+        return redirect('diary')
     lesson = models.Lessons.objects.get(pk=pk)
+    # Fool protection for users who will try to delete a lesson of another teacher.
+    if not functions.fool_teacher_protection(request.user.id, lesson):
+        return render(request, 'access_denied.html', {
+            'message': "Вы не можете удалить этот урок.",
+        })
     if request.method == "POST":
         lesson.delete()
         return redirect('diary')
