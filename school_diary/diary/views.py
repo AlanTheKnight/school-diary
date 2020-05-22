@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.db import transaction
 from django.shortcuts import render, redirect
-from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from . import forms
 from .decorators import teacher_only, student_only
@@ -12,43 +11,41 @@ from . import models
 from . import functions
 
 
+# Tuple of keys needed to be in request.session
+# whan a teachers works with diary.
+NEEDED_IN_SESSION = ('grade', 'subject', 'term')
+
+
 @teacher_only
 @login_required(login_url="/login/")
 @transaction.atomic
 def lesson_page(request, pk):
-    """
-    Page where teachers can edit lesson.
-    """
-    lesson = models.Lessons.objects.get(pk=pk)
-    context = {'lesson': lesson}
-    # Filling up available controls.
-    context.update(functions.create_controls(grade=models.Grades.objects.get(
-        pk=request.session['grade']),
-        subject=models.Subjects.objects.get(
-            pk=request.session['subject']), term=request.session['term']
-        )
-    )
-    if request.method == 'POST':
-        lesson = models.Lessons.objects.get(pk=request.POST.get('pk'))
-        if request.FILES.get('h_file'):
-            lesson.h_file = request.FILES.get('h_file')
-        lesson.date = request.POST.get('date')
-        lesson.quarter = functions.get_quarter_by_date(lesson.date)
-        lesson.theme = request.POST.get('theme')
-        lesson.control = models.Controls.objects.get(
-            pk=request.POST.get('control'))
-        lesson.homework = request.POST.get('homework')
-        if request.POST.get('deletehwfile') is not None:
-            lesson.h_file = ""
-        lesson.save()
-        return redirect('diary')
+    """Page where teachers can edit lesson."""
 
+    # If teacher haven't chosen grade, term and subject, redirect back to diary.
+    if not functions.each_contains(request.session, NEEDED_IN_SESSION):
+        return redirect('diary')
+    lesson = models.Lessons.objects.get(pk=pk)
+    form = forms.LessonCreationForm(instance=lesson)
+    grade, subject, term = functions.get_session_data(request.session)
+    form.fields["control"].queryset = functions.create_controls(grade, subject, term)
+
+    if request.method == "POST":
+        form = forms.LessonCreationForm(request.POST, request.FILES, instance=lesson)
+        if form.is_valid():
+            deletefile = request.POST.get("deletefile") is not None
+            form.save(subject=subject, grade=grade, deletefile=deletefile)
+            return redirect('diary')
+    context = {'form': form, 'lesson': lesson}
     return render(request, 'lesson_page.html', context)
 
 
 @login_required(login_url='/login/')
 @teacher_only
 def delete_lesson(request, pk):
+    """
+    Asks teacher's confirmation and then deletes the selected lesson.
+    """
     lesson = models.Lessons.objects.get(pk=pk)
     if request.method == "POST":
         lesson.delete()
@@ -111,52 +108,62 @@ def students_diary(request):
 
 
 def teachers_diary(request):
-    teacher = models.Teachers.objects.get(account=request.user)
-    context = {'Teacher': teacher,
-               'subjects': teacher.subjects.all(),
-               'grades': models.Grades.objects.filter(teachers=teacher),
-               # 'controls': controls
-               }
+    teacher = models.Teachers.objects.get(account=request.user)  # Current teacher
+    available_classes = models.Grades.objects.filter(teachers=teacher).order_by('number', 'letter')
+    available_subjects = teacher.subjects.all().order_by('name')
 
-    if request.method == 'POST':
+    if not (available_classes and available_subjects):
+        return render(request, 'access_denied.html', {
+            'message': "Пока что вы не указаны как учитель ни в одном классе."
+        })
 
-        if 'getgrade' in request.POST:
-            subject = models.Subjects.objects.get(name=request.POST.get('subject'))
-            grade = request.POST.get('grade')
-            number = int(grade[0:-1])
-            letter = grade[-1]
-            grade = models.Grades.objects.get(
-                number=number, subjects=subject, letter=letter, teachers=teacher)
-            term = int(request.POST.get('term'))
-            request.session['subject'] = subject.id  # Save data to session
-            request.session['term'] = int(term)
-            request.session['grade'] = grade.id
-            functions.update_context(context, grade, term, subject)
-            return render(request, 'teacher.html', context)
+    if request.method == 'POST' and 'getgrade' in request.POST:
+        # Teacher has just chosen class, term and subject.
+        # This part of code saves chosen data to session and builds up
+        # a table with marks.
+        subject = available_subjects.get(name=request.POST.get('subject'))
+        grade = request.POST.get('grade')
+        term = int(request.POST.get('term'))
+        grade = available_classes.get(number=int(grade[0:-1]), subjects=subject, letter=grade[-1])
+        functions.load_to_session(
+            request.session,
+            term=term, subject=subject.id, grade=grade.id
+        )
+        return redirect('diary')
 
-        elif 'createlesson' in request.POST:
-            date = request.POST.get('date')
-            quarter = functions.get_quarter_by_date(date)
-            theme = request.POST.get('theme')
-            homework = request.POST.get('homework')
-            control = models.Controls.objects.get(id=request.POST.get('control'))
-            grade = models.Grades.objects.get(id=request.session['grade'])
-            subject = models.Subjects.objects.get(id=request.session['subject'])
-            term = request.session['term']
-            h_file = request.FILES.get('h_file')
-            lesson = models.Lessons.objects.create(
-                date=date, h_file=h_file, quarter=quarter,
-                theme=theme, homework=homework,
-                control=control, grade=grade, subject=subject)
-            lesson.save()
-            functions.update_context(context, grade, term, subject)
-            return render(request, 'teacher.html', context)
+    if not functions.each_contains(request.session, NEEDED_IN_SESSION):
+        current_quarter = functions.get_current_quarter()
+        if not current_quarter:
+            current_quarter = 1
+        request.session['subject'] = available_subjects[0].id  # Loading default data into session
+        request.session['grade'] = available_classes[0].id
+        request.session['term'] = current_quarter
+
+    # Creating table with marks and setting up available controls.
+    grade_, subject_, term_ = functions.get_session_data_diary(
+        request.session, available_classes, available_subjects)
+
+    form = forms.LessonCreationForm()
+
+    context = {
+        'TEACHER': teacher,
+        'subjects': available_subjects,
+        'grades': available_classes,
+        'current_class': grade_,
+        'current_term': term_,
+        'current_subject': subject_,
+        'form': form
+    }
+
+    if request.method == "POST":
+
+        if 'createlesson' in request.POST:
+            # Teacher creates a new lesson.
+            form = forms.LessonCreationForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save(subject=subject_, grade=grade_)
 
         elif 'addcomment' in request.POST:
-            # Get data from session
-            grade = models.Grades.objects.get(id=request.session['grade'])
-            term = request.session['term']
-            subject = models.Subjects.objects.get(id=request.session['subject'])
             comment = request.POST.get('comment')
             data = request.POST.get('commentdata')
             student_id = data.split("|")[0]
@@ -166,24 +173,18 @@ def teachers_diary(request):
             mark = models.Marks.objects.get(student=student, lesson=lesson)
             mark.comment = comment
             mark.save()
-            context.update(functions.create_table(grade=grade, subject=subject, quarter=term))
-            context.update(functions.create_controls(grade=grade, subject=subject, term=term))
-            return render(request, 'teacher.html', context)
+
         else:
             # Save marks block
-            term_ = request.session['term']
-            grade_ = models.Grades.objects.get(id=request.session['grade'])
-
             marks_dict = {
                 tuple(map(int, k.replace("mark_", "").split("|"))): str(request.POST[k])
                 for k in dict(request.POST)
                 if k.startswith('mark_')
             }
-            subject = models.Subjects.objects.get(id=request.POST.get('subject_id'))
             marks_raw = models.Marks.objects.select_for_update().filter(
-                student__grade_id=request.POST.get('grade_id'),
-                lesson__grade_id=request.POST.get('grade_id'),
-                lesson__subject_id=subject.id
+                student__grade_id=grade_.id,
+                lesson__grade_id=grade_.id,
+                lesson__subject_id=subject_.id
             )
             marks_in_db = {
                 (x.student_id, x.lesson_id): x
@@ -195,7 +196,7 @@ def teachers_diary(request):
                     marks_in_db[k].amount = int(v)
                     objs_for_update.append(marks_in_db[k])
             objs_for_create = [
-                models.Marks(lesson_id=k[1], student_id=k[0], amount=int(v), subject=subject)
+                models.Marks(lesson_id=k[1], student_id=k[0], amount=int(v), subject=subject_)
                 for k, v in marks_dict.items()
                 if v != "" and k not in marks_in_db.keys()
             ]
@@ -209,17 +210,8 @@ def teachers_diary(request):
             if len(objs_for_remove) != 0:
                 models.Marks.objects.filter(reduce(lambda a, b: a | b, objs_for_remove)).delete()
 
-            functions.update_context(context, grade_, term_, subject)
-            return render(request, 'teacher.html', context)
-    else:
-        
-        if functions.each_contains(request.session, ['grade', 'term', 'subject']):
-            term_ = request.session['term']
-            grade_ = models.Grades.objects.get(id=request.session['grade'])
-            subject_ = models.Subjects.objects.get(id=request.session['subject'])
-            functions.update_context(context, grade_, term_, subject_)
-            print(context)
-        return render(request, 'teacher.html', context)
+    functions.update_context(context, grade_, term_, subject_)
+    return render(request, 'teacher.html', context)
 
 
 @login_required(login_url="/login/")

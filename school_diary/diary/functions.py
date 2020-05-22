@@ -4,6 +4,7 @@ This function don't return render
 
 import datetime
 from . import models
+from . import forms
 
 TERMS = (
     ((1, 7), (27, 10)),
@@ -95,8 +96,6 @@ def create_table(grade, subject, quarter):
         'is_post': True,
         'lessons': lessons,
         'scope': scope,
-        'subject_id': subject.id,
-        'grade_id': grade.id,
         'avg': avg
     }
 
@@ -105,14 +104,13 @@ def create_controls(grade, subject, term):
     controls = models.Controls.objects.all()
     controls = term_valid(controls)
     controls = year_valid(controls)
-    print(controls)
     lessons = models.Lessons.objects.filter(grade=grade, subject=subject, quarter=term).all()
     for lesson in lessons:
         if lesson.control.name == 'Четвертная оценка':
             controls = controls.exclude(name='Четвертная оценка')
         if lesson.control.name == 'Годовая оценка':
             controls = controls.exclude(name='Годовая оценка')
-    return {'controls': controls}
+    return controls
 
 
 def check_if_teacher_has_class(teacher):
@@ -170,7 +168,7 @@ def year_valid(controls):
     return controls.exclude(name='Годовая оценка')
 
 
-def each_contains(d: dict, elements: list) -> bool:
+def each_contains(d: dict, elements) -> bool:
     """
     Check if each element from list is in dictionary.
     """
@@ -185,7 +183,34 @@ def update_context(context, class_, term, subject):
         grade=class_,
         subject=subject,
         quarter=term))
-    context.update(create_controls(
+    context.update({'contols': create_controls(
         grade=class_,
         subject=subject,
-        term=term))
+        term=term)})
+
+
+def check_if_student_in_class(student: models.Students) -> bool:
+    return student.grade is not None
+
+
+def get_session_data_diary(session, classes, subjects):
+    grade = classes.get(id=session['grade'])
+    subject = subjects.get(id=session['subject'])
+    term = session['term']
+    return grade, subject, term
+
+
+def get_session_data(session):
+    grade = models.Grades.objects.get(id=session['grade'])
+    subject = models.Subjects.objects.get(id=session['subject'])
+    term = session['term']
+    return grade, subject, term
+
+
+def create_lesson_form(context):
+    context.update({'form': forms.LessonCreationForm()})
+
+
+def load_to_session(session, **kwargs):
+    for i in kwargs:
+        session[i] = kwargs[i]

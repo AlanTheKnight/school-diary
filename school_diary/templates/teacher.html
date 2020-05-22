@@ -89,10 +89,8 @@
         
         <form method="POST" >
         {% csrf_token %}
-        <input hidden name="subject_id" value="{{ subject_id }}"/>
-        <input hidden name="grade_id" value="{{ grade_id }}"/>
         <div class="my-3">
-            <button type="submit" class="btn btn-success">Сохранить изменения</button>
+            <button type="submit" class="btn btn-success" name="save_marks">Сохранить изменения</button>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
         </div>
 
@@ -154,7 +152,6 @@
                 </tbody>
              </table>
         </div>
-        <hr>
         <p><small class="text-muted">Серым цветом выделяются поля с оценками, которые Вы изменили. Перед выходом с этой страницы не забудьте сохранить
             все изменения.<br>Вы можете нажать на дату урока и редактировать информацию о выбранном уроке.
         </small></p>
@@ -178,37 +175,38 @@
                     <div class="modal-body">
                         <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
-                            <div class="form-group">
-                                <label for="date">Дата</label>
-                                <input type="date" name="date" id="date" class="form-control auto-save" required>
+                            {{ form.date.label_tag }}
+                            <div class="input-group mb-3">
+                                {{ form.date }}
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    {% for error in form.date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label for="theme">Тема урока</label>
-                                <input type="text" name="theme" id="theme" maxlenght="120" class="form-control auto-save" required>
+                                {{ form.theme.label_tag }}
+                                {{ form.theme }}
                             </div>
                             <div class="form-group">
-                                <label for="homework">Домашнее задание <small class="text-muted">(не обязательно)</small></label>
-                                <textarea name="homework" id="homework" rows="10" class="form-control auto-save"></textarea>
+                                {{ form.homework.label_tag }}
+                                {{ form.homework }}
                             </div>
                             <div class="form-group">
                                 <div class="custom-file">
-                                    <input type='file' name='h_file' class="custom-file-input" id="homeworkfileinput" onchange="showdeletebutton();">
-                                    <label for="homeworkfileinput" class="custom-file-label">Загрузить файл <small class="text-muted">(не обязательно)</small></label>
+                                    {{ form.h_file }}
+                                    <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
                                 </div>
                             </div>
-                            <button class="btn btn-danger btn-sm" id="homeworkfiledeletebutton" style="display: none;" type="button" onclick="deleteinputvalue();">Очистить поле</button>
                             <div class="form-group">
-                                <label for="control">Вид работы</label>
-                                <select name="control" id="control" class="form-control auto-save" required>
-                                    {% for control in controls %}
-                                    <option id="{{ control.name }}"value="{{ control.id }}">{{ control.name }}</option>
-                                    {% endfor %}
-                                </select>
+                                {{ form.control.label_tag }}
+                                {{ form.control }}
                             </div>
-                            <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
-                            <button type="submit" class="btn btn-primary" name="createlesson">Создать</button>
-                            </div>
+                            <a href="{% url 'diary' %}" class="btn btn-secondary">Отменить</a>
+                            <button type="submit" class="btn btn-primary" name="createlesson">Добавить</button>
                         </form>
                     </div>
                     </div>
@@ -245,12 +243,14 @@
         </div>
 </div>
 <script>
+    'use strict'
+
     function myfunction(that){
         that.style.backgroundColor = "#d6d6d6";
     };
 
     function show_confirm(element){
-        var content = element.getAttribute('comment');
+        let content = element.getAttribute('comment');
         document.getElementById("commenttextfield").value = content;
         document.getElementById("commentdata").value = element.value;
         $("#commentmodal").modal('show');
@@ -268,5 +268,14 @@
         $('#homeworkfiledeletebutton').css('display', 'none');
         $('#homeworkfileinput').val('');
     };
+    
+    $(function() {
+        $('[data-toggle="datepicker"]').datepicker({
+            autoHide: true,
+            format: 'dd.mm.yyyy',
+            language: 'ru-RU',
+            zIndex: 2048,
+        });
+    });
 </script>
 {% endblock %}

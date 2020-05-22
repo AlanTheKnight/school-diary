@@ -10,63 +10,64 @@
 {% block content %}
 
 <div class="container my-5">
-    <div class="card">
-        <div class="card-body">
-            <form method="POST" class="form" id="form" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label>Дата</label>
-                    <input type="date" class="form-control" name="date" value="{{ lesson.date|date:"Y-m-d" }}">
+    <div class="card card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.date.label_tag }}
+            <div class="input-group mb-3">
+                {{ form.date }}
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                 </div>
-                <input type="hidden" class="form-control" value="{{lesson.pk}}" name="pk">
-                <div class="form-group">
-                    <label>Тема</label>
-                    <input type="text" name="theme" class="form-control" value="{{ lesson.theme }}">
+                <script>
+                    'use strict'
+                    $(function() {
+                        $('#id_date').datepicker({
+                            autoHide: true,
+                            format: 'dd.mm.yyyy',
+                            language: 'ru-RU',
+                        });
+                    });
+                </script>
+                <div class="invalid-feedback">
+                    {% for error in form.date.errors %}
+                        {{ error }}
+                    {% endfor %}
                 </div>
-                <div class="form-group">
-                    <label>Домашняя работа <small class="text-muted">(необязательно)</small></label>
-                    <textarea name="homework" class="form-control">{{ lesson.homework }}</textarea>
+            </div>
+            <div class="form-group">
+                {{ form.theme.label_tag }}
+                {{ form.theme }}
+            </div>
+            <div class="form-group">
+                {{ form.homework.label_tag }}
+                {{ form.homework }}
+            </div>
+            {% if lesson.h_file %}
+                <p>
+                    Вы можете просмотреть <a href="{{ lesson.h_file.url }}">файл</a>, приложенный к домашнему заданию. После выбора
+                    нового файла, существующий сотрётся.
+                </p>
+                <div class="custom-control custom-switch my-3">
+                    <input type="checkbox" class="custom-control-input" id="deletefile" name="deletefile">
+                    <label class="custom-control-label" for="deletefile">Удалить файл с заданием</label>
                 </div>
-                {% if lesson.h_file %}
-                    <p><a href='{{lesson.h_file.url}}'>Просмотреть загруженный файл</a></p>
-                    <div class="form-group form-check">
-                        <input type="checkbox" class="form-check-input" id="deletehwfile" name="deletehwfile" value="1">
-                        <label class="form-check-label" for="deletehwfile">Удалить файл</label>
-                    </div>
-                {%endif%}
-                <div class="form-group">
-                    <div class="custom-file">
-                        <input type='file' name='h_file' class="custom-file-input" id="homeworkfileinput" onchange="showdeletebutton();">
-                        <label for="homeworkfileinput" class="custom-file-label">Загрузить файл <small class="text-muted">(не обязательно)</small></label>
-                    </div>
-                    <button class="btn btn-danger btn-sm mt-2" id="homeworkfiledeletebutton" style="display: none;" type="button" onclick="deleteinputvalue();">Очистить поле</button>
+            {% endif %}
+            <div class="form-group">
+                <div class="custom-file">
+                    {{ form.h_file }}
+                    <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
                 </div>
-                
-                <div class="form-group">
-                    <label>Вид контроля</label>
-                    <select name="control" class="form-control">
-                        {% for i in controls %}
-                        <option  value="{{  i.pk  }}" {% if lesson.control == i %}selected{% endif %}>{{ i.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <a href="{% url 'diary' %}" class="btn btn-secondary">Назад</a>
-                <button type="submit" class="btn btn-primary">Изменить</button>
-            </form>
-            <a href="{% url 'diary_lesson_delete' lesson.pk %}"><button class="btn btn-danger my-1" >Удалить</button></a>
-        </div>
+            </div>
+            <div class="form-group">
+                {{ form.control.label_tag }}
+                {{ form.control }}
+            </div>
+            <a href="{% url 'diary' %}" class="btn btn-secondary">Отменить</a>
+            <a href="{% url 'diary_lesson_delete' lesson.pk %}" class="btn btn-danger">Удалить</a>
+            <button type="submit" class="btn btn-primary">Изменить</button>
+        </form>
     </div>
 </div>
-
-<script>
-    function showdeletebutton(){
-        $('#homeworkfiledeletebutton').css('display', 'block');
-    };
-
-    function deleteinputvalue(){
-        $('#homeworkfiledeletebutton').css('display', 'none');
-        $('#homeworkfileinput').val('');
-    };
-</script>
 
 {% endblock %}

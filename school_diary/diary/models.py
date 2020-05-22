@@ -171,7 +171,7 @@ class Administrators(models.Model):
 class Controls(models.Model):
     name = models.CharField(max_length=120, verbose_name='Вид работы')
     weight = models.IntegerField(verbose_name=' Коэффицент', default=1)
-    
+
     class Meta:
         verbose_name = "Вид работы"
         verbose_name_plural = "Виды работ"
@@ -193,7 +193,7 @@ class Lessons(models.Model):
     grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
     control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')
     h_file = models.FileField(
-        null=True, default="None", 
+        null=True, default=None, blank=True,
         verbose_name="Файл", upload_to=lesson_upload)
 
     class Meta:
@@ -212,7 +212,7 @@ class Marks(models.Model):
     subject = models.ForeignKey(
         Subjects, on_delete=models.PROTECT, verbose_name='Предмет', null=True, default=None)
     comment = models.TextField(blank=True, verbose_name='комментарий', default="")
-    
+
     class Meta():
         verbose_name_plural = "Оценки"
         ordering = ['lesson']
