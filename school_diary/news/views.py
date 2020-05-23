@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from collections import OrderedDict
+from .serialazer import ValidSerializer
 
 
 def first_page(request):
@@ -39,20 +40,27 @@ def get_posts(request, page):
 def get_posts_api(request):
     news = Publications.objects.all()
     if request.method == 'POST':
-        data = request.data
-        search_text = data.get("search_text")
-        news = news.filter(title__icontains=search_text)
-        search = True
-        context = OrderedDict({
-            'news': list(news.values()),
-            'search': search,
-            'search_text': search_text
-        })
-        return Response(context, status=status.HTTP_200_OK)
+        form = ValidSerializer(data=request.data)
+        if form.is_valid():
+            data = request.data
+            search_text = data.get("search_text")
+            news = news.filter(title__icontains=search_text)
+            search = True
+            context = OrderedDict({
+                'news': list(news.values()),
+                'search': search,
+                'search_text': search_text
+            })
+            return Response(context, status=status.HTTP_200_OK)
+        else:
+            return Response(OrderedDict({
+                'title': "Bad form",
+                'error': "400",
+            }), status=status.HTTP_400_BAD_REQUEST)
     else:
         context = OrderedDict({
             'news': list(news.values()),
-            'search': True
+            'search': False
         })
         return Response(context, status=status.HTTP_200_OK)
 
@@ -86,7 +94,7 @@ def post_api(request, url):
         return Response(OrderedDict({
             'title': "Статья не найдена",
             'error': "404",
-        }))
+        }), status=status.HTTP_404_NOT_FOUND)
 
 
 @login_required(login_url="/login/")
