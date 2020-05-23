@@ -1,9 +1,15 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from rest_framework.parsers import JSONParser
+
 from .models import Publications
 from django.core.paginator import Paginator
 from .forms import ArticleCreationForm
 from .decorators import admin_only
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from collections import OrderedDict
 
 
 def first_page(request):
@@ -28,6 +34,28 @@ def get_posts(request, page):
     news = Paginator(news, 10)  # 10 posts per page.
     news = news.get_page(page)
     return render(request, 'news_list.html', {'news': news, "search": search})
+
+
+@api_view(['GET', 'POST'])
+def get_posts_api(request):
+    news = Publications.objects.all()
+    if request.method == 'POST':
+        data = JSONParser().parse(request)
+        search_text = data.get("search_text")
+        news = news.filter(title__icontains=search_text)
+        search = True
+        context = OrderedDict({
+            'news': list(news.values()),
+            'search': search,
+            'search_text': search_text
+        })
+        return Response(context, status=status.HTTP_200_OK)
+    else:
+        context = OrderedDict({
+            'news': list(news.values()),
+            'search': True
+        })
+        return Response(context)
 
 
 def post(request, url):

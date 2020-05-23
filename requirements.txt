@@ -1,3 +1,4 @@
+djangorestframework
 Django==3.0.3
 django-cleanup==4.0.0
 django-crispy-forms==1.8.1

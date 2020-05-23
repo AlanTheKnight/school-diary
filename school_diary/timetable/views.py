@@ -2,19 +2,19 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from urllib.parse import unquote
 
-from rest_framework.renderers import JSONRenderer
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .forms import GetTimeTableForm, LessonCreateForm, BellCreateForm
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect
 from .models import Grades, Lessons, BellsTimeTable
 import time
 from .decorators import admin_only
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import *
-import json
+
+
 from collections import OrderedDict
 
 
@@ -80,6 +80,8 @@ def output(request, grade, litera):
             'title': "Расписание не найдено", 
             "description": "Расписание на этот класс еще не было добавлено администраторами.",
         })
+
+
 @api_view(['GET'])
 def output_api(request, grade, litera):
     data = {}
