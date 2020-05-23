@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'accounts',
     'django_cleanup',
     'debug_toolbar',
+    'rest_framework'
 ]
 
 """
