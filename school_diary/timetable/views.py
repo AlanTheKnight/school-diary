@@ -8,6 +8,10 @@ import time
 from .decorators import admin_only
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+import json
 
 
 DAYWEEK_NAMES = {
@@ -72,6 +76,43 @@ def output(request, grade, litera):
             'title': "Расписание не найдено", 
             "description": "Расписание на этот класс еще не было добавлено администраторами.",
         })
+@api_view(['GET'])
+def output_api(request, grade, litera):
+    data = {}
+    """Shows the timetable depending on the url."""
+    CURRENT_DAY = time.localtime().tm_wday + 1
+    # If current day isn't sunday, users will see timetable for today.
+    current_day_name = DAYWEEK_NAMES[CURRENT_DAY]
+    # If surrent day isn't friday, users will see timetable for tomorrow.
+    if CURRENT_DAY != 6: next_day_name = DAYWEEK_NAMES[(CURRENT_DAY + 1) % 7]
+    # try:
+    class_number = int(grade)
+    class_letter = litera
+    my_class = str(class_number) + class_letter
+    my_grade = Grades.objects.get(number=class_number, letter=class_letter)
+    all_lessons = Lessons.objects.filter(connection=my_grade.id)
+    if CURRENT_DAY != 7:
+        data["today"] = list(all_lessons.filter(day=current_day_name).values())
+    else:
+        data["today"] = []
+    if CURRENT_DAY != 6:
+        data["tomorrow"] = list(all_lessons.filter(day=next_day_name).values())
+    else:
+        data["tomorrow"] = []
+    for weekday in DAYWEEK_NAMES.values():
+        data[weekday] = list(all_lessons.filter(day=weekday).values())
+    print(data)
+    return Response(json.dumps({
+        'current_weekday': current_day_name,
+        'data': data,
+        'my_grade': my_class
+    }))
+    # except Exception as error:
+    #     print(error)
+    #     return Response(json.dumps({
+    #         'error': "404",
+    #         'title': "Расписание не найдено"
+    #     }))
 
 
 def download(request):
