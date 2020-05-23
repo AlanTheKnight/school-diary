@@ -5,7 +5,7 @@ from urllib.parse import unquote
 from rest_framework.renderers import JSONRenderer
 
 from .forms import GetTimeTableForm, LessonCreateForm, BellCreateForm
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from .models import Grades, Lessons, BellsTimeTable
 import time
 from .decorators import admin_only
@@ -13,8 +13,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from rest_framework.response import *
 import json
+from collections import OrderedDict
 
 
 DAYWEEK_NAMES = {
@@ -88,34 +89,34 @@ def output_api(request, grade, litera):
     current_day_name = DAYWEEK_NAMES[CURRENT_DAY]
     # If surrent day isn't friday, users will see timetable for tomorrow.
     if CURRENT_DAY != 6: next_day_name = DAYWEEK_NAMES[(CURRENT_DAY + 1) % 7]
-    # try:
-    class_number = int(grade)
-    class_letter = litera
-    my_class = str(class_number) + class_letter
-    my_grade = Grades.objects.get(number=class_number, letter=class_letter)
-    all_lessons = Lessons.objects.filter(connection=my_grade.id)
-    if CURRENT_DAY != 7:
-        data["today"] = list(all_lessons.filter(day=current_day_name).values())
-    else:
-        data["today"] = []
-    if CURRENT_DAY != 6:
-        data["tomorrow"] = list(all_lessons.filter(day=next_day_name).values())
-    else:
-        data["tomorrow"] = []
-    for weekday in DAYWEEK_NAMES.values():
-        data[weekday] = list(all_lessons.filter(day=weekday).values())
-    print(data)
-    return Response(JSONRenderer().render({
-        'current_weekday': current_day_name,
-        'data': data,
-        'my_grade': my_class
-    }))
-    # except Exception as error:
-    #     print(error)
-    #     return Response(json.dumps({
-    #         'error': "404",
-    #         'title': "Расписание не найдено"
-    #     }))
+    try:
+        class_number = int(grade)
+        class_letter = litera
+        my_class = str(class_number) + class_letter
+        my_grade = Grades.objects.get(number=class_number, letter=class_letter)
+        all_lessons = Lessons.objects.filter(connection=my_grade.id)
+        if CURRENT_DAY != 7:
+            data["today"] = list(all_lessons.filter(day=current_day_name).values())
+        else:
+            data["today"] = []
+        if CURRENT_DAY != 6:
+            data["tomorrow"] = list(all_lessons.filter(day=next_day_name).values())
+        else:
+            data["tomorrow"] = []
+        for weekday in DAYWEEK_NAMES.values():
+            data[weekday] = list(all_lessons.filter(day=weekday).values())
+        print(data)
+        return Response(OrderedDict({
+            'current_weekday': current_day_name,
+            'data': data,
+            'my_grade': my_class
+        }), status=status.HTTP_201_CREATED)
+    except Exception as error:
+        print(error)
+        return Response(OrderedDict({
+            'error': "404",
+            'title': "Расписание не найдено"
+        }), status=status.HTTP_418_IM_A_TEAPOT)
 
 
 def download(request):
