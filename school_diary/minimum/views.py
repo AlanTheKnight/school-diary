@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
+from rest_framework import status
+
 from .forms import GetMinimumForm, MinimumCreationForm
 from .models import Documents
 from .decorators import admin_only
@@ -33,23 +35,29 @@ def minimum(request):
     return render(request, 'minimum.html', {'form': form})
 
 
+@api_view(['POST'])
 def minimum_api(request):
-    form = ValidSerializer(request.data)
+    form = ValidSerializer(data=request.data)
     if form.is_valid():
-        cleaned_data = JSONParser().parse(request.data)
-        chosen_grade = form.cleaned_data['grade']
-        chosen_subject = form.cleaned_data['subject']
-        chosen_term = form.cleaned_data['term']
+        cleaned_data = request.data
+        chosen_grade = request.data['grade']
+        chosen_subject = request.data['subject']
+        chosen_term = request.data['term']
         try:
-            minimum = Documents.objects.get(
+            minimum = Documents.objects.filter(
                 grade=chosen_grade, term=chosen_term, subject=chosen_subject)
-            return render(request, 'minimum_download.html', {'minimum': minimum})
+            return Response(OrderedDict({'minimum': list(minimum.values())}), status=status.HTTP_200_OK)
         except:
-            return render(request, 'error.html', {
-                'title': "Минимум не найден",
+            return Response(OrderedDict({
+                'title': "Have Not File",
                 'error': "404",
-                'description': "Минимум, который Вы ищите, не найден."
-            })
+            }), status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response(OrderedDict({
+            'title': "Bad form",
+            'error': "400",
+        }), status=status.HTTP_400_BAD_REQUEST)
+
 
 @login_required(login_url='/login/')
 @admin_only

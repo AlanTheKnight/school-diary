@@ -26,3 +26,7 @@ class ValidSerializer(serializers.Serializer):
         (2, "II"),
         (3, "III"),
         (4, "IV")])
+
+# {"subject": "Информатика",
+# "grade": 8,
+# "term": 4}
