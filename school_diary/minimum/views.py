@@ -4,6 +4,11 @@ from django.core.paginator import Paginator
 from .forms import GetMinimumForm, MinimumCreationForm
 from .models import Documents
 from .decorators import admin_only
+from .serializer import ValidSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from collections import OrderedDict
+from rest_framework.parsers import JSONParser
 
 
 def minimum(request):
@@ -27,6 +32,24 @@ def minimum(request):
         form = GetMinimumForm()
     return render(request, 'minimum.html', {'form': form})
 
+
+def minimum_api(request):
+    form = ValidSerializer(request.data)
+    if form.is_valid():
+        cleaned_data = JSONParser().parse(request.data)
+        chosen_grade = form.cleaned_data['grade']
+        chosen_subject = form.cleaned_data['subject']
+        chosen_term = form.cleaned_data['term']
+        try:
+            minimum = Documents.objects.get(
+                grade=chosen_grade, term=chosen_term, subject=chosen_subject)
+            return render(request, 'minimum_download.html', {'minimum': minimum})
+        except:
+            return render(request, 'error.html', {
+                'title': "Минимум не найден",
+                'error': "404",
+                'description': "Минимум, который Вы ищите, не найден."
+            })
 
 @login_required(login_url='/login/')
 @admin_only

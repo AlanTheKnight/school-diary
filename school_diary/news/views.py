@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from rest_framework.parsers import JSONParser
-
 from .models import Publications
 from django.core.paginator import Paginator
 from .forms import ArticleCreationForm
@@ -40,7 +39,7 @@ def get_posts(request, page):
 def get_posts_api(request):
     news = Publications.objects.all()
     if request.method == 'POST':
-        data = JSONParser().parse(request)
+        data = request.data
         search_text = data.get("search_text")
         news = news.filter(title__icontains=search_text)
         search = True
