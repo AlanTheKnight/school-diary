@@ -1,6 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from urllib.parse import unquote
+
+from rest_framework.renderers import JSONRenderer
+
 from .forms import GetTimeTableForm, LessonCreateForm, BellCreateForm
 from django.http import HttpResponseRedirect
 from .models import Grades, Lessons, BellsTimeTable
@@ -102,7 +105,7 @@ def output_api(request, grade, litera):
     for weekday in DAYWEEK_NAMES.values():
         data[weekday] = list(all_lessons.filter(day=weekday).values())
     print(data)
-    return Response(json.dumps({
+    return Response(JSONRenderer().render({
         'current_weekday': current_day_name,
         'data': data,
         'my_grade': my_class
