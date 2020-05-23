@@ -55,7 +55,7 @@ def get_posts_api(request):
             'news': list(news.values()),
             'search': True
         })
-        return Response(context)
+        return Response(context, status=status.HTTP_200_OK)
 
 
 def post(request, url):
@@ -71,6 +71,23 @@ def post(request, url):
             'error': "404",
             'description': "Статьи с таким именем не существует."
         })
+
+
+@api_view(['GET'])
+def post_api(request, url):
+    """
+    Page where post is showed.
+    """
+    try:
+        article = Publications.objects.filter(slug=url)
+        return Response(OrderedDict({
+            'post': list(article.values())
+        }), status=status.HTTP_200_OK)
+    except Exception:
+        return Response(OrderedDict({
+            'title': "Статья не найдена",
+            'error': "404",
+        }))
 
 
 @login_required(login_url="/login/")
