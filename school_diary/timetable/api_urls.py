@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views
+from . import api_views
+
 
 urlpatterns = [
-    path('/<int:grade>/<str:litera>', views.output_api)
+    path('/<int:grade>/<str:litera>', api_views.output_api)
 ]

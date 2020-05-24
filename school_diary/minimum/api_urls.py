@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views
+from . import api_views
+
 
 urlpatterns = [
-    path('', views.minimum_api)
+    path('', api_views.minimum_api)
 ]
