@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from rest_framework.parsers import JSONParser
 from .models import Publications
 from django.core.paginator import Paginator
 from .forms import ArticleCreationForm
