@@ -26,7 +26,7 @@
                             <td>{{ post.publication_date }}</td>
                             <td class="text-center"><a class="btn btn-sm btn-primary text-" href="{% url 'news_update' post.id %}"><i class="fas fa-edit"></i></a></td>
                             <td class="text-center"><a class="btn btn-sm btn-danger" href="{% url 'news_delete' post.id %}"><i class="fas fa-trash-alt"></i></a></td>
-                            <td class="text-center"><a href="/news/articles/{{ post.slug }}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></a></td>
+                            <td class="text-center"><a href="{% url 'news_post_details' post.slug %}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -45,8 +45,8 @@
     <nav class="mt-5">
         <ul class="pagination justify-content-center">
             {% if news.has_previous %}
-                <li class="page-item"><a href="/news/dashboard/1" class="page-link">&laquo;</a></li>
-                <li class="page-item"></li><a href="/news/dashboard/{{ news.previous_page_number }}" class="page-link">&lt;</a>
+                <li class="page-item"><a href="{% url 'news_dashboard' 1 %}" class="page-link">&laquo;</a></li>
+                <li class="page-item"></li><a href="{% url 'news_dashboard' news.previous_page_number %}" class="page-link">&lt;</a>
             {% endif %}
 
             <span class="current">
@@ -54,8 +54,8 @@
             </span>
 
             {% if news.has_next %}
-                <li class="page-item"><a href="/news/dashboard/{{ news.next_page_number }}" class="page-link">&gt;</a></li>
-                <li class="page-item"><a href="/news/dashboard/{{ news.paginator.num_pages }}" class="page-link">&raquo;</a></li>
+                <li class="page-item"><a href="{% url 'news_dashboard' news.next_page_number %}" class="page-link">&gt;</a></li>
+                <li class="page-item"><a href="{% url 'news_dashboard' news.paginator.num_pages %}" class="page-link">&raquo;</a></li>
             {% endif %}
         </ul>
     </nav>

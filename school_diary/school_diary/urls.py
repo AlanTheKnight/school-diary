@@ -10,5 +10,6 @@ urlpatterns = [
     path('', include('diary.urls')),
     path('', include('pages.urls')),
     path('', include('accounts.urls')),
+    path('grades/', include('grades.urls')),
     path('news/', include('news.urls')),
 ]

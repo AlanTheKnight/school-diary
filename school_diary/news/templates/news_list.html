@@ -42,7 +42,7 @@
                 {% for post in news %}
                 <li class="media my-2">
                     <div class="media-body">
-                    <a href="/news/articles/{{ post.slug }}"><h5 class="mt-0">{{ post.title }}</h5></a>
+                    <a href="{% url 'news_post_details' post.slug %}"><h5 class="mt-0">{{ post.title }}</h5></a>
                     <p class="my-0">От {{ post.author }}</p>
                     <p class="text-muted my-0">{{ post.publication_date }}</p>
                     </div>
@@ -69,8 +69,8 @@
     <nav>
         <ul class="pagination justify-content-center">
             {% if news.has_previous %}
-                <li class="page-item"><a href="/news/page/1" class="page-link">&laquo; first</a></li>
-                <li class="page-item"></li><a href="/news/page/{{ news.previous_page_number }}" class="page-link">&lt;</a>
+                <li class="page-item"><a href="{% url 'news' 1 %}" class="page-link">&laquo; first</a></li>
+                <li class="page-item"></li><a href="{% url 'news' news.previous_page_number %}" class="page-link">&lt;</a>
             {% endif %}
 
             {% if news %}
@@ -80,8 +80,8 @@
             {% endif %}
 
             {% if news.has_next %}
-                <li class="page-item"><a href="/news/page/{{ news.next_page_number }}" class="page-link">&gt;</a></li>
-                <li class="page-item"><a href="/news/page/{{ news.paginator.num_pages }}" class="page-link">&raquo;</a></li>
+                <li class="page-item"><a href="{% url 'news' news.next_page_number %}" class="page-link">&gt;</a></li>
+                <li class="page-item"><a href="{% url 'news' news.paginator.num_pages %}" class="page-link">&raquo;</a></li>
             {% endif %}
         </ul>
     </nav>
