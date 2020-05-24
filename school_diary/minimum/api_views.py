@@ -10,7 +10,7 @@ from .serializer import ValidSerializer
 def minimum_api(request):
     form = ValidSerializer(data=request.data)
     if form.is_valid():
-        cleaned_data = request.data
+
         chosen_grade = request.data['grade']
         chosen_subject = request.data['subject']
         chosen_term = request.data['term']

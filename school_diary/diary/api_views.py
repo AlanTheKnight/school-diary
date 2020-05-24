@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from collections import OrderedDict
 from rest_framework.decorators import api_view
-from . import models, functions
+from . import models, functions, serializer
 
 
 @api_view(['POST'])
@@ -46,18 +46,17 @@ def diary_api(request):
                         marks_list.append(i)
                     else:
                         n_amount += 1
-            avg = functions.get_average(marks_list)
+            avg = functions.get_average(marks_list)[0]
             smart_avg = functions.get_smart_average(marks_list)
-            d.update({s: [avg, smart_avg, marks]})
+            d.update({s.name: {'avg': avg, 'smart_avg': smart_avg, 'mark list': list(marks.values())}})
 
             total_missed += n_amount
 
-        for subject in d:
-            d[subject].append(range(max_length - len(d[subject][2])))
         student = list(models.Students.objects.filter(account=request.user).values())
+        print(d)
         return Response(OrderedDict({
             'student': student,
-            'd': d,
+            'marks': d,
             'max_length': max_length,
             'total_missed': total_missed,
             'term': chosen_quarter,
