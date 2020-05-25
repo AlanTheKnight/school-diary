@@ -2,8 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.timetable, name='timetable'),
-    path('<int:grade>/<str:litera>', views.output),
+    #path('', views.timetable, name='timetable'),
+    path('', views.output, name='timetable'),
+    path('ajax', views.aj),
+    #path('<int:grade>/<str:litera>', views.output),
     path('download/', views.download, name='timetable_download'),
     path('dashboard', views.dashboard, name='timetable_dashboard'),
     path('edit_lesson/<str:id>', views.edit_lesson, name='timetable_update'),
