@@ -10,25 +10,93 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-md-auto my-5">
+        <div class="col-md-auto mt-5">
             <section class="sticky-top">
                 <div class="form-group">
                     {{ form|crispy }}
                     <button class="btn btn-primary" OnClick="GetGradeEtLitera();">Выбрать класс</button>
+                    <!--<a class="btn btn-primary text-decoration-none" href="{% url 'timetable_download' %}">Скачать</a>-->
+                    <a class="btn btn-primary text-decoration-none" href="{% url 'timetable_download' %}"data-toggle="modal" data-target="#downloadModal" >Скачать</a>
                 </div>
             </section>
         </div>
-        <div class="col" id="weekdays">
+        <div class="col">
+            <div id="weekdays">
+
+            </div>
             
         </div>
     </div>
-    <div class="alert alert-info">
-        Если расписание для Вашего класса неполное, попросите администратора дозаполнить его.
+    
+    <!--<div class="alert alert-info">
         <p>Вы можете скачать расписание в формате PDF или просмотреть его онлайн, выбрав свой класс.</p>
         <a class="btn btn-primary text-decoration-none" href="{% url 'timetable_download' %}">Скачать в формате PDF</a>
-    </div>
-    <h1 id="mda"></h1>
-    
+    #</div>-->
+
+    <div class="modal fade" id="downloadModal" tabindex="-1" role="dialog" aria-labelledby="downloadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="downloadModalLabel">Скачать расписание в PDF</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                <div class="row">
+                    <div class="col-3 my-3">
+                        <div class="list-group">
+                            <li class="list-group-item list-group-item-info"><b>Старшая школа</b></li>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/11.pdf">Понедельник</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/12.pdf">Вторник</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/13.pdf">Среда</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/14.pdf">Четверг</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/15.pdf">Пятница</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/16.pdf">Суббота</a>
+                        </div>
+                    </div>
+                    <div class="col-3 my-3">
+                        <div class="list-group">
+                            <li class="list-group-item list-group-item-info"><b>Средняя школа</b></li>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/21.pdf">Понедельник</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/22.pdf">Вторник</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/23.pdf">Среда</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/24.pdf">Четверг</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/25.pdf">Пятница</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/26.pdf">Суббота</a>
+                        </div>
+                    </div>
+                    <div class="col-3 my-3">
+                        <div class="list-group">
+                            <li class="list-group-item list-group-item-info"><b>Младшая школа на Крестовском</b></li>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/31.pdf">1 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/32.pdf">2 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/33.pdf">3 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/34.pdf">4 классы</a>
+                        </div>
+                    </div>
+                    <div class="col-3 my-3">
+                        <div class="list-group">
+                            <li class="list-group-item list-group-item-info"><b>Младшая школа на Пудожской</b></li>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/41.pdf">1 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/42.pdf">2 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/43.pdf">3 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/44.pdf">4 классы</a>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+              <!--<button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+          </div>
+        </div>
+      </div>
+
 </div>
 <script>
     
@@ -100,9 +168,15 @@
             if (strGET != "") { 
             var g = parseInt(strGET.split("&")[0].split("=")[1]);
             var l = strGET.split("&")[1].split("=")[1];
-            console.log(l);
-            sendreq(g,l); 
             }
+            else {
+                var g = 1;
+                var l = "А";
+            }
+            sendreq(g,l); 
         });
+    function MdlShow() {
+        $("#downloadModal").modal('show');
+    }
 </script>
 {% endblock %}

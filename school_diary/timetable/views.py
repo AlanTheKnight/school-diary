@@ -227,7 +227,7 @@ def aj(request):
             "strt": str(les.number.start)[:-3],
             "end": str(les.number.end)[:-3]
         })
-    week['Сегодня'] = today
+    week['Сегодня ({0})'.format(current_day_name)] = today
     tomorrow = []
     for les in tomorrow_lessons:
         tomorrow.append({
@@ -237,7 +237,7 @@ def aj(request):
             "strt": str(les.number.start)[:-3],
             "end": str(les.number.end)[:-3]
         })
-    week['Завтра'] = tomorrow
+    week['Завтра ({0})'.format(next_day_name)] = tomorrow
     DAYWEEK_NAMES_list = list(DAYWEEK_NAMES.values())
     for weekday in DAYWEEK_NAMES_list[:-1]:
             week_les = all_lessons.filter(day=weekday)
