@@ -49,9 +49,11 @@ INSTALLED_APPS = [
     'admin_panel',
     'pages',
     'accounts',
-    'django_cleanup',
-    'debug_toolbar',
-    'rest_framework'
+    'grades',
+    'rest_framework',
+    'django_cleanup',  # Deleting unused files in storage
+    'debug_toolbar',  # Displaying debug info
+    'django_extensions'  # Advances manage.py functions
 ]
 
 """

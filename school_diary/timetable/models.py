@@ -79,7 +79,6 @@ class Lessons(models.Model):
     subject = models.CharField(max_length=50, verbose_name="Предмет")
     classroom = models.CharField(max_length=50 ,verbose_name="Кабинет")
     
-    
     class Meta:
         ordering = ['connection', 'day', 'number']
         verbose_name = "Урок"
