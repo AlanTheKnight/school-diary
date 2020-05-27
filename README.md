@@ -37,12 +37,18 @@ Go to http://127.0.0.1:8000/ in your browser and enjoy our diary.
 
 Superuser account let you create other administrators and teachers. Students register by themself.
 
-To automatically create migrations and run the server, use our ```setup.sh``` and ```setup.bat``` files.
+To run the server, use our ```setup.sh``` and ```setup.bat``` files.
 
 Linux:
 
     chmod +x setup.sh
     ./setup.sh
+    
+Using our bash script you can also create a super user, install requirements or make migrations:
+    
+    ./setup.sh -s
+    ./setup.sh -r
+    ./setup.sh -m
     
 Windows:
 
