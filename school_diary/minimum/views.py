@@ -1,9 +1,16 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
+from rest_framework import status
+
 from .forms import GetMinimumForm, MinimumCreationForm
 from .models import Documents
 from .decorators import admin_only
+from .serializer import ValidSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from collections import OrderedDict
+from rest_framework.parsers import JSONParser
 
 
 def minimum(request):
@@ -26,6 +33,9 @@ def minimum(request):
     else:
         form = GetMinimumForm()
     return render(request, 'minimum.html', {'form': form})
+
+
+
 
 
 @login_required(login_url='/login/')
