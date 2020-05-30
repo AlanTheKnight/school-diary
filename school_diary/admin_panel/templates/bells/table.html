@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load templateLibs %}
+
+{% block title %}
+<title>{{ title }}</title>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <form id="friend-form">
+
+        <div class="row">
+            <div class="col-auto">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="Select1Label">Выбор школы</label>
+                    <select class="form-control" id="Select1" style="width: 100%;" onchange="GetLessons()">
+                        <option>Младшая школа</option>
+                        <option>Средняя и старшая школа</option>
+                    </select>
+                </div>
+                <div class="card">
+                <div class="card-body">
+                <table class="table table-sm table-borderless">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Начало</th>
+                        <th scope="col">Конец</th>
+                    </tr>
+                    </thead>
+                    <tbody id="lessonlist">
+                    <tr id="newlesson">
+                        <th scope="row" id="newlesson-num">1</th>
+                        <td colspan="2"><button type="button" class="btn btn-outline-dark" style="width: 100%;" onclick="AddLesson()">+</button></td>
+                    </tr>
+
+                    </tbody>
+                </table>
+                </div>
+                </div>
+                <input type="submit" class="btn btn-success" id="sbmt-button" value="Сохранено" style="width: 100%;"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    function Succes(response) {
+        data = JSON.parse(response)
+        document.getElementById('lessonlist').innerHTML = `<tr id="newlesson">
+                        <th scope="row" id="newlesson-num">1</th>
+                        <td colspan="3"><button type="button" class="btn btn-outline-dark" style="width: 100%;" onclick="AddLesson()">+</button></td>
+                    </tr>`
+        for (var key in data) {
+            l = document.getElementById('newlesson');
+            a = parseInt(key)+1
+            h = `
+            <tr>
+                <th scope="row">${key}</th>
+                <td><input class="form-control" type="time" onchange="BtnReturn()" value="${data[key][0]}"></td>
+                <td><input class="form-control" type="time" onchange="BtnReturn()" value="${data[key][1]}"></td>
+            </tr>
+            `
+            l.insertAdjacentHTML("beforeBegin", h);
+            document.getElementById('newlesson-num').innerHTML = a;
+        }
+    }
+    function GetLessons() {
+        school_select = document.getElementById('Select1');
+        school_id = school_select.options.selectedIndex;
+        school_c = school_select.options[school_id].text;
+        $.ajax({
+            type: 'GET',
+            url: "aj_create_bell",
+            data: {
+                    school: school_c,
+                },
+            success: Succes
+        })
+    }
+    $(document).ready(GetLessons)
+</script>
+
+<script>
+    sb_button = document.getElementById("sbmt-button");
+    function BtnReturn() {
+        sb_button.classList.add("btn-primary");
+        sb_button.classList.remove("btn-success");
+        sb_button.value = "Сохранить";
+    };
+    function AddLesson() {
+        l = document.getElementById('newlesson');
+        a = parseInt(document.getElementById('newlesson').childNodes[1].innerHTML)
+        h = `
+        <tr>
+            <th scope="row">${a}</th>
+            <td><input class="form-control" type="time" onchange="BtnReturn()"></td>
+            <td><input class="form-control" type="time" onchange="BtnReturn()"></td>
+        </tr>
+        `
+        l.insertAdjacentHTML("beforeBegin", h);
+        document.getElementById('newlesson-num').innerHTML = a+1;
+        BtnReturn();
+    }
+
+
+    $("#friend-form").submit(function (e) {
+        sb_button.classList.remove("btn-primary");
+        sb_button.classList.add("btn-success");
+        sb_button.value = "Сохранено";
+        e.preventDefault();
+        var serializedData = $(this).serialize();
+        csrf = serializedData.split("=")[1]
+        school_select = document.getElementById('Select1')
+        school_id = school_select.options.selectedIndex
+        school_c = school_select.options[school_id].text;
+        m = 3
+        var d = {};
+        for (var i = 1; i < document.getElementById('lessonlist').childNodes.length-2; i=i+m) {
+            vals = document.getElementById('lessonlist').childNodes[i];
+            l_num = parseInt(vals.childNodes[1].innerHTML);
+            time_begin = vals.childNodes[3].firstChild.value;
+            time_end = vals.childNodes[5].firstChild.value;
+            d[l_num] = time_begin+'&'+time_end;;
+            d['lsnlist'] += l_num+"&"
+        }
+        d['csrfmiddlewaretoken'] = csrf;
+        d['school'] = school_c;
+        $.ajax({
+            type: 'POST',
+            url: "aj_create_bell",
+            data: d,
+            success: function (response) {
+                console.log(response)
+            }
+        })
+    })
+</script>
+
+{% endblock %}

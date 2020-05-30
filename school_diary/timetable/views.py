@@ -6,9 +6,6 @@ from .models import Grades, Lessons
 import time
 
 
-from collections import OrderedDict
-
-
 DAYWEEK_NAMES = {
     1: "Понедельник",
     2: "Вторник",
