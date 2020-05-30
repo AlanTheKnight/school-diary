@@ -2,13 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from urllib.parse import unquote
 from .forms import GetTimeTableForm, LessonCreateForm, BellCreateForm
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from .models import Grades, Lessons, BellsTimeTable
 import time
 from .decorators import admin_only
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-
+import json
 
 DAYWEEK_NAMES = {
     1:"Понедельник",
@@ -118,6 +118,58 @@ def dashboard(request):
     }
     return render(request, 'timetable/dashboard.html', context)
 
+@login_required(login_url="/login/")
+@admin_only
+def bells_table(request):
+    return render(request, 'bells/table.html')
+@login_required(login_url="/login/")
+@admin_only
+def bells_table_save(request):
+    if request.is_ajax and request.method == "POST":
+        #bell = BellsTimeTable.objects.create(school)
+        
+        sch = request.POST.get('school')
+        if sch == "Младшая школа":
+            s = 1
+            
+        else:
+            s = 2
+        lsnlist = request.POST.get("lsnlist")[9:].split("&")[:-1]
+        msg = ''
+        time_format = "%H:%M"
+        for lsn in lsnlist:
+            lsninfo = request.POST.get(lsn).split("&")
+            begin = lsninfo[0]
+            end = lsninfo[1]
+            if begin == '':
+                begin = datetime.strptime('00:00',time_format)
+            if end == '':
+                end = datetime.strptime('00:00',time_format)
+            if BellsTimeTable.objects.filter(school=s,n=lsn).exists():
+                bell = BellsTimeTable.objects.get(school=s, n=lsn)
+                if bell.start != begin or bell.end != end:
+                    bell.start = begin
+                    bell.end = end
+                    bell.save()
+            else:
+                bell = BellsTimeTable.objects.create(school=s, n=lsn,start=begin,end=end)
+            
+                
+
+        return HttpResponse('ok')
+    elif request.is_ajax and request.method == "GET":
+        s = request.GET.get("school")        
+        if s == "Младшая школа":
+            sch = 1
+            
+        else:
+            sch = 2
+        b = BellsTimeTable.objects.filter(school=sch)
+        data = {}
+        for Bell in b:
+            data[Bell.n] = [str(Bell.start)[:-3],str(Bell.end)[:-3]]
+        jsondata = json.dumps(data)
+        return HttpResponse(jsondata)
 
 @login_required(login_url="/login/")
 @admin_only

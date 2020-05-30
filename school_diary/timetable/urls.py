@@ -16,4 +16,6 @@ urlpatterns = [
     path('bells/delete/<int:pk>', views.bells_delete, name='bells_delete'),
     path('bells/update/<int:pk>', views.bells_update, name='bells_update'),
     path('bells/dashboard/<int:page>', views.bells_dashboard),
+    path('bells/table', views.bells_table),
+    path('bells/aj_create_bell', views.bells_table_save),
 ]
