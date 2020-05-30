@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.timetable, name='timetable'),
-    path('<int:grade>/<str:litera>', views.output),
-    path('download/', views.download, name='timetable_download')
+    path('', views.output, name='timetable'),
+    path('ajax', views.aj),
+    path('download/', views.download, name='timetable_download'),
 ]

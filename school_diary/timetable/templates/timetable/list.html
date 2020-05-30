@@ -1,62 +1,184 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load templateLibs %}
+{% load crispy_forms_tags %}
 
 {% block title %}
 <title>Расписание</title>
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="alert alert-info" role="alert">
-        Показано расписание для класса: {{ my_grade }}
-    </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-auto mt-5">
+            <section class="sticky-top pt-2">
+                <div class="form-group">
+                    {{ form|crispy }}
+                    <button class="btn btn-primary" OnClick="GetGradeEtLitera();">Выбрать класс</button>
+                    <!--<a class="btn btn-primary text-decoration-none" href="{% url 'timetable_download' %}">Скачать</a>-->
+                    <a class="btn btn-primary text-decoration-none" href="{% url 'timetable_download' %}"data-toggle="modal" data-target="#downloadModal" >Скачать</a>
+                </div>
+            </section>
+        </div>
+        <div class="col">
+            <div id="weekdays">
 
-    {% for weekday in data %}
-
-    {% if data|lookup:weekday %}
-    <div class="card my-5">
-        <div class="card-body">
-            <div class="card-title text-center">
-                {% if weekday == "today" %}
-                <h4>Расписание на сегодня</h4>
-                {% elif weekday == "tomorrow" %}
-                <h4>Расписание на завтра</h4>
-                {% else %}
-                <h4>{{ weekday }}</h4>
-                {% endif %}
             </div>
-            <div class="table-responsive-md">
-                <table class="table-sm table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Номер</th>
-                            <th>Предмет</th>
-                            <th>Кабинет</th>
-                            <th>Начало</th>
-                            <th>Конец</th>
-                        </tr>
-                    </thead>
-                    {% for lesson in data|lookup:weekday %}
-                    <tr>
-                        <td>{{ lesson.number.n }}</td>
-                        <td>{{ lesson.subject }}</td>
-                        <td>{{ lesson.classroom }}</td>
-                        <td>{{ lesson.number.start }}</td>
-                        <td>{{ lesson.number.end }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
+            
         </div>
     </div>
-    {% endif %}
-    {% endfor %}
-
-    <div class="alert alert-info">
-        Если расписание для Вашего класса неполное, попросите администратора дозаполнить его.
-    </div>
     
+    <!--<div class="alert alert-info">
+        <p>Вы можете скачать расписание в формате PDF или просмотреть его онлайн, выбрав свой класс.</p>
+        <a class="btn btn-primary text-decoration-none" href="{% url 'timetable_download' %}">Скачать в формате PDF</a>
+    #</div>-->
+
+    <div class="modal fade" id="downloadModal" tabindex="-1" role="dialog" aria-labelledby="downloadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="downloadModalLabel">Скачать расписание в PDF</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                <div class="row">
+                    <div class="col-3 my-3">
+                        <div class="list-group">
+                            <li class="list-group-item list-group-item-info"><b>Старшая школа</b></li>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/11.pdf">Понедельник</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/12.pdf">Вторник</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/13.pdf">Среда</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/14.pdf">Четверг</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/15.pdf">Пятница</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/16.pdf">Суббота</a>
+                        </div>
+                    </div>
+                    <div class="col-3 my-3">
+                        <div class="list-group">
+                            <li class="list-group-item list-group-item-info"><b>Средняя школа</b></li>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/21.pdf">Понедельник</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/22.pdf">Вторник</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/23.pdf">Среда</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/24.pdf">Четверг</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/25.pdf">Пятница</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/26.pdf">Суббота</a>
+                        </div>
+                    </div>
+                    <div class="col-3 my-3">
+                        <div class="list-group">
+                            <li class="list-group-item list-group-item-info"><b>Младшая школа на Крестовском</b></li>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/31.pdf">1 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/32.pdf">2 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/33.pdf">3 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/34.pdf">4 классы</a>
+                        </div>
+                    </div>
+                    <div class="col-3 my-3">
+                        <div class="list-group">
+                            <li class="list-group-item list-group-item-info"><b>Младшая школа на Пудожской</b></li>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/41.pdf">1 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/42.pdf">2 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/43.pdf">3 классы</a>
+                            <a class="list-group-item list-group-item-action text-decoration-none" target="_blank" href="{{ MEDIA_URL }}/media/pdf/timetable/44.pdf">4 классы</a>
+                        </div>
+                    </div>
+                </div>
+                  
+    {% for weekday in data %}
+
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+              <!--<button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+          </div>
+        </div>
+      </div>
 
 </div>
+<script>
+    
+    
+    function sendreq(grade,litera) {
+        $.get( "http://127.0.0.1:8000/timetable/ajax",
+            {g:grade,l:litera},
+            function( data ) {
+            //alert( "Load was performed." );
+            dec = JSON.parse(data);
+            //alert(dec);
+            document.getElementById('weekdays').innerHTML = '';
+            for (var day in dec) {
+                if (dec[day].length > 0) {
+                lsntb = `
+                <div class="card my-5">
+                    <div class="card-body">
+                        <div class="card-title text-center">
+                            <h4>${day}</h4>
+                        </div>
+                        <div class="table-responsive-md">
+                            <table class="table-sm table">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Номер</th>
+                                        <th>Предмет</th>
+                                        <th>Кабинет</th>
+                                        <th>Начало</th>
+                                        <th>Конец</th>
+                                    </tr>
+                                </thead>`;
+
+                tod = dec[day];
+                for (var i=0;i<tod.length; i++) {
+                    lsninfo = `
+                    <tr>
+                        <td> ${tod[i]['num']} </td>
+                        <td> ${tod[i]['sub']} </td>
+                        <td> ${tod[i]['cls']} </td>
+                        <td> ${tod[i]['strt']} </td>
+                        <td> ${tod[i]['end']} </td>
+                    </tr>
+                    `;
+                    //console.log(dec[i])
+                    //console.log(dec[0])
+                    lsntb = lsntb + lsninfo;
+                }
+                lsntb = lsntb + `
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                `;
+                document.getElementById('weekdays').innerHTML += lsntb;
+            }
+            }
+        });
+    }
+    function GetGradeEtLitera() {
+        var id_grade = document.getElementById("id_grade").options.selectedIndex;
+        var id_litera = document.getElementById("id_litera").options.selectedIndex;
+        var grade = document.getElementById("id_grade").options[id_grade].text;
+        var litera = document.getElementById("id_litera").options[id_litera].text;
+        sendreq(grade,litera);
+    }
+    $(document).ready ( 
+        function() {
+            var strGET = window.location.search.replace( '?', '');
+            if (strGET != "") { 
+            var g = parseInt(strGET.split("&")[0].split("=")[1]);
+            var l = strGET.split("&")[1].split("=")[1];
+            }
+            else {
+                var g = 1;
+                var l = "А";
+            }
+            sendreq(g,l); 
+        });
+    function MdlShow() {
+        $("#downloadModal").modal('show');
+    }
+</script>
 {% endblock %}
