@@ -140,3 +140,5 @@ school_diary/db.sqlite3
 /school_diary/media/minimum/
 /school_diary/media/homework/
 settings.ini
+/venv/
+.pylintrc
