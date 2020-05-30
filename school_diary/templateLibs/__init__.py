@@ -9,10 +9,12 @@ register = template.Library()
 def lookup(value, arg):
     return value[arg]
 
+
 @register.filter()
 @stringfilter
 def markdown(value):
     return md.markdown(value, extensions=['markdown.extensions.fenced_code'])
+
 
 @register.filter(name="smart_average")
 def smartaverage(value):
@@ -21,6 +23,7 @@ def smartaverage(value):
     else:
         return "-"
 
+
 @register.filter(name="average")
 def average(value):
     if value[3] != 0:
@@ -28,7 +31,7 @@ def average(value):
     else:
         return "-"
 
+
 @register.filter(name='minus')
 def minus(value, arg):
     return value - arg
-    

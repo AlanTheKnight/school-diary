@@ -7,8 +7,13 @@ from diary.decorators import admin_only
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+
 import diary.models as models
 import diary.forms as forms
+from .forms import ArticleCreationForm, BellCreateForm, LessonCreateForm
+import news.models as news_models
+from timetable.forms import GetTimeTableForm
+import timetable.models as tt_models
 
 
 @admin_only
@@ -16,7 +21,7 @@ def admin_panel(request):
     return render(request, 'admin_panel.html')
 
 
-# Students dashboard
+# Students dashboard ==========================================================
 
 
 @login_required(login_url="/login/")
@@ -93,7 +98,7 @@ def students_update(request, id):
     return render(request, 'students/update.html', {'form': form})
 
 
-# Administrators dashboard
+# Administrators dashboard ====================================================
 
 
 @login_required(login_url="/login/")
@@ -149,7 +154,7 @@ def admins_update(request, id):
     return render(request, 'admins/update.html', {'form': form})
 
 
-# Teachers dashboard
+# Teachers dashboard ==========================================================
 
 
 @login_required(login_url="/login/")
@@ -206,7 +211,7 @@ def teachers_update(request, id):
     return render(request, 'teachers/update.html', {'form': form})
 
 
-# Messages dashboard
+# Messages dashboard ==========================================================
 
 
 @login_required(login_url="/login/")
@@ -242,6 +247,7 @@ def messages_view(request, pk):
     return render(request, 'messages/view.html', {'s': s})
 
 
+# Marks EXPORT section ========================================================
 # Exporting TODO: move generated tables to MEDIA folder!!!
 
 
@@ -302,3 +308,209 @@ def export_page(request):
         quarter = request.POST.get('quarter')
         return redirect('export_marks_download', quarter=quarter)
     return render(request, 'export.html')
+
+
+# NEWS PANEL ==================================================================
+
+
+@login_required(login_url="/login/")
+@admin_only
+def news_create(request):
+    """Page where admin can create a new post."""
+    if request.method == "POST":
+        form = ArticleCreationForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('news_dashboard')
+    else:
+        form = ArticleCreationForm()
+        return render(request, 'news/news_editor.html', {'form': form})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def news_dashboard(request, page):
+    """Dashboard for posts."""
+    news = news_models.Publications.objects.all()
+    news = Paginator(news, 100)  # 100 posts per page
+    news = news.get_page(page)
+    return render(request, 'news/news_dashboard.html', {'news': news})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def news_dashboard_first_page(request):
+    """Redirects user to the first page of the dashboard."""
+    return redirect('news_dashboard', page=1)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def news_delete(request, pk):
+    """Page where admin deletes a post."""
+    article = news_models.Publications.objects.get(id=pk)
+    if request.method == "POST":
+        article.delete()
+        return redirect('/news/dashboard')
+    context = {'item': article}
+    return render(request, 'news/news_delete.html', context)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def news_update(request, pk):
+    """Page where post can be edited."""
+    article = news_models.Publications.objects.get(id=pk)
+    form = ArticleCreationForm(instance=article)
+    if request.method == 'POST':
+        form = ArticleCreationForm(request.POST, request.FILES, instance=article)
+        if form.is_valid():
+            form.save()
+            if request.POST.get('deleteimage') is not None:
+                article.image = ''
+                article.save()
+            return redirect('news_dashboard')
+    context = {'form': form, 'data': article}
+    return render(request, 'news/news_editor.html', context)
+
+
+# Timetable' lessons dashboard =====================================
+
+
+SCHOOLS = dict([
+    (1, "Младшая школа"),
+    (2, "Средняя и старшая школа"),
+])
+
+
+@login_required(login_url='/login/')
+@admin_only
+def tt_dashboard(request):
+    if request.method == "POST":
+        form = GetTimeTableForm(request.POST)
+        if form.is_valid():
+            chosen_grade = form.cleaned_data['grade']
+            chosen_litera = form.cleaned_data['litera']
+            request.session['tt_grade'] = chosen_grade
+            request.session['tt_litera'] = chosen_litera
+        return redirect('timetable_dashboard')
+    if 'tt_grade' in request.session:
+        chosen_grade = request.session['tt_grade']
+        chosen_litera = request.session['tt_litera']
+    else:
+        chosen_grade = '1'
+        chosen_litera = 'А'
+    form = GetTimeTableForm(initial={
+        'grade': chosen_grade,
+        'litera': chosen_litera
+    })
+    my_grade = tt_models.Grades.objects.get_or_create(number=chosen_grade, letter=chosen_litera)[0]
+    lessons = tt_models.Lessons.objects.filter(connection=my_grade).order_by('day', 'number')
+    context = {
+        'form': form,
+        'lessons': lessons,
+        'number': chosen_grade,
+        'letter': chosen_litera
+    }
+    return render(request, 'timetable/dashboard.html', context)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def tt_lesson_update(request, pk):
+    lesson = tt_models.Lessons.objects.get(id=pk)
+    form = LessonCreateForm(instance=lesson)
+    if request.method == "POST":
+        form = LessonCreateForm(request.POST, instance=lesson)
+        if form.is_valid():
+            form.save()
+            return redirect('timetable_dashboard')
+    return render(request, 'timetable/create.html', {'form': form})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def tt_lesson_create(request):
+    if request.method == "POST":
+        form = LessonCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('timetable_dashboard')
+    form = LessonCreateForm()
+    return render(request, 'timetable/create.html', {'form': form})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def tt_lesson_delete(request, pk):
+    lesson = tt_models.Lessons.objects.get(id=pk)
+    if request.method == "POST":
+        lesson.delete()
+        return redirect('tmetable_dashboard')
+    context = {'item': lesson}
+    return render(request, 'timetable/delete.html', context)
+
+
+# Bells dashboard =================================================
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_dashboard_first_page(request):
+    return redirect('bells_dashboard', page=1)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_dashboard(request, page):
+    objects = tt_models.BellsTimeTable.objects.all()
+    amount = len(objects)
+    objects = Paginator(objects, 100)
+    objects = objects.get_page(page)
+    context = {
+        "objects": objects,
+        "amount": amount,
+        "wiki": "help/",
+        "title": " Расписание звонков",
+        "schools": SCHOOLS
+    }
+    return render(request, 'bells/dashboard.html', context)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_delete(request, pk):
+    obj = tt_models.BellsTimeTable.objects.get(pk=pk)
+    if request.method == "POST":
+        obj.delete()
+        return redirect('bells_dashboard')
+    context = {
+        "object": obj,
+        "help_text": "Вы уверены, что хотите удалить эту запись?"
+    }
+    return render(request, 'bells/delete.html', context)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_update(request, pk):
+    obj = tt_models.BellsTimeTable.objects.get(pk=pk)
+    if request.method == "POST":
+        form = BellCreateForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return redirect('bells_dashboard')
+    form = BellCreateForm(instance=obj)
+    return render(request, 'bells/create.html', {'form': form, 'title': "Добавить звонок"})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def bells_create(request):
+    if request.method == "POST":
+        form = BellCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('bells_dashboard')
+    form = BellCreateForm()
+    return render(request, 'bells/create.html', {'form': form, 'title': "Добавить звонок"})

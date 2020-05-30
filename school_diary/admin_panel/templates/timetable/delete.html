@@ -10,10 +10,10 @@
     <div class="card my-5">
         <div class="card-body">
             <p>Вы уверены, что хотите удалить урок "{{ item }}"?</p>
-            <form action="{% url 'delete_lesson' item.id  %}" method="POST">
+            <form action="{% url 'timetable_delete' item.id  %}" method="POST">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Подтвердить</button>
-                <a href="{% url 'news_dashboard' %}" class="btn btn-success">Отмена</a>
+                <a href="{% url 'timetable_dashboard' %}" class="btn btn-success">Отмена</a>
             </form>
         </div>
     </div>

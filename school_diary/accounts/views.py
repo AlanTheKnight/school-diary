@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from diary.decorators import admin_only, unauthenticated_user, teacher_only, allowed_users
+from diary.decorators import admin_only, unauthenticated_user, allowed_users
 from django.contrib import messages
-import diary.forms as forms
+from . import forms
 import diary.models as models
 
 
