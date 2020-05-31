@@ -3,7 +3,7 @@ from diary.decorators import admin_only
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from diary import models
-from diary import forms
+from admin_panel.admins import forms
 
 
 @login_required(login_url="/login/")

@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from diary.decorators import admin_only
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from admin_panel import forms
+from admin_panel.bells import forms
 from timetable import models
 
 
