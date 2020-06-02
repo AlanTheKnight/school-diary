@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     'rest_framework',  # Working with API
     'django_cleanup',  # Deleting unused files in storage
     'debug_toolbar',  # Displaying debug info
-    'django_extensions'  # Advances manage.py functions
+    'django_extensions',  # Advances manage.py functions
+    'django_filters',  # Filtering support for API
 ]
 
 """
@@ -220,3 +221,7 @@ if not DEBUG:
             },
         },
     }
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
