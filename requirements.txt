@@ -9,3 +9,4 @@ pytz==2019.3
 sqlparse==0.3.0
 Markdown==3.2.1
 XlsxWriter==1.2.8
+django-filter==2.2.0
