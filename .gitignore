@@ -142,3 +142,4 @@ school_diary/db.sqlite3
 settings.ini
 /venv/
 .pylintrc
+diaryenv/

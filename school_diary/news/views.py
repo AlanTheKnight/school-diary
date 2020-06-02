@@ -22,7 +22,7 @@ def get_posts(request, page):
     news = news.get_page(page)
     return render(request, 'news_list.html', {'news': news, "search": search})
 
-  
+
 def post(request, url):
     """Page where post is showed."""
     article = get_object_or_404(Publications, slug=url)

@@ -35,14 +35,15 @@ if DEBUG:
 # Application definition
 
 INSTALLED_APPS = [
+    # Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Apps
     'timetable.apps.TimetableConfig',
-    'crispy_forms',
     'minimum.apps.MinimumConfig',
     'diary.apps.DiaryConfig',
     'news.apps.NewsConfig',
@@ -50,7 +51,10 @@ INSTALLED_APPS = [
     'pages',
     'accounts',
     'grades',
-    'rest_framework',
+    'api',
+    # Third party
+    'crispy_forms',  # "Bootstrapped" forms
+    'rest_framework',  # Working with API
     'django_cleanup',  # Deleting unused files in storage
     'debug_toolbar',  # Displaying debug info
     'django_extensions'  # Advances manage.py functions
