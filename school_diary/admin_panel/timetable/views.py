@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from admin_panel.timetable import forms
 from timetable.forms import GetTimeTableForm
 from timetable import models
+from diary.models import Grades
 
 
 SCHOOLS = dict([
@@ -33,7 +34,7 @@ def tt_dashboard(request):
         'grade': chosen_grade,
         'litera': chosen_litera
     })
-    my_grade = models.Grades.objects.get_or_create(number=chosen_grade, letter=chosen_litera)[0]
+    my_grade = Grades.objects.get_or_create(number=chosen_grade, letter=chosen_litera)[0]
     lessons = models.Lessons.objects.filter(connection=my_grade).order_by('day', 'number')
     context = {
         'form': form,

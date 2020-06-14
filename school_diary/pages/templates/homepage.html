@@ -1,9 +1,13 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% load static %}
 
 {% block title %}
-<title>Домашняя страница</title>
+<title>Электронный дневник diary56 - домашняя страница</title>
 {% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'pages/homepage.css' %}">
+{% endblock  %}
 
 {% block content %}
 <div class="container">
@@ -12,6 +16,13 @@
         {{ m }}
     </div>
     {% endfor %}
+
+    <!-- <div class="jumbotron my-5 text-center" id="join-us-jumbotron">
+        <h1>Дневник, сделанный учениками для учеников</h1>
+        <a href="{% url 'help_us' %}">Помочь развитию проекта</a><br>
+        <a id="hide-jumbotron">Скрыть</a>
+    </div> -->
+
     <div class="row my-5">
         {% if user.account_type == 0 or user.account_type == 1 %}
         <div class="col-md-4 col-sm-6 col-lg-3 my-3">
@@ -101,4 +112,13 @@
         </div>
     </div>
 </div>
+<script>
+    if (!("join-us-jumbotron" in localStorage)) {
+        $('#join-us-jumbotron').css("display", "block");
+    }
+    // $('#hide-jumbotron').on("click", function() {
+    //     $(this).parent().css("display", "none");
+    //     localStorage.setItem("join-us-jumbotron", "hide");
+    // })
+</script>
 {% endblock %}

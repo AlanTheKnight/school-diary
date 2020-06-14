@@ -1,0 +1,91 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Помощь проекту</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'pages/get_involved.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="jumbotron-fluid" id="coding-jumbotron">
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <img src="{% static 'laptop_with_code.jpeg' %}" alt="" width="100%">
+            </div>
+            <div class="col-md-6 col-12 text-box">
+                <h1 class="text-center">Присоединяйтесь к нашей команде</h1>
+                <hr>
+                <p class="lead text-center">
+                    Используйте свой опыт frontend или backend разработки, чтобы
+                    улучшить этот сайт или создайте новое приложение, используя наш
+                    API
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row my-4">
+        <div class="col-12 col-sm-6 col-md-4 my-2">
+            <div class="card h-100">
+                <div class="card-body">
+                    Исходный код этого дневника открыт и хранится в нашем <a href="https://github.com/ideasoft-spb/school-diary/">репозитории</a> 
+                    на GitHub. Также у нас есть документация для API.
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 my-2">
+            <div class="card h-100">
+                <div class="card-body">
+                    У дневника есть RESTful API, с помощью которого вы можете сделать собственное
+                    приложение, Telegram-бота и многое другое.
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 my-2">
+            <div class="card h-100">
+                <div class="card-body">
+                    Участвуйте в тестировании нашего дневника и сообщайте о том, что можно сделать лучше,
+                    а также о багах и ошибках.
+                </div>
+            </div>
+        </div>
+        <div class="col-12 my-2">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title text-center">Что нужно знать для разработки?</h2>
+                    <p>
+                        Как было сказано раньше, вы можете работать над этим сайтом или
+                        над каким-то своим приложением. Свое приложение - это просто работа с нашим
+                        API, которое можно обрабатывать на любом языке программирования.
+                        Работа над этим сайтом требует ряда знаний. Ниже перечислено то, с чем нужно
+                        уметь работать для улучшения frontend'а или backend'а:
+                        <br>
+                        Фронтенд: HTML, CSS, JavaScript, Bootstrap
+                        <br>
+                        Бэкенд: Python 3, Django 3
+                        <br>
+                        Общее для обеих категорий: Git, GitHub
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 my-2">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title text-center">Наши контакты</h2>
+                    <p>
+                        <i class="fas fa-phone mx-2"></i><a href="tel:89217720597">+79217720597</a>
+                        <br>
+                        <i class="fas fa-envelope mx-2"></i><a href="mailto:ideasoft-spb@yandex.ru">ideasoft-spb@yandex.ru</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+</div>
+{% endblock %}

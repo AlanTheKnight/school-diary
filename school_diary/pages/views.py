@@ -10,7 +10,11 @@ def get_help(request):
 
 
 def about(request):
-    return render(request, 'about_us.html', {})
+    return render(request, 'about_us.html')
+
+
+def help_us(request):
+    return render(request, 'help_us.html')
 
 
 def error404(request):

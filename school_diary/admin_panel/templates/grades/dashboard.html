@@ -1,0 +1,139 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load templateLibs %}
+
+{% block title %}
+<title>{{ title }}</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/admin_panel/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    {% if objects %}
+    <p>Всего объектов: {{ amount }}</p>
+    <div class="table-responsive">
+        <table class="table text-center table-sm">
+            <thead class="thead-dark">
+                <tr>
+                    {% for field in fields %}
+                    <th scope="col">{{ field }}</th>
+                    {% endfor %}
+                    <th scope="col">Изменить</th>
+                    <th scope="col">Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for object in objects %}
+                    <tr>
+                        <!--Add custom attrinutes to display-->
+                        <td>{{ object }}</td>
+                        <td>{% if object.main_teacher %}{{ object.main_teacher }}{% else %}-{% endif %}</td>
+                        <td>
+                        {% if object.subjects.all %}
+                            <div class="scrollable-y">
+                                {% for i in object.subjects.all %}
+                                    {{ i }}</br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            -
+                        {% endif %}
+                        </td>
+                        <td>
+                        {% if object.teachers.all %}
+                            <div class="scrollable-y">
+                                {% for i in object.teachers.all %}
+                                    {{ i }}<br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            -
+                        {% endif %}
+                        </td>
+
+                        <!--Edit and delete buttons-->
+                        <td><a href="{% url 'grades:update' object.pk %}"><i class="fas fa-edit text-primary"></i></a></td>
+                        <td><a href="{% url 'grades:delete' object.pk %}"><i class="fas fa-trash-alt text-danger"></i></a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-secondary">
+        <p><i class="fas fa-info px-3"></i>Не было найдено ни одного объекта</p>
+    </div>
+    {% endif %}
+
+    <!--Create button-->
+    <div class="text-center">
+        <a data-target="#creationModal" data-toggle="modal" class="btn btn-success text-white" role="button"><i class="fas fa-plus"></i></a>
+    </div>
+
+    <div class="modal fade" data-backdrop="static" aria-hidden="true" id="creationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">{{ create_text }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                    
+                        <div class="form-group">
+                        {{ form.number.label_tag }}
+                        {{ form.number }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.letter.label_tag }}
+                            {{ form.letter }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.main_teacher.label_tag }}
+                            {{ form.main_teacher }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.teachers.label_tag }}
+                            {{ form.teachers }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.subjects.label_tag }}
+                            {{ form.subjects }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                        <button class="btn btn-primary" type="submit">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--Paginator-->
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if objects.has_previous %}
+                <li class="page-item"><a href="{% url 'grades:dashboard' 1 %}" class="page-link">&laquo;</a></li>
+                <li class="page-item"></li><a href="{% url 'grades:dashboard' objects.previous_page_number %}" class="page-link">&lt;</a>
+            {% endif %}
+
+            <span class="current">
+                <li class="page-item active"><a href="#" class="page-link">{{ objects.number }}</a></li>
+            </span>
+
+            {% if objects.has_next %}
+                <li class="page-item"><a href="{% url 'grades:dashboard' users.next_page_number %}" class="page-link">&gt;</a></li>
+                <li class="page-item"><a href="{% url 'grades:dashboard' users.paginator.num_pages %}" class="page-link">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

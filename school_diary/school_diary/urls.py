@@ -16,5 +16,5 @@ urlpatterns = [
     # path('api/news/', include('news.api_urls')),
     # path('api/minimum/', include('minimum.api_urls')),
     # path('api/diary/', include('diary.api_urls')),
-    path('api/', include('api.urls')),
+    path('api/', include('api.urls', namespace="api")),
 ]

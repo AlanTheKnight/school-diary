@@ -41,6 +41,14 @@ LITERAS = [
 
 
 class Users(AbstractBaseUser, PermissionsMixin):
+    """
+    Base model for any user: admin, student or teacher.
+
+    Attributes:
+        email - email of the user
+        account_type - set at registration. Can be equal to
+        0 (Superuser), 1 (Admin), 2 (Teacher) and 3 (Student)
+    """
     email = models.EmailField('Почта', unique=True)
     account_type = models.IntegerField(
         verbose_name="Тип аккаунта", default=3, choices=TYPES)
@@ -112,9 +120,15 @@ class Teachers(models.Model):
 
 
 class Grades(models.Model):
+    """
+    Model that represents a grade with students.
+
+    Fields:
+        id (PK), number (int), letter (str), teachers (MTM), subjects (MTM),
+        main_teacher (FK - Teachers)
+    """
     number = models.IntegerField(choices=GRADES, verbose_name="Класс")
-    letter = models.CharField(
-        max_length=2, choices=LITERAS, verbose_name="Буква")
+    letter = models.CharField(max_length=2, choices=LITERAS, verbose_name="Буква")
     teachers = models.ManyToManyField(
         Teachers, verbose_name="Учителя",
         related_name="subjects_chosen")
@@ -127,12 +141,23 @@ class Grades(models.Model):
         ordering = ['number', 'letter']
         verbose_name = "Класс"
         verbose_name_plural = "Классы"
+        unique_together = ('number', 'letter')
 
     def __str__(self):
         return '{}{}'.format(self.number, self.letter)
 
 
 class Students(models.Model):
+    """
+    Model that represents a User with account_type = 3.
+
+    Fields:
+        account (OTO -> User, PK),
+        first_name (str),
+        surname (str),
+        second_name (str),
+        grade (FK -> Grades)
+    """
     account = models.OneToOneField(
         Users, on_delete=models.CASCADE,
         verbose_name="Пользователь", primary_key=True)
@@ -190,7 +215,10 @@ class Lessons(models.Model):
     homework = models.TextField(blank=True, verbose_name='ДЗ')
     theme = models.CharField(max_length=120, verbose_name='Тема')
     subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет')
-    grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
+    grade = models.ForeignKey(
+        Grades, on_delete=models.CASCADE,
+        verbose_name='Класс',
+        related_name='timetable_lesson'),
     control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')
     h_file = models.FileField(
         null=True, default=None, blank=True,

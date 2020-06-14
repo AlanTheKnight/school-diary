@@ -8,6 +8,10 @@ class APIUserPermission(permissions.BasePermission):
     is allowed only if user exists in AllowedToUseAPIList
     or user is superuser (root with account_type = 0).
     """
+    message = "You must be in whitelist or be logged" + \
+        "in as root administrator to use the API."
+
     def has_permission(self, request, view):
-        return request.user.is_superuser or \
-            models.AllowedToUseAPIList.objects.filter(user=request.user).exists()
+        return request.user.is_authenticated and (
+            request.user.is_superuser or
+            models.AllowedToUseAPIList.objects.filter(user=request.user).exists())

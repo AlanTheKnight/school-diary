@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Grades, Lessons, BellsTimeTable
+from .models import Lessons, BellsTimeTable
 
 
 @admin.register(Lessons)
@@ -9,4 +9,3 @@ class LessonsAdmin(admin.ModelAdmin):
 
 
 admin.site.register(BellsTimeTable)
-admin.site.register(Grades)

@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from urllib.parse import unquote
 from .forms import GetTimeTableForm
 from django.http import HttpResponseRedirect
-from .models import Grades, Lessons
+from .models import Lessons
+from diary.models import Grades
 import time
 
 
@@ -34,11 +35,13 @@ def timetable(request):
 
 def output(request, grade, litera):
     data = {}
-    """Shows the timetable depending on the url."""
+    """
+    Shows the timetable.
+    """
     CURRENT_DAY = time.localtime().tm_wday + 1
     # If current day isn't sunday, users will see timetable for today.
     current_day_name = DAYWEEK_NAMES[CURRENT_DAY]
-    # If surrent day isn't friday, users will see timetable for tomorrow.
+    # If current day isn't friday, users will see timetable for tomorrow.
     if CURRENT_DAY != 6:
         next_day_name = DAYWEEK_NAMES[(CURRENT_DAY + 1) % 7]
     class_number = int(grade)
@@ -46,14 +49,10 @@ def output(request, grade, litera):
     my_class = str(class_number) + class_letter
     my_grade = get_object_or_404(Grades, number=class_number, letter=class_letter)
     all_lessons = Lessons.objects.filter(connection=my_grade.id)
-    if CURRENT_DAY != 7:
-        data["today"] = all_lessons.filter(day=current_day_name)
-    else:
-        data["today"] = []
-    if CURRENT_DAY != 6:
-        data["tomorrow"] = all_lessons.filter(day=next_day_name)
-    else:
-        data["tomorrow"] = []
+    # If current day is not Sunday, student may have lessons today.
+    data["today"] = all_lessons.filter(day=current_day_name) if CURRENT_DAY != 7 else []
+    # If current_day is not Saturday, student may have lessons on the next day.
+    data["tomorrow"] = all_lessons.filter(day=next_day_name) if CURRENT_DAY != 6 else []
     for weekday in DAYWEEK_NAMES.values():
         data[weekday] = all_lessons.filter(day=weekday)
     return render(request, 'timetable/list.html', {

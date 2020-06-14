@@ -12,4 +12,5 @@ urlpatterns = [
     path('timetable/bells/', include('admin_panel.bells.urls')),
     path('messages/', include('admin_panel.messages.urls')),
     path('export/', include('admin_panel.export.urls')),
+    path('grades/', include('admin_panel.grades.urls', namespace='grades')),
 ]

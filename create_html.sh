@@ -3,7 +3,7 @@ name=""
 read -p "Enter name of the file: " name
 name="${name}.html"
 cat <<EOT >> $name
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% load static %}
 
 {% block title %}

@@ -55,25 +55,12 @@ INSTALLED_APPS = [
     # Third party
     'crispy_forms',  # "Bootstrapped" forms
     'rest_framework',  # Working with API
+    'rest_framework.authtoken',  # Token authentication for REST API
     'django_cleanup',  # Deleting unused files in storage
     'debug_toolbar',  # Displaying debug info
     'django_extensions',  # Advances manage.py functions
     'django_filters',  # Filtering support for API
 ]
-
-"""
-APPS:
-main - returns general webpages like homepage, about, social, etc.
-timetable - uses database; using this app students can download .pdf
-timetable or fill in the form and get it online from the database.
-minimum - using this app students can download .doc files with theory
-studied.
-diary [NOT ACTIVATED] - using this app students can get their marks, homework,
-personal statistics, etc.
-[TO ACTIVATE]
-- Go to ./urls.py and uncomment 9th line
-- Add needed links to homepage.html and base.html
-"""
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 """Lets Django to style created forms with bootstrap 4"""
@@ -113,8 +100,6 @@ AUTH_USER_MODEL = 'diary.Users'
 
 WSGI_APPLICATION = 'school_diary.wsgi.application'
 
-
-# Database# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 if not DEBUG:
     DATABASES = {
         'default': {
@@ -223,5 +208,10 @@ if not DEBUG:
     }
 
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ]
 }
