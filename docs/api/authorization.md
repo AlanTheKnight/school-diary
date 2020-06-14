@@ -1,6 +1,4 @@
-# API
-
-## Authorization
+# Authorization
 
 For security purposes, API of our diary is locked for unauthenticated users.
 To start using it on localhost, you will need to to several things.
