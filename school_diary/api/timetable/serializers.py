@@ -6,5 +6,9 @@ class LessonsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Lessons
-        fields = ['connection', 'day', 'number', 'subject', 'classroom']
-        depth = 1
+        fields = ['number', 'subject', 'classroom']
+
+
+class LessonsListSerializer(serializers.Serializer):
+    weekday = serializers.CharField()
+    lessons = LessonsSerializer(many=True)
