@@ -79,7 +79,7 @@
             </form>
         </div>
     </div>
-
+    
     <!--Big table form with choosing marks.-->
 
     <form method="POST" >
@@ -158,56 +158,7 @@
 
     </form>
 
-    <div class="modal fade" id="lessonmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="lessonmodalLabel">Создать новый урок</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form.date.label_tag }}
-                        <div class="input-group mb-3">
-                            {{ form.date }}
-                            <div class="input-group-append">
-                                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                            </div>
-                            <div class="invalid-feedback">
-                                {% for error in form.date.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            {{ form.theme.label_tag }}
-                            {{ form.theme }}
-                        </div>
-                        <div class="form-group">
-                            {{ form.homework.label_tag }}
-                            {{ form.homework }}
-                        </div>
-                        <div class="form-group">
-                            <div class="custom-file">
-                                {{ form.h_file }}
-                                <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            {{ form.control.label_tag }}
-                            {{ form.control }}
-                        </div>
-                        <a href="{% url 'diary' %}" class="btn btn-secondary">Отменить</a>
-                        <button type="submit" class="btn btn-primary" name="createlesson">Добавить</button>
-                    </form>
-                </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'teacher_page/create_lesson.html' %}
 
     <div class="modal fade" id="commentmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -263,14 +214,5 @@
         $('#homeworkfiledeletebutton').css('display', 'none');
         $('#homeworkfileinput').val('');
     };
-    
-    $(function() {
-        $('[data-toggle="datepicker"]').datepicker({
-            autoHide: true,
-            format: 'dd.mm.yyyy',
-            language: 'ru-RU',
-            zIndex: 2048,
-        });
-    });
 </script>
 {% endblock %}

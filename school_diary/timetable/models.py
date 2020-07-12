@@ -61,7 +61,9 @@ class BellsTimeTable(models.Model):
 
 
 class Lessons(models.Model):
-    connection = models.ForeignKey(diary_models.Grades, on_delete=models.CASCADE, verbose_name="У какого класса урок")
+    connection = models.ForeignKey(
+        diary_models.Grades, on_delete=models.CASCADE,
+        related_name="t_grade", verbose_name="Класс")
     day = models.CharField(max_length=11, choices=DAYS, verbose_name="День недели", blank=False)
     number = models.ForeignKey(BellsTimeTable, on_delete=models.CASCADE, verbose_name="Номер урока")
     subject = models.CharField(max_length=50, verbose_name="Предмет")

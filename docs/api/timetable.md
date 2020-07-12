@@ -17,7 +17,11 @@
         "weekday": "Понедельник",
         "lessons": [
             {
-                "number": 2,
+                "number": {
+                    "n": 1,
+                    "start": "09:00:00",
+                    "end": "09:40:00"
+                },
                 "subject": "Русский язык",
                 "classroom": "205"
             },
@@ -32,9 +36,14 @@
 ```lessons``` - *list* - a list of lessons on this weekday
 
 **Lessons**:  
-```number``` - *int* - an index number of the lesson  
+```number``` - *int* - time when the lesson starts and it's index
 ```subject``` - *string* - a subject of the lesson  
 ```classroom``` - *string* - a classroom where the lesson is held
+
+**Number**:  
+```n``` - *int* - index of the lesson  
+```start``` - *string* - start of the lesson in HH:MM:SS format  
+```end``` - *string* - end of the lesson in HH:MM:SS format
 
 **Notes**:  
 ```weekday``` field also contains ```today``` and ```tomorrow``` values which automatically
@@ -58,6 +67,6 @@ token = json.loads(r.content.decode())['token']
 headers = {"Authorization": "Token " + token}
 
 # Getting timetable
-r = requests.get(URL + 'timetable/8/З/', headers)
+r = requests.get(URL + 'timetable/8/З/', headers=headers)
 pprint.pprint(json.loads(r.content.decode()), indent=4)
 ```

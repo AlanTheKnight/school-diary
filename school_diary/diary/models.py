@@ -218,7 +218,7 @@ class Lessons(models.Model):
     grade = models.ForeignKey(
         Grades, on_delete=models.CASCADE,
         verbose_name='Класс',
-        related_name='timetable_lesson'),
+        related_name='grade')
     control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')
     h_file = models.FileField(
         null=True, default=None, blank=True,
@@ -268,7 +268,7 @@ class AdminMessages(models.Model):
 class Quarters(models.Model):
     number = models.IntegerField(verbose_name="Четверть", choices=(
         (1, "I"), (2, "II"), (3, "III"), (4, "IV")
-    ))
+    ), unique=True)
     begin = models.DateField(verbose_name="Начало четверти")
     end = models.DateField(verbose_name="Конец четверти")
 

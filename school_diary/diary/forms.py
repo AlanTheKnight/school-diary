@@ -15,7 +15,6 @@ class DatePickForm(forms.Form):
 
 class LessonCreationForm(forms.ModelForm):
     """Form for creating/editing a lesson."""
-
     class Meta:
         model = models.Lessons
         fields = (
@@ -25,8 +24,6 @@ class LessonCreationForm(forms.ModelForm):
             'h_file': forms.FileInput(attrs=bts4attr_file),
             'date': forms.DateInput(attrs={
                 'class': 'form-control',
-                'data-toggle': 'datepicker',
-                'autocomplete': 'off',
             }),
             'theme': forms.TextInput(attrs=bts4attr),
             'homework': forms.Textarea(attrs=bts4attr),
@@ -42,8 +39,8 @@ class LessonCreationForm(forms.ModelForm):
 
     def clean_date(self):
         date = self.cleaned_data['date']
-        self.fields['date'].widget.attrs['class'] += ' is-invalid'
         if not functions.get_quarter_by_date(str(date)):
+            self.fields['date'].widget.attrs['class'] += ' is-invalid'
             raise forms.ValidationError("Урок не может быть на каникулах")
         return date
 

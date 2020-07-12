@@ -16,19 +16,6 @@
             {{ form.date.label_tag }}
             <div class="input-group mb-3">
                 {{ form.date }}
-                <div class="input-group-append">
-                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                </div>
-                <script>
-                    'use strict'
-                    $(function() {
-                        $('#id_date').datepicker({
-                            autoHide: true,
-                            format: 'dd.mm.yyyy',
-                            language: 'ru-RU',
-                        });
-                    });
-                </script>
                 <div class="invalid-feedback">
                     {% for error in form.date.errors %}
                         {{ error }}

@@ -28,9 +28,9 @@ def lesson_page(request, pk):
             'message': "Вы не можете удалить этот урок.",
         })
     form = forms.LessonCreationForm(instance=lesson)
+    print(form.as_table())
     grade, subject, term = functions.get_session_data(request.session)
     form.fields["control"].queryset = functions.create_controls(grade, subject, term)
-
     if request.method == "POST":
         form = forms.LessonCreationForm(request.POST, request.FILES, instance=lesson)
         if form.is_valid():
@@ -124,6 +124,10 @@ def teachers_diary(request):
     grade_, subject_, term_ = functions.get_session_data(
         request.session, grades=available_classes, subjects=available_subjects)
     form = forms.LessonCreationForm()
+    if request.method == "POST" and 'createlesson' in request.POST:
+        form = forms.LessonCreationForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save(subject=subject_, grade=grade_)
     context = {
         'TEACHER': teacher, 'subjects': available_subjects,
         'grades': available_classes, 'current_class': grade_,
@@ -131,12 +135,7 @@ def teachers_diary(request):
         'form': form
     }
     if request.method == "POST":
-        if 'createlesson' in request.POST:
-            # Teacher creates a new lesson.
-            form = forms.LessonCreationForm(request.POST, request.FILES)
-            if form.is_valid():
-                form.save(subject=subject_, grade=grade_)
-        elif 'addcomment' in request.POST:
+        if 'addcomment' in request.POST:
             functions.add_comment_to_mark(request.POST)
         else:
             functions.save_marks(request.POST, grade_, subject_)
@@ -205,13 +204,16 @@ def stats(request, pk, term):
 @login_required(login_url="login")
 @student_only
 def homework(request):
+    """
+    Page where students can see their homework.
+    """
     student = models.Students.objects.get(account=request.user)
     grade = student.grade
     if grade is None:
         return render(request, 'access_denied.html', {'message': """Вы не состоите в классе, попросите Вашего
         классного руководителя Вас добавить"""})
     if request.method == "POST":
-        if "day" in request.POST:
+        if "day" in request.GET:
             form = forms.DatePickForm(request.POST)
             if form.is_valid():
                 date = form.cleaned_data['date']
