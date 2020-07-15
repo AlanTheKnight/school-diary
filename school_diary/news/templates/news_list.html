@@ -16,7 +16,7 @@
 
     {% if search %}
     <p class="text-muted text-center">Показаны новости по запросу "{{ search_text }}"</p>
-    <a href="{% url 'news' %} class="btn btn-primary">Отмена</a>
+    <a href="{% url 'news' %}" class="btn btn-primary">Отмена</a>
     {% endif %}
 
     <!--Search-->
@@ -25,10 +25,9 @@
     </a>
     <div class="collapse" id="search-news-form">
         <div class="card my-4 card-body">
-            <form method="POST">
-                {% csrf_token %}
+            <form method="GET">
                 <div class="form-group">
-                    <input type="text" name="search_text" class="form-control">
+                    <input type="text" name="search" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-primary">Поиск</button>
             </form>
@@ -58,7 +57,10 @@
     
     {% else %}
         {% if not search %}
-        <p class="text-muted text-justify-center">Новостей пока что нет.</p>
+        <div class="text-center">
+            <img src="{% static 'icons/cactus.svg' %}" alt="" height="60">
+            <p class="my-2">Кажется, тут нет новостей.</p>
+        </div>
         {% else %}
         <p class="text-muted text-justify-center">По вашему запросу не найдено ни одной новости.</p>
         {% endif %}

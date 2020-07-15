@@ -11,8 +11,8 @@ def first_page(request):
 def get_posts(request, page):
     """Page where posts are displayed."""
     news = Publications.objects.all()
-    if request.method == "POST":  # Posts search
-        search_text = request.POST.get("search_text")
+    if "search" in request.GET:  # Posts search
+        search_text = request.GET.get("search")
         news = news.filter(title__icontains=search_text)
         search = True
         context = {'news': news, "search": search, "search_text": search_text}
