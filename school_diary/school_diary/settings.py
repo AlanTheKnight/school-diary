@@ -177,7 +177,6 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 
 # SMTP CONFIGURATIONS
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
@@ -186,6 +185,14 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = config.get("Email", 'user')
 EMAIL_HOST_PASSWORD = config.get("Email", 'password')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Administrators list and their emails to get Django reports.
+ADMINS = [
+    (
+        'Maxim', 'alantheknight2@gmail.com',
+        'IdeaSoft', 'ideasoft-spb@yandex.ru'
+    )
+]
 
 if not DEBUG:
     LOGGING = {
