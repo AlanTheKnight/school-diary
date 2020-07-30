@@ -17,7 +17,7 @@ def get_marks_data(marks):
     # data[2] - sum of marks' amounts
     # data[3] - marks' quantity
     # data[4] - list of marks' amounts
-    # data[5] - how many lesson were missed
+    # data[5] - how many lesson have been missed
     for mark in marks:
         if mark.amount == -1:
             data[5] += 1
@@ -30,8 +30,8 @@ def get_marks_data(marks):
             data[4].append(mark.amount)
     avg = data[2] / data[3]  # Average
     return (
-        data[0] / data[1],  # Smart average
-        avg,  # Average
+        round(data[0] / data[1], 2),  # Smart average
+        round(avg, 2),  # Average
         data[3],  # Marks quantity
         data[4],  # List of amounts of all marks
         get_needed_mark(data[2:4], avg),
