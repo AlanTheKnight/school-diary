@@ -13,7 +13,7 @@
             <form action="{% url 'add_student' s.account %}" method="POST">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Подтвердить</button>
-                <a href="{% url 'add_student_page' %}" class="btn btn-success">Отмена</a>
+                <a href="{% url 'my_grade' %}" class="btn btn-success">Отмена</a>
             </form>
         </div>
     </div>

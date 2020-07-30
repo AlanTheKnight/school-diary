@@ -6,7 +6,7 @@ bts4attr = {'class': 'form-control'}
 
 
 class AddStudentToGradeForm(forms.Form):
-    email = forms.CharField(
+    account__email = forms.CharField(
         label="Почта", required=False, max_length=100, widget=forms.TextInput(attrs=bts4attr))
     first_name = forms.CharField(
         label="Имя", required=False, max_length=100, widget=forms.TextInput(attrs=bts4attr))

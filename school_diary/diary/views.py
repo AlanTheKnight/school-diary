@@ -9,8 +9,13 @@ from . import functions
 
 
 # Tuple of keys needed to be in request.session
-# whan a teachers works with diary.
+# when teachers work with diary.
 NEEDED_IN_SESSION = ('grade', 'subject', 'term')
+# Context which is used when student doesn't belong to any grade.
+NO_GRADE_CONTEXT = {
+    "message": ("Вы не состоите в классе. Попросите Вашего"
+                "классного руководителя добавить Вас в класс.")
+}
 
 
 @teacher_only
@@ -18,7 +23,6 @@ NEEDED_IN_SESSION = ('grade', 'subject', 'term')
 @transaction.atomic
 def lesson_page(request, pk):
     """Page where teachers can edit lesson."""
-
     # If teacher haven't chosen grade, term and subject, redirect back to diary.
     if not functions.each_contains(request.session, NEEDED_IN_SESSION):
         return redirect('diary')
@@ -28,7 +32,6 @@ def lesson_page(request, pk):
             'message': "Вы не можете удалить этот урок.",
         })
     form = forms.LessonCreationForm(instance=lesson)
-    print(form.as_table())
     grade, subject, term = functions.get_session_data(request.session)
     form.fields["control"].queryset = functions.create_controls(grade, subject, term)
     if request.method == "POST":
@@ -62,7 +65,7 @@ def delete_lesson(request, pk):
 
 
 def students_diary(request):
-    student = models.Students.objects.get(account=request.user)
+    student = request.user.student
     grade = student.grade
     if grade is None:
         return render(request, 'access_denied.html', {'message': "Вы не состоите в классе.\
@@ -161,7 +164,7 @@ def diary(request):
 @student_only
 def stats(request, pk, term):
     """Return a page with results for one specified subject."""
-    student = models.Students.objects.get(account=request.user)
+    student = request.user.student
     grade = student.grade
     if grade is None:
         return render(request, 'access_denied.html', {'message': "Вы не состоите в классе.\
@@ -183,7 +186,6 @@ def stats(request, pk, term):
         for i in range(5, 1, -1):
             data.append(amounts.count(i))
         data.append(missed)
-
         context = {
             'term': term,
             'lessons': lessons,
@@ -207,29 +209,19 @@ def homework(request):
     """
     Page where students can see their homework.
     """
-    student = models.Students.objects.get(account=request.user)
+    student = request.user.student
     grade = student.grade
     if grade is None:
-        return render(request, 'access_denied.html', {'message': """Вы не состоите в классе, попросите Вашего
-        классного руководителя Вас добавить"""})
-    if request.method == "POST":
-        if "day" in request.GET:
-            form = forms.DatePickForm(request.POST)
-            if form.is_valid():
-                date = form.cleaned_data['date']
-                raw_lessons = models.Lessons.objects.filter(date=date, grade=grade)
-                lessons = []
-                for lesson in raw_lessons:
-                    if lesson.homework or lesson.h_file:
-                        lessons.append(lesson)
-                context = {'form': form, 'lessons': lessons, 'date': date}
-                return render(request, 'homework.html', context)
+        return render(request, 'access_denied.html', NO_GRADE_CONTEXT)
+    if "date" in request.GET:
+        form = forms.DatePickForm(request.GET)
+        if form.is_valid():
+            date = form.cleaned_data['date']
+            lessons = functions.get_homework(grade, date)
+            context = {'form': form, 'lessons': lessons, 'date': date}
+            return render(request, 'homework.html', context)
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=6)
-    lessons = models.Lessons.objects.filter(
-        date__range=[start_date, end_date], grade=grade, homework__iregex=r'\S+')
-    if not lessons:
-        lessons = models.Lessons.objects.filter(
-            date__range=[start_date, end_date], grade=grade, h_file__iregex=r'\S+')
+    lessons = functions.get_homework(grade, start_date, end_date)
     form = forms.DatePickForm()
     return render(request, 'homework.html', {'form': form, 'lessons': lessons})

@@ -1,0 +1,19 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Мой класс</title>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center">{{ grade }}</h1>
+    <div class="text-right">
+        <a href="{% url 'grade-settings' %}" class="btn btn-primary"><i class="fas fa-cog"></i> Настройки</a>
+    </div>
+
+    {% include 'grades/students_list.html' %}
+
+    {% include 'grades/students_search.html' %}
+</div>
+{% endblock %}

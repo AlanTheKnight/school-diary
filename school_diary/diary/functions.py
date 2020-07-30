@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 from functools import reduce
 from django.db.models import Q
 from . import models
@@ -287,3 +288,64 @@ def add_comment_to_mark(post_data):
     mark = models.Marks.objects.get(student=student, lesson=lesson)
     mark.comment = comment
     mark.save()
+
+
+class Homework(object):
+    """
+    A class representing one homework for specified date & subject.
+
+    Attributes:
+        date:
+            A datetime.date instance indicating homework date.
+        subject:
+            A diary.models.Subjects instance indicating homework subject.
+        text:
+            A string with task description.
+        file:
+            A string with link to a file that was attached to the task description.
+        file_exists:
+            A boolean that shows if file is attached to the task.
+    """
+    def __init__(self, lesson: models.Lessons):
+        self.date = lesson.date
+        self.subject = lesson.subject
+        self.text = lesson.homework
+        self.file = lesson.h_file
+
+    @property
+    def file_exists(self):
+        """Show if homework task has an attached file."""
+        return bool(self.file)
+
+
+def get_homework(
+        grade: models.Lessons,
+        start_date: datetime.date,
+        end_date: datetime.date = None) -> List[Homework]:
+    """
+    Get homework for specified grade. If both start_date and end_date are
+    specified, search for homework in this time range. Otherwise (only start_date)
+    search for homework only for start_date.
+
+    Args:
+        grade:
+            diary.models.Grades instance that means a grade where search is performed.
+        start_date:
+            A datetime.date instance, date for which a search is performed.
+        end_date:
+            Optional; A datetime.date instance. If it's provided, start_date turns
+            into a start date of time range and end_date will mean an end of this range.
+
+    Returns:
+        A list of diary.functions.Homework objects.
+    """
+    if end_date is not None:
+        queryset = models.Lessons.objects.filter(
+            Q(homework__iregex=r'\S+') | Q(h_file__iregex=r'\S+'),
+            grade=grade,
+            date__range=(start_date, end_date))
+    else:
+        queryset = models.Lessons.objects.filter(
+            Q(homework__iregex=r'\S+') | Q(h_file__iregex=r'\S+'),
+            grade=grade, date=start_date)
+    return [Homework(i) for i in queryset]

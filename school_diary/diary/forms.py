@@ -8,8 +8,8 @@ bts4attr_file = {'class': 'custom-file-input'}
 
 
 class DatePickForm(forms.Form):
-    date = forms.DateField(widget=forms.DateInput(attrs={
-        'class': 'form-control', 'type': 'date', 'id': 'date'
+    date = forms.DateField(label="Дата", widget=forms.DateInput(attrs={
+        'class': 'form-control', 'type': 'date',
     }))
 
 

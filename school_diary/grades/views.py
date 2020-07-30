@@ -1,46 +1,11 @@
 import datetime
-from django.shortcuts import render, redirect
-from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import diary.models as models
 from . import forms
 from diary.decorators import teacher_only
-import diary.functions as functions
-
-
-@login_required(login_url="login")
-@teacher_only
-def add_student_page(request):
-    """
-    Page where teachers can add students to their grade.
-    """
-    try:
-        grade = models.Grades.objects.get(main_teacher=request.user.id)
-    except ObjectDoesNotExist:
-        return render(request, 'access_denied.html', {'message': "Вы не классный руководитель."})
-    students = models.Students.objects.filter(grade=grade)
-
-    if request.method == "POST":
-        form = forms.AddStudentToGradeForm(request.POST)
-        if form.is_valid:
-            email = request.POST.get('email')
-            fn = request.POST.get('first_name').strip()
-            s = request.POST.get('surname').strip()
-            if fn or s or email:
-                search = models.Students.objects.filter(
-                    first_name__icontains=fn, surname__icontains=s,
-                    account__email__icontains=email)
-            else:
-                search = []
-            context = {
-                'form': form, 'search': search,
-                'grade': grade, 'students': students
-            }
-            return render(request, 'grades/add_student.html', context)
-
-    form = forms.AddStudentToGradeForm()
-    context = {'form': form, 'grade': grade, 'students': students}
-    return render(request, 'grades/add_student.html', context)
+from diary import functions
+from django.http import HttpResponseForbidden
 
 
 @login_required(login_url="login")
@@ -49,19 +14,21 @@ def add_student(request, i):
     """
     Function defining the process of adding new student to a grade and confirming it.
     """
-    u = models.Users.objects.get(email=i)
-    s = models.Students.objects.get(account=u)
-    if request.method == "POST":
-        try:
-            grade = models.Grades.objects.get(main_teacher=request.user.id)
+    if not hasattr(request.user.teacher, 'grade'):
+        context = {'message': "Вы не классный руководитель."}
+        return render(request, 'access_denied.html', context)
+    s = models.Students.objects.get(account__email=i)
+    if s.grade is None:
+        if request.method == "POST":
+            grade = request.user.teacher.grade
             s.grade = grade
             s.save()
-            return redirect('add_student_page')
-        except ObjectDoesNotExist:
-            context = {'message': "Вы не классный руководитель."}
-            return render(request, 'access_denied.html', context)
-    else:
-        return render(request, 'grades/add_student_confirm.html', {'s': s})
+            return redirect('my_grade')
+        return render(request, 'grades/add_student.html', {'s': s})
+    context = {
+        'message': "Вы пытаетесь добавить к себе в класс ученика, который уже состоит в классе."
+    }
+    return render(request, 'access_denied.html', context)
 
 
 @login_required(login_url="login")
@@ -75,6 +42,8 @@ def create_grade_page(request):
             grade.main_teacher = mt
             grade.save()
             return redirect('my_grade')
+        context = {'form': form}
+        return render(request, 'grades/add_grade.html', context)
     form = forms.GradeCreationForm()
     context = {'form': form}
     return render(request, 'grades/add_grade.html', context)
@@ -86,12 +55,28 @@ def my_grade(request):
     """
     Page with information about teacher's grade.
     """
-    me = models.Teachers.objects.get(account=request.user)
-    try:
-        grade = models.Grades.objects.get(main_teacher=me)
-    except ObjectDoesNotExist:
-        grade = None
-    context = {'grade': grade}
+    me = request.user.teacher
+    if not hasattr(me, 'grade') or me.grade is None:
+        # Teacher has no grade connected.
+        return render(request, 'grades/no_grade.html')
+    grade = me.grade
+    students = grade.students_set.all()
+    context = {
+        'grade': grade,
+        'students': students,
+    }
+    if "search" in request.GET:
+        email = request.GET.get('email')
+        fn = request.GET.get('first_name')
+        s = request.GET.get('surname')
+        if fn or s or email:
+            search = models.Students.objects.filter(
+                first_name__icontains=fn, surname__icontains=s,
+                account__email__icontains=email)
+        else:
+            search = []
+        context['search'] = search
+
     return render(request, 'grades/my_grade.html', context)
 
 
@@ -116,81 +101,75 @@ def view_students_marks(request):
             })
 
 
-def students_marks(request, pk, term):
-    student = models.Students.objects.get(account=pk)
-    me = models.Teachers.objects.get(account=request.user)
-    my_class = functions.check_if_teacher_has_class(me)
-    if not my_class:
+def students_marks(request, student_id):
+    teacher = request.user.teacher
+    student = get_object_or_404(models.Students, pk=student_id)
+    if student.grade != teacher.grade:
         return render(request, 'access_denied.html', {
-                'message': 'Вы не являетесь классным руководителем.'
-            })
-    subjects = my_class.subjects.all()
+            'message': 'Вы не можете просматривать оценки учеников из другого класса.'
+        })
+    term = request.GET.get('quarter')
+    if term is None:
+        current = functions.get_current_quarter()
+        term = current if current != 0 else 1
+    term = int(term)
+    subjects = student.grade.subjects.all()
     all_marks = student.marks_set.filter(lesson__quarter=term)
     if not all_marks:
-        return render(request, 'grades/no_marks.html')
+        return render(request, 'grades/marks.html', {'no_marks': True, 'term': term})
     d = {}
     max_length, total_missed = 0, 0
     for s in subjects:
         marks = all_marks.filter(subject=s.id).order_by('lesson__date')
-
         if len(marks) > max_length:
             max_length = len(marks)
-
-        n_amount = 0
-        marks_list = []
-        for i in marks:
-            if i.amount != -1:
-                marks_list.append(i)
-            else:
-                n_amount += 1
-
-        avg = functions.get_average(marks_list)
-        smart_avg = functions.get_smart_average(marks_list)
-        d.update({s: [avg, smart_avg, marks]})
-        total_missed += n_amount
-
+        data = functions.get_marks_data(marks)
+        d[s] = [data[1], data[0], marks]
+        total_missed += data[5]
     for subject in d:
         d[subject].append(range(max_length - len(d[subject][2])))
     context = {
         'student': student,
         'd': d,
         'max_length': max_length,
-        'total_missed': total_missed
+        'total_missed': total_missed,
+        'term': term,
     }
-    return render(request, 'view_marks.html', context)
+    return render(request, 'grades/marks.html', context)
 
 
 @login_required(login_url="login")
 @teacher_only
-def delete_student(request, i):
+def delete_student(request, pk: int):
     """
     Function defining the process of deleting a student from a grade and confirming it.
+
+    Args:
+        pk - primary key of student to be deleted.
     """
-    u = models.Users.objects.get(email=i)
-    s = models.Students.objects.get(account=u)
+    me = request.user.teacher
+    if not hasattr(me, 'grade') or me.grade is None:
+        return render(request, 'grades/no_grade.html')
+    student = models.Users.objects.get(pk=pk).student
+    if student.grade != me.grade:
+        return HttpResponseForbidden("Вы пытаетесь удалить ученика из другого класса.")
     if request.method == "POST":
-        try:
-            s.grade = None
-            s.save()
-            return redirect('add_student_page')
-        except ObjectDoesNotExist:
-            context = {'message': "Вы не классный руководитель."}
-            return render(request, 'access_denied.html', context)
-    else:
-        return render(request, 'grades/delete_student_confirm.html', {'s': s})
+        student.grade = None
+        student.save()
+        return redirect('my_grade')
+    return render(request, 'grades/delete_student.html', {'s': student})
 
 
 @login_required(login_url="login")
 @teacher_only
-def mygradesettings(request):
-    me = models.Teachers.objects.get(account=request.user)
-    class_ = functions.check_if_teacher_has_class(me)
-    if class_:
-        if request.method == "POST":
-            form = forms.ClassSettingsForm(request.POST, instance=class_)
-            if form.is_valid():
-                form.save()
-                return redirect('my_grade')
-        form = forms.ClassSettingsForm(instance=class_)
-        return render(request, 'grades/class_settings.html', {'form': form})
-    return render(request, 'access_denied.html', {'message': 'Вы не классный руководитель.'})
+def settings(request):
+    me = request.user.teacher
+    if not hasattr(me, 'grade') or me.grade is None:
+        return render(request, 'grades/no_grade.html')
+    if request.method == "POST":
+        form = forms.ClassSettingsForm(request.POST, instance=me.grade)
+        if form.is_valid():
+            form.save()
+            return redirect('my_grade')
+    form = forms.ClassSettingsForm(instance=me.grade)
+    return render(request, 'grades/settings.html', {'form': form})

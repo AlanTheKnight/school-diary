@@ -97,7 +97,7 @@ def teacher_avatar_upload(instanse, filename):
 
 class Teachers(models.Model):
     account = models.OneToOneField(
-        Users, on_delete=models.CASCADE,
+        Users, on_delete=models.CASCADE, related_name='teacher',
         verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     surname = models.CharField(max_length=100, verbose_name="Фамилия")
@@ -133,9 +133,9 @@ class Grades(models.Model):
         Teachers, verbose_name="Учителя",
         related_name="subjects_chosen")
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
-    main_teacher = models.ForeignKey(
+    main_teacher = models.OneToOneField(
         Teachers, verbose_name='Классный руководитель',
-        on_delete=models.SET_NULL, null=True, default=None)
+        on_delete=models.SET_NULL, null=True, default=None, related_name='grade')
 
     class Meta:
         ordering = ['number', 'letter']
@@ -160,7 +160,7 @@ class Students(models.Model):
     """
     account = models.OneToOneField(
         Users, on_delete=models.CASCADE,
-        verbose_name="Пользователь", primary_key=True)
+        verbose_name="Пользователь", primary_key=True, related_name='student')
     first_name = models.CharField(verbose_name="Имя", max_length=100)
     surname = models.CharField(verbose_name="Фамилия", max_length=100)
     second_name = models.CharField(verbose_name="Отчество", max_length=100, blank=True, default="")
@@ -217,8 +217,7 @@ class Lessons(models.Model):
     subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет')
     grade = models.ForeignKey(
         Grades, on_delete=models.CASCADE,
-        verbose_name='Класс',
-        related_name='grade')
+        verbose_name='Класс')
     control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')
     h_file = models.FileField(
         null=True, default=None, blank=True,
