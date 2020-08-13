@@ -190,7 +190,8 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 ADMINS = [
     (
         'Maxim', 'alantheknight2@gmail.com',
-        'IdeaSoft', 'ideasoft-spb@yandex.ru'
+        'IdeaSoft', 'ideasoft-spb@yandex.ru',
+        'Pasha', 'pashs.ba@gmail.com'
     )
 ]
 
