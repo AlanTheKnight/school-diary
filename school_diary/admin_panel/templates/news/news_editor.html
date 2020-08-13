@@ -1,0 +1,74 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+<title>Создать новость</title>
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card card-75 my-5">
+        <div class="card-body">
+            <h2 class="card-title">Создать новость</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="title">Название новости</label>
+                    {{ form.title }}
+                </div>
+                <div class="form-group">
+                    <label for="author">Отображаемый автор</label>
+                    {{ form.author }}
+                </div>
+                <div class="form-group">
+                    <label for="content">Содержание</label>
+                    {{ form.content }}
+                </div>
+                <div class="form-group">
+                    <div class="custom-file">
+                        {{ form.image }}
+                        <label for="imageinput" class="custom-file-label">Изображение</label>
+                    </div>
+                </div>
+                <button class="btn btn-danger btn-sm mb-4" id="imagedeletebutton" onclick="delete_image()" style="display: none;" type="button">Очистить это поле</button>
+                {% if data.image %}
+                    <p><a href="{{ data.image.url }}">Выбранное изображение</a></p>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="deleteimage" name="deleteimage" value="1">
+                        <label class="form-check-label" for="deleteimage">Удалить изображение</label>
+                    </div>
+                {% endif %}
+                <div class="form-group">
+                    <label for="slug">Ссылка на новость</label>
+                    {{ form.slug }}
+                </div>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    let isMobile = window.matchMedia("only screen and (max-width: 760px)").matches;
+    if (!isMobile) {
+    var simplemde = new SimpleMDE({ element: $("#content")[0], spellChecker:false });
+    };
+    function show_delete_button() {
+        var x = document.getElementById("imagedeletebutton");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    };
+    function delete_image() {
+        console.log('OK');
+        $('#image').val('');
+        $('#imagedeletebutton').css('display', 'none');
+    };
+</script>
+{% endblock %}

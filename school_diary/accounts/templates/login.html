@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% load static %}
 
 {% block title %}
@@ -70,8 +70,9 @@
 	<div class="card card-50 my-3">
 		<div class="card-body">
 			<h2 class="card-title">Нет аккаунта?</h2>
-			<p>Бесплатно зарегистрируйтесь в системе и получите
-				доступ к электронному дневнику, домашнему заданию и оценкам.
+			<p>
+				Зарегистрируйтесь в системе и получите
+				доступ к домашнему заданию и оценкам.
 			</p>
 			<a href="{% url 'register' %}" class="btn btn-primary">Создать аккаунт</a>
 		</div>

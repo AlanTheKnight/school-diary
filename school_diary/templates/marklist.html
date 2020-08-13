@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% load static %}
 
 {% block title %}
@@ -18,83 +18,82 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid my-5">
-        <h2>Оценки за {{ term }} четверть:  </h2>
-        <div class="alert alert-secondary my-3">
-            Нажмите на оценку, чтобы увидеть больше информации.
-        </div>
-        <div class="table-responsive">
-            <table class="table table-sm table-bordered" id="marks_table">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Предмет</th>
-                    <th scope="col" class="text-center" tabindex="0" data-trigger="focus" data-toggle="popover" title="Средний балл" data-content="Высчитывается исходя из среднего арифметического оценок.">AVG</th>
-                    <th scope="col" class="text-center" tabindex="0" data-trigger="focus" data-toggle="popover" title="Взвешенный средний балл" data-content="Взвешенный балл высчитывается с помощью системы весов - исходя из значимости определенного вида работы.">SM.AVG</th>
-                    <th scope="col" colspan="{{ max_length }}"></th>
-                  </tr>
+<div class="container my-5">
+    <h1 class="text-center">Оценки за {{ term }} четверть</h1>
+    <div class="table-responsive mt-4">
+        <table class="table table-sm table-bordered" id="marks_table">
+            <thead>
+                <tr>
+                <th scope="col" width="15%">Предмет</th>
+                <th scope="col" class="text-center" tabindex="0" data-trigger="focus" data-toggle="popover" title="Средний балл" data-content="Высчитывается исходя из среднего арифметического оценок.">
+                    AVG
+                </th>
+                <th scope="col" class="text-center" tabindex="0" data-trigger="focus" data-toggle="popover" title="Взвешенный средний балл" data-content="Взвешенный балл высчитывается с помощью системы весов - исходя из значимости определенного вида работы.">
+                    SM.AVG
+                </th>
+                <th scope="col" colspan="{{ max_length }}"></th>
+                </tr>
 
-                </thead>
-                <tbody>
-                    {% for subject, marks in d.items %}
-                        <tr>
-                            <th scope="row" class="sm-width">{{ forloop.counter }}</th>
-                            <td class="md-width"><a href="{{ subject.id }}/{{term}}/">{{ subject }}</a></td>
-                            <td class="text-center md-width">{{ marks.0.0 }}</td>
-                            <td class="text-center md-width">{{ marks.1 }}</td>
-                            {% for mark in marks.2 %}
+            </thead>
+            <tbody>
+                {% for subject, marks in d.items %}
+                    <tr>
+                        <td class="md-width"><a href="{% url 'statistics' subject.id term %}">{{ subject }}</a></td>
+                        <td class="text-center md-width">{{ marks.0 }}</td>
+                        <td class="text-center md-width">{{ marks.1 }}</td>
+                        {% for mark in marks.2 %}
 
-                                {% if mark.amount == 2 %}
-                                <td scope="col" style="color:red" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<i>{{ mark.lesson.theme }}</i><br><b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
-                                {% elif mark.amount == 3 %}
-                                    <td scope="col" style="color:orangered" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<i>{{ mark.lesson.theme }}</i><br><b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
-                                {% elif mark.amount == 4 %}
-                                    <td scope="col" style="color:darkorange" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<i>{{ mark.lesson.theme }}</i><br><b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
-                                {% elif mark.amount == 5 %}
-                                    <td scope="col" class="text-success" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<i>{{ mark.lesson.theme }}</i><br><b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></tdcolspan="100">
-                                {% else %}
-                                    <td scope="col" class="text-secondary" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<i>{{ mark.lesson.theme }}</i><br><b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>Н</b></td>
-                                {% endif %}
-                            {% endfor %}
-                            
-                            {% for n in marks.3 %}
-                            <td></td>
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-              </table>
-              <p>Всего пропущено уроков: {{ total_missed  }}</p>
-        </div>
-        <button type="button" class="btn btn-primary copy_btn copy" data-clipboard-target="#marks_table"><i class="fas fa-copy"></i></button>    
+                            {% if mark.amount == 2 %}
+                            <td scope="col" style="color:red" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<i>{{ mark.lesson.theme }}</i><br><b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
+                            {% elif mark.amount == 3 %}
+                                <td scope="col" style="color:orangered" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<i>{{ mark.lesson.theme }}</i><br><b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
+                            {% elif mark.amount == 4 %}
+                                <td scope="col" style="color:darkorange" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<i>{{ mark.lesson.theme }}</i><br><b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></td>
+                            {% elif mark.amount == 5 %}
+                                <td scope="col" class="text-success" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<i>{{ mark.lesson.theme }}</i><br><b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>{{ mark.amount }}</b></tdcolspan="100">
+                            {% else %}
+                                <td scope="col" class="text-secondary" tabindex="0" data-trigger="focus" data-toggle="popover" title="{{ mark.lesson.date|date:'d.m, D' }}" data-content="<i>{{ mark.lesson.theme }}</i><br><b>{{ mark.lesson.control }}</b><br>{{ mark.comment }}"><b>Н</b></td>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% for n in marks.3 %}
+                        <td></td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+            <p>Всего пропущено уроков: {{ total_missed  }}</p>
     </div>
-    <script>
-        $('[data-toggle="popover"]').popover({ trigger: "focus", html:true });
-        
-        $('.copy').tooltip({
-            trigger: 'click',
-            placement: 'bottom'
-          });
-
-        function setTooltip(message) {
-            $('.copy').tooltip('hide')
-              .attr('data-original-title', message)
-              .tooltip('show');
-          }
-          
-          function hideTooltip() {
-            setTimeout(function() {
-              $('.copy').tooltip('hide');
-            }, 1000);
-          }
-        
-        clipboard = new ClipboardJS('.copy_btn');
-
-        clipboard.on('success', function(e) {
-            e.clearSelection();
-            setTooltip('Скопировано!');
-            hideTooltip();
+    <button type="button" class="btn btn-primary copy_btn copy" data-clipboard-target="#marks_table"><i class="fas fa-copy"></i></button>    
+</div>
+<script>
+    $('[data-toggle="popover"]').popover({ trigger: "focus", html:true });
+    
+    $('.copy').tooltip({
+        trigger: 'click',
+        placement: 'bottom'
         });
+
+    function setTooltip(message) {
+        $('.copy').tooltip('hide')
+            .attr('data-original-title', message)
+            .tooltip('show');
+    }
         
-    </script>
+    function hideTooltip() {
+        setTimeout(function() {
+            $('.copy').tooltip('hide');
+        }, 1000);
+    }
+
+    clipboard = new ClipboardJS('.copy_btn');
+
+    clipboard.on('success', function(e) {
+        e.clearSelection();
+        setTooltip('Скопировано!');
+        hideTooltip();
+    });
+    
+</script>
 {% endblock %}

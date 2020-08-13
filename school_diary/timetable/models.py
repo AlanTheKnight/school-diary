@@ -1,5 +1,6 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+from diary import models as diary_models
+
 
 DAYS = [
     ("Понедельник", "Понедельник"),
@@ -44,19 +45,6 @@ GRADES = [
 ]
 
 
-class Grades(models.Model):
-    number = models.IntegerField(choices=GRADES, verbose_name="Класс")
-    letter = models.CharField(max_length=1, choices=LITERAS, verbose_name="Литера")
-
-    class Meta:
-        ordering = ['number', 'letter']
-        verbose_name = "Класс"
-        verbose_name_plural = "Классы"
-
-    def __str__(self):
-        return str(self.number) + self.letter
-
-
 class BellsTimeTable(models.Model):
     school = models.IntegerField(choices=SCHOOLS, verbose_name="Школа")
     n = models.IntegerField(verbose_name="Номер урока")
@@ -73,13 +61,14 @@ class BellsTimeTable(models.Model):
 
 
 class Lessons(models.Model):
-    connection = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name="У какого класса урок")
+    connection = models.ForeignKey(
+        diary_models.Grades, on_delete=models.CASCADE,
+        related_name="t_grade", verbose_name="Класс")
     day = models.CharField(max_length=11, choices=DAYS, verbose_name="День недели", blank=False)
     number = models.ForeignKey(BellsTimeTable, on_delete=models.CASCADE, verbose_name="Номер урока")
     subject = models.CharField(max_length=50, verbose_name="Предмет")
-    classroom = models.CharField(max_length=50 ,verbose_name="Кабинет")
-    
-    
+    classroom = models.CharField(max_length=50, verbose_name="Кабинет")
+
     class Meta:
         ordering = ['connection', 'day', 'number']
         verbose_name = "Урок"

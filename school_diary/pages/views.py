@@ -1,8 +1,19 @@
 from django.shortcuts import render
+from diary import models
 
 
 def homepage(request):
-    return render(request, 'homepage.html')
+    """
+    Return a homepage.
+
+    Context:
+        type - a type of user (None if anonymous)
+        grade - shows which grade user belongs to if user is a student
+    """
+    context = {'type': (request.user.account_type if request.user.is_authenticated else None)}
+    if context['type'] == 3:
+        context.update({'grade': models.Students.objects.get(account=request.user).grade})
+    return render(request, 'homepage.html', context)
 
 
 def get_help(request):
@@ -10,7 +21,11 @@ def get_help(request):
 
 
 def about(request):
-    return render(request, 'about_us.html', {})
+    return render(request, 'about_us.html')
+
+
+def help_us(request):
+    return render(request, 'help_us.html')
 
 
 def error404(request):

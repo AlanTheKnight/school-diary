@@ -24,8 +24,6 @@ footer.footer a:visited{
     color: white;
 }
 
-
-
 footer.footer a:hover, footer.footer a:active, footer.footer a:focus {
     color: white;
 }
@@ -53,7 +51,7 @@ h2 {
 }
 
 h3 {
-    font-size: 23px;
+    font-size: 23px;   
 }
 
 h4 {

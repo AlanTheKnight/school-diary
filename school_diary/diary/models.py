@@ -41,6 +41,14 @@ LITERAS = [
 
 
 class Users(AbstractBaseUser, PermissionsMixin):
+    """
+    Base model for any user: admin, student or teacher.
+
+    Attributes:
+        email - email of the user
+        account_type - set at registration. Can be equal to
+        0 (Superuser), 1 (Admin), 2 (Teacher) and 3 (Student)
+    """
     email = models.EmailField('Почта', unique=True)
     account_type = models.IntegerField(
         verbose_name="Тип аккаунта", default=3, choices=TYPES)
@@ -89,7 +97,7 @@ def teacher_avatar_upload(instanse, filename):
 
 class Teachers(models.Model):
     account = models.OneToOneField(
-        Users, on_delete=models.CASCADE,
+        Users, on_delete=models.CASCADE, related_name='teacher',
         verbose_name="Пользователь", primary_key=True)
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     surname = models.CharField(max_length=100, verbose_name="Фамилия")
@@ -112,30 +120,47 @@ class Teachers(models.Model):
 
 
 class Grades(models.Model):
+    """
+    Model that represents a grade with students.
+
+    Fields:
+        id (PK), number (int), letter (str), teachers (MTM), subjects (MTM),
+        main_teacher (FK - Teachers)
+    """
     number = models.IntegerField(choices=GRADES, verbose_name="Класс")
-    letter = models.CharField(
-        max_length=2, choices=LITERAS, verbose_name="Буква")
+    letter = models.CharField(max_length=2, choices=LITERAS, verbose_name="Буква")
     teachers = models.ManyToManyField(
         Teachers, verbose_name="Учителя",
         related_name="subjects_chosen")
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
-    main_teacher = models.ForeignKey(
+    main_teacher = models.OneToOneField(
         Teachers, verbose_name='Классный руководитель',
-        on_delete=models.SET_NULL, null=True, default=None)
+        on_delete=models.SET_NULL, null=True, default=None, related_name='grade')
 
     class Meta:
         ordering = ['number', 'letter']
         verbose_name = "Класс"
         verbose_name_plural = "Классы"
+        unique_together = ('number', 'letter')
 
     def __str__(self):
         return '{}{}'.format(self.number, self.letter)
 
 
 class Students(models.Model):
+    """
+    Model that represents a User with account_type = 3.
+
+    Fields:
+        account (OTO -> User, PK),
+        first_name (str),
+        surname (str),
+        second_name (str),
+        grade (FK -> Grades)
+    """
     account = models.OneToOneField(
         Users, on_delete=models.CASCADE,
-        verbose_name="Пользователь", primary_key=True)
+        verbose_name="Пользователь", primary_key=True, related_name='student')
     first_name = models.CharField(verbose_name="Имя", max_length=100)
     surname = models.CharField(verbose_name="Фамилия", max_length=100)
     second_name = models.CharField(verbose_name="Отчество", max_length=100, blank=True, default="")
@@ -190,7 +215,9 @@ class Lessons(models.Model):
     homework = models.TextField(blank=True, verbose_name='ДЗ')
     theme = models.CharField(max_length=120, verbose_name='Тема')
     subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет')
-    grade = models.ForeignKey(Grades, on_delete=models.CASCADE, verbose_name='Класс')
+    grade = models.ForeignKey(
+        Grades, on_delete=models.CASCADE,
+        verbose_name='Класс')
     control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')
     h_file = models.FileField(
         null=True, default=None, blank=True,
@@ -240,7 +267,7 @@ class AdminMessages(models.Model):
 class Quarters(models.Model):
     number = models.IntegerField(verbose_name="Четверть", choices=(
         (1, "I"), (2, "II"), (3, "III"), (4, "IV")
-    ))
+    ), unique=True)
     begin = models.DateField(verbose_name="Начало четверти")
     end = models.DateField(verbose_name="Конец четверти")
 

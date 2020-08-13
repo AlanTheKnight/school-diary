@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% load static %}
 
 {% block title %}
@@ -16,7 +16,7 @@
 
     {% if search %}
     <p class="text-muted text-center">Показаны новости по запросу "{{ search_text }}"</p>
-    <a href="{% url 'news' %} class="btn btn-primary">Отмена</a>
+    <a href="{% url 'news' %}" class="btn btn-primary">Отмена</a>
     {% endif %}
 
     <!--Search-->
@@ -25,10 +25,9 @@
     </a>
     <div class="collapse" id="search-news-form">
         <div class="card my-4 card-body">
-            <form method="POST">
-                {% csrf_token %}
+            <form method="GET">
                 <div class="form-group">
-                    <input type="text" name="search_text" class="form-control">
+                    <input type="text" name="search" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-primary">Поиск</button>
             </form>
@@ -42,7 +41,7 @@
                 {% for post in news %}
                 <li class="media my-2">
                     <div class="media-body">
-                    <a href="/news/articles/{{ post.slug }}"><h5 class="mt-0">{{ post.title }}</h5></a>
+                    <a href="{% url 'news_post_details' post.slug %}"><h5 class="mt-0">{{ post.title }}</h5></a>
                     <p class="my-0">От {{ post.author }}</p>
                     <p class="text-muted my-0">{{ post.publication_date }}</p>
                     </div>
@@ -58,7 +57,10 @@
     
     {% else %}
         {% if not search %}
-        <p class="text-muted text-justify-center">Новостей пока что нет.</p>
+        <div class="text-center">
+            <img src="{% static 'icons/cactus.svg' %}" alt="" height="60">
+            <p class="my-2">Кажется, тут нет новостей.</p>
+        </div>
         {% else %}
         <p class="text-muted text-justify-center">По вашему запросу не найдено ни одной новости.</p>
         {% endif %}
@@ -69,8 +71,8 @@
     <nav>
         <ul class="pagination justify-content-center">
             {% if news.has_previous %}
-                <li class="page-item"><a href="/news/page/1" class="page-link">&laquo; first</a></li>
-                <li class="page-item"></li><a href="/news/page/{{ news.previous_page_number }}" class="page-link">&lt;</a>
+                <li class="page-item"><a href="{% url 'news' 1 %}" class="page-link">&laquo; first</a></li>
+                <li class="page-item"></li><a href="{% url 'news' news.previous_page_number %}" class="page-link">&lt;</a>
             {% endif %}
 
             {% if news %}
@@ -80,8 +82,8 @@
             {% endif %}
 
             {% if news.has_next %}
-                <li class="page-item"><a href="/news/page/{{ news.next_page_number }}" class="page-link">&gt;</a></li>
-                <li class="page-item"><a href="/news/page/{{ news.paginator.num_pages }}" class="page-link">&raquo;</a></li>
+                <li class="page-item"><a href="{% url 'news' news.next_page_number %}" class="page-link">&gt;</a></li>
+                <li class="page-item"><a href="{% url 'news' news.paginator.num_pages %}" class="page-link">&raquo;</a></li>
             {% endif %}
         </ul>
     </nav>

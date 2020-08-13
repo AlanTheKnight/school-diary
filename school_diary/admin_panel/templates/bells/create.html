@@ -1,0 +1,25 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+<title>Изменить</title>
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card my-5">
+        <div class="card-body">
+            <h2 class="card-title">Изменить объект</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form }}
+                </div>
+                <button type="submit" class="btn btn-primary">Изменить</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

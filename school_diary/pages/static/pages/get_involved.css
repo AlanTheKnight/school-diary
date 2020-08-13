@@ -1,0 +1,19 @@
+#coding-jumbotron {
+    padding: 0;
+    background-color: #353535;
+}
+
+.text-box {
+    padding-top: 40px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.text-box > * {
+    color: white;
+}
+
+.text-box > hr {
+    width: 50%;
+    background-color: white;
+}

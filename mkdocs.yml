@@ -1,0 +1,3 @@
+site_name: Diary56 Documentation
+theme: readthedocs
+dev_addr: 127.0.0.2:8000

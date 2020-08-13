@@ -1,0 +1,19 @@
+{% load static %}
+<div class="col-md-4 col-sm-6 col-lg-3 my-3">
+    <div class="card h-100">
+        <a href="{% url 'homework' %}"><img src="{% static 'homework.png' %}" class="card-img-top" alt="Мой класс"></a>
+        <div class="card-body">
+            <h5 class="card-title">Домашнее задание</h5>
+            <p class="card-text text-muted">Домашнее задание, добавленное учителями</p>
+          </div>
+    </div>
+</div>
+<div class="col-md-4 col-sm-6 col-lg-3 my-3">
+    <div class="card h-100">
+        <a href="{% url 'diary' %}"><img src="{% static 'diary.png' %}" class="card-img-top" alt="Дневник"></a>
+        <div class="card-body">
+            <h5 class="card-title">Дневник</h5>
+            <p class="card-text text-muted">Просмотр своих оценок и успеваемости</p>
+          </div>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% load static %}
 {% load templateLibs %}
 
@@ -11,70 +11,6 @@
     <div class="alert alert-info" role="alert">
         Показано расписание для класса: {{ my_grade }}
     </div>
-
-    {% if today %}
-    <div class="card my-5">
-        <div class="card-body">
-            <div class="card-title text-center">
-                <h4>Расписание на сегодня</h4>
-            </div>
-            <div class="table-responsive-md">
-                <table class="table-sm table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Номер</th>
-                            <th>Предмет</th>
-                            <th>Кабинет</th>
-                            <th>Начало</th>
-                            <th>Конец</th>
-                        </tr>
-                    </thead>
-                    {% for lesson in today %}
-                    <tr>
-                        <td>{{ lesson.number }}</td>
-                        <td>{{ lesson.subject }}</td>
-                        <td>{{ lesson.classroom }}</td>
-                        <td>{{ lesson.number.start }}</td>
-                        <td>{{ lesson.number.end }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-    
-    {% if tomorrow %}
-    <div class="card my-5">
-        <div class="card-body">
-            <div class="card-title text-center">
-                <h4>Расписание на завтра</h4>
-            </div>
-            <div class="table-responsive-md">
-                <table class="table-sm table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Номер</th>
-                            <th>Предмет</th>
-                            <th>Кабинет</th>
-                            <th>Начало</th>
-                            <th>Конец</th>
-                        </tr>
-                    </thead>
-                    {% for lesson in tomorrow %}
-                    <tr>
-                        <td>{{ lesson.number }}</td>
-                        <td>{{ lesson.subject }}</td>
-                        <td>{{ lesson.classroom }}</td>
-                        <td>{{ lesson.start }}</td>
-                        <td>{{ lesson.end }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
     {% for weekday in data %}
 

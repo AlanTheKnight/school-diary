@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
 
@@ -16,19 +16,18 @@
 <div class="container my-5">
     <div class="card card-50">
         <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
+            <form method="GET">
                 <div class="form-group">
-                    <label for="date">Дата</label>
+                    {{ form.date.label_tag }}
                     {{ form.date }}
                 </div>
-                <button type="submit" class="btn btn-primary" name="day">Найти</button>
+                <button type="submit" class="btn btn-primary">Найти</button>
                 <a href="{% url 'homework' %}" class="btn btn-primary">Д/з на неделю</a>
             </form>
         </div>
     </div>
 
-    {% if request.method == "POST" %}
+    {% if "date" in request.GET %}
     <div class="card  card-50">
         <div class="card-body">
             <h2 class="card-title">Домашнее задание на {{ date|date:"d.m, D" }}</h2>
@@ -36,9 +35,12 @@
             {% if lessons %}
             {% for lesson in lessons %}
             <h5>{{ lesson.subject }}</h5>
-            <p>{{ lesson.homework }}</p>
-            {% if lesson.h_file %}
-            <p class="text-muted" style="margin-top: -15px;">Ваш учитель приложил файл к домашнему заданию. <a href="{{ lesson.h_file.url }}">Скачать</a></p>
+            <p>{{ lesson.text }}</p>
+            {% if lesson.file_exists %}
+            <p class="text-muted" style="margin-top: -15px;">
+                Ваш учитель приложил файл к домашнему заданию. <a href="{{ lesson.file.url }}" download>
+                Скачать</a>
+            </p>
             {% endif %}
             <hr>
             {% endfor %}
