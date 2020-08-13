@@ -1,6 +1,5 @@
 from rest_framework import generics
 from timetable import models
-from api import permissions
 from api.timetable import serializers
 import time
 from django.shortcuts import get_object_or_404
@@ -21,7 +20,6 @@ class TimeTableList(generics.ListAPIView):
     """
     Return a timetable for selected grade.
     """
-    permission_classes = [permissions.APIUserPermission]
     serializer_class = serializers.LessonsListSerializer
 
     def get_queryset(self):
