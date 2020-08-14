@@ -13,15 +13,18 @@
     <script src="{% static 'js/savy.min.js' %}"></script> <!--Savy.js-->
     <script src="{% static 'js/charts.min.js' %}"></script> <!--Charts.js-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.js" integrity="sha256-/7FLTdzP6CfC1VBAj/rsp3Rinuuu9leMRGd354hvk0k=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
     <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet"> <!--FontAwesome-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.css" integrity="sha256-b88RdwbRJEzRx95nCuuva+hO5ExvXXnpX+78h8DjyOE=" crossorigin="anonymous" />
     {% block css %}{% endblock %}
 </head>
 
 <body>
+  
   {% include 'base/navbar.html' %}
   {% block content %}{% endblock %}
+  
+  {% block js %}{% endblock %}
 </body>
 
 {% include 'base/footer.html' %}
