@@ -1,6 +1,9 @@
 from django import forms
 
 
+bts_attrs = {'class': 'form-control'}
+
+
 class GetTimeTableForm(forms.Form):
     grade = forms.ChoiceField(label="Класс:", choices=[
         (1, 1),
@@ -13,7 +16,7 @@ class GetTimeTableForm(forms.Form):
         (8, 8),
         (9, 9),
         (10, 10),
-        (11, 11)])
+        (11, 11)], widget=forms.Select(attrs=bts_attrs))
     litera = forms.ChoiceField(label="Буква:", choices=[
         ("А", "А"),
         ("Б", "Б"),
@@ -24,4 +27,4 @@ class GetTimeTableForm(forms.Form):
         ("Ж", "Ж"),
         ("З", "З"),
         ("И", "И"),
-        ("К", "К")])
+        ("К", "К")], widget=forms.Select(attrs=bts_attrs))
