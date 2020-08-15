@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from diary.models import Marks, Students, Subjects, Lessons
 
+
 class SaveMark(APIView):
     def post(self, request):
         data = request.POST
@@ -12,11 +13,7 @@ class SaveMark(APIView):
         student = Students.objects.get(pk=student_id)
         lesson = Lessons.objects.get(pk=lesson_id)
         subject = Subjects.objects.get(name=data['subject'])
-        try:
-            mark = Marks.objects.get(subject=subject, student=student, lesson=lesson)
-            mark.amount = value
-            mark.save()
-        except:
-            mark = Marks(subject=subject, student=student, lesson=lesson, amount=value)
-            mark.save()
+        mark = Marks.objects.get_or_create(subject=subject, student=student, lesson=lesson)[0]
+        mark.amount = value
+        mark.save()
         return Response(status=status.HTTP_200_OK)
