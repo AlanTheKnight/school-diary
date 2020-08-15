@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from diary.models import Marks, Students, Subjects, Lessons
+from diary.models import Marks, Students, Lessons
 
 
 class SaveMark(APIView):
@@ -12,8 +12,7 @@ class SaveMark(APIView):
         value = int(data['value'])
         student = Students.objects.get(pk=student_id)
         lesson = Lessons.objects.get(pk=lesson_id)
-        subject = Subjects.objects.get(name=data['subject'])
-        mark = Marks.objects.get_or_create(subject=subject, student=student, lesson=lesson)[0]
+        mark = Marks.objects.get_or_create(student=student, lesson=lesson)[0]
         mark.amount = value
         mark.save()
         return Response(status=status.HTTP_200_OK)

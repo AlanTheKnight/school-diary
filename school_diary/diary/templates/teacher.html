@@ -195,16 +195,14 @@
         // that.style.backgroundColor = "#d6d6d6"; need?
         // save mark
         var csrf = $("input[name='csrfmiddlewaretoken']").val();
-        var subject = $("#subject").val();
-        console.log([that.name, that.value, subject]);
         $.ajax({
             url:'http://{{request.get_host}}/api/ajax/save_mark',
             method: 'POST',
-            data:{"csrfmiddlewaretoken":csrf,
-                    "name": that.name, 
-                    "value": that.value, 
-                    "subject": subject
-                    },
+            data:{
+                "csrfmiddlewaretoken": csrf,
+                "name": that.name, 
+                "value": that.value, 
+                },
             success: function (data){
                 console.log(data)}
         })
