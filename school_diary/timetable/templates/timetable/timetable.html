@@ -1,6 +1,5 @@
 {% extends 'base/base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
 
 {% block title %}
 <title>Расписание</title>
@@ -14,9 +13,9 @@
 <div class="container my-5">
     <p>Вы можете скачать расписание в формате PDF или просмотреть его онлайн, выбрав свой класс.</p>
     <a class="btn btn-primary text-decoration-none" href="{% url 'timetable_download' %}">Скачать в формате PDF</a>
-    <div class="card my-5">
+    <div class="card my-4">
         <div class="card-body">
-        <form class="my-5">
+        <form class="my-2">
             <div class="form-group">
                 {{ form.grade.label_tag }}
                 {{ form.grade }}
@@ -25,7 +24,7 @@
                 {{ form.litera.label_tag }}
                 {{ form.litera }}
             </div>
-            <button id="timetable_btn" type="button" class="btn btn-primary">Получить расписание</button>
+            <button id="timetable_btn" type="button" class="btn btn-primary">Просмотреть расписание</button>
         </form>
         </div>
     </div>
