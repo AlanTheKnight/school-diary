@@ -127,7 +127,7 @@
                         {% with mark=small_scope|lookup:lesson %}
 
                             <td {% if lesson.control.name == 'Четвертная оценка' %} class="quater-mark" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="year-mark" {% endif %}>
-                                <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная оценка' %} class="inp_table select quater-mark" style="background-color: #e9ecef;" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="inp_table select year-mark" style="background-color: rgb(233,236,239);" {% endif %}>
+                                <select name="{{ student.account_id }}_{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная оценка' %} class="inp_table select quater-mark" style="background-color: #e9ecef;" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="inp_table select year-mark" style="background-color: rgb(233,236,239);" {% endif %}>
                                     <option value="" {% if not mark %}selected{%endif%}></option>
                                     <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
                                     <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</opti+on>
@@ -195,12 +195,12 @@
         that.style.backgroundColor = "#d6d6d6";
         // save mark
         var csrf = $("input[name='csrfmiddlewaretoken']").val();
-        console.log(csrf);
+        console.log([that.name, that.value]);
         $.ajax({
-            url:'https://{{request.get_host}}/api/ajax/save_mark',
+            url:'http://{{request.get_host}}/api/ajax/save_mark',
             method: 'POST',
             data:{"csrfmiddlewaretoken":csrf,
-                    "data": that.value},
+                    "data": [that.name, that.value]},
             success: function (data){
                 console.log(data)}
         })
