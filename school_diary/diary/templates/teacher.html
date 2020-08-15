@@ -192,9 +192,23 @@
     'use strict'
 
     function myfunction(that){
-        that.style.backgroundColor = "#d6d6d6";
+        // that.style.backgroundColor = "#d6d6d6"; need?
+        // save mark
+        var csrf = $("input[name='csrfmiddlewaretoken']").val();
+        var subject = $("#subject").val();
+        console.log([that.name, that.value, subject]);
+        $.ajax({
+            url:'http://{{request.get_host}}/api/ajax/save_mark',
+            method: 'POST',
+            data:{"csrfmiddlewaretoken":csrf,
+                    "name": that.name, 
+                    "value": that.value, 
+                    "subject": subject
+                    },
+            success: function (data){
+                console.log(data)}
+        })
     };
-
     function show_confirm(element){
         let content = element.getAttribute('comment');
         document.getElementById("commenttextfield").value = content;
@@ -202,9 +216,7 @@
         $("#commentmodal").modal('show');
     };
 
-    function myfunction(that){
-        that.style.backgroundColor = "#d6d6d6";
-    };
+
 
     function showdeletebutton(){
         $('#homeworkfiledeletebutton').css('display', 'block');
