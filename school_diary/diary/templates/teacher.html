@@ -193,8 +193,18 @@
 
     function myfunction(that){
         that.style.backgroundColor = "#d6d6d6";
+        // save mark
+        var csrf = $("input[name='csrfmiddlewaretoken']").val();
+        console.log(csrf);
+        $.ajax({
+            url:'https://{{request.get_host}}/api/ajax/save_mark',
+            method: 'POST',
+            data:{"csrfmiddlewaretoken":csrf,
+                    "data": that.value},
+            success: function (data){
+                console.log(data)}
+        })
     };
-
     function show_confirm(element){
         let content = element.getAttribute('comment');
         document.getElementById("commenttextfield").value = content;
@@ -202,9 +212,7 @@
         $("#commentmodal").modal('show');
     };
 
-    function myfunction(that){
-        that.style.backgroundColor = "#d6d6d6";
-    };
+
 
     function showdeletebutton(){
         $('#homeworkfiledeletebutton').css('display', 'block');
