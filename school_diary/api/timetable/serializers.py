@@ -9,11 +9,13 @@ class LessonNumberSerializer(serializers.ModelSerializer):
 
 
 class LessonsSerializer(serializers.ModelSerializer):
-    number = LessonNumberSerializer()
+    n = serializers.IntegerField(source="number.n")
+    start = serializers.TimeField(source="number.start")
+    end = serializers.TimeField(source="number.end")
 
     class Meta:
         model = models.Lessons
-        fields = ['number', 'subject', 'classroom']
+        fields = ['n', 'start', 'end', 'subject', 'classroom']
 
 
 class LessonsListSerializer(serializers.Serializer):

@@ -12,7 +12,8 @@ class SaveMark(APIView):
         value = int(data['value'])
         student = Students.objects.get(pk=student_id)
         lesson = Lessons.objects.get(pk=lesson_id)
-        mark = Marks.objects.get_or_create(student=student, lesson=lesson)[0]
+        subject = lesson.subject
+        mark = Marks.objects.get_or_create(student=student, lesson=lesson, subject=subject)[0]
         mark.amount = value
         mark.save()
         return Response(status=status.HTTP_200_OK)

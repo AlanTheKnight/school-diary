@@ -8,4 +8,5 @@ urlpatterns = [
     path('timetable/', include('api.timetable.urls', namespace="timetable")),
     path('auth/', views.obtain_auth_token),
     path('ajax/', include('api.ajax.urls', namespace='ajax')),
+    path('', include('api.diary.urls', namespace='diary')),
 ]
