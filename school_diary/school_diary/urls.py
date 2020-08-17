@@ -12,9 +12,5 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('grades/', include('grades.urls')),
     path('news/', include('news.urls')),
-    # path('api/timetable', include('timetable.api_urls')),
-    # path('api/news/', include('news.api_urls')),
-    # path('api/minimum/', include('minimum.api_urls')),
-    # path('api/diary/', include('diary.api_urls')),
     path('api/', include('api.urls', namespace="api")),
 ]
