@@ -189,8 +189,6 @@
     </div>
 </div>
 <script>
-    'use strict'
-
     function myfunction(that){
         // that.style.backgroundColor = "#d6d6d6"; need?
         // save mark
@@ -200,8 +198,8 @@
             method: 'POST',
             data:{
                 "csrfmiddlewaretoken": csrf,
-                "name": that.name, 
-                "value": that.value, 
+                "name": that.name,
+                "value": that.value,
                 },
             success: function (data){
                 console.log(data)}
