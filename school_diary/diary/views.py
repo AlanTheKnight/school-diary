@@ -174,7 +174,6 @@ def stats(request, pk, term):
         return render(request, 'access_denied.html', {'message': "В вашем классе\
             не преподают запрашиваемый предмет."})
     lessons = models.Lessons.objects.filter(grade=grade, subject=subject, quarter=term)
-    marks = []
     marks = student.marks_set.filter(subject=subject, lesson__quarter=term)
 
     # If student has no marks than send him a page with info.
