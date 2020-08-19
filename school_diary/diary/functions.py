@@ -282,7 +282,7 @@ def add_comment_to_mark(post_data):
     """
     comment = post_data.get('comment')
     data = post_data.get('commentdata')
-    student_id, lesson_id = data.split("|")[1]
+    student_id, lesson_id = data.split("|")
     student = models.Students.objects.get(account=student_id)
     lesson = models.Lessons.objects.get(id=lesson_id)
     mark = models.Marks.objects.get(student=student, lesson=lesson)
