@@ -127,7 +127,7 @@
                         {% with mark=small_scope|lookup:lesson %}
 
                             <td {% if lesson.control.name == 'Четвертная оценка' %} class="quater-mark" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="year-mark" {% endif %}>
-                                <select name="mark_{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная оценка' %} class="inp_table select quater-mark" style="background-color: #e9ecef;" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="inp_table select year-mark" style="background-color: rgb(233,236,239);" {% endif %}>
+                                <select name="{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная оценка' %} class="inp_table select quater-mark" style="background-color: #e9ecef;" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="inp_table select year-mark" style="background-color: rgb(233,236,239);" {% endif %}>
                                     <option value="" {% if not mark %}selected{%endif%}></option>
                                     <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
                                     <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</option>
@@ -135,10 +135,7 @@
                                     <option value="2" {% if mark and mark.amount == 2 %}selected{% endif %}>2</option>
                                     <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
                                 </select>
-                                {% if mark %}
-
-                                    <button type="button" {% if lesson.control.name == 'Четвертная оценка'  %} class="quater-mark-select" {%  elif lesson.control.name == 'Годовая оценка'  %} class="year-mark-select" {% else %} class="mark-plus-btn" {% endif %} onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" comment="{{ mark.comment }}" >+</button>
-                                {% endif %}
+                                <button type="button" {% if lesson.control.name == 'Четвертная оценка'  %} class="quater-mark-select" {%  elif lesson.control.name == 'Годовая оценка'  %} class="year-mark-select" {% else %} class="mark-plus-btn" {% endif %} onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" name = "{{ student.account_id }}|{{ lesson.id }}" comment="{{ mark.comment }}" {% if not mark %}style="display: none"{% else %} style="display: inline"{% endif %}>+</button>
                             </td>
                         {% endwith %}
                     {% endfor %}
@@ -192,7 +189,16 @@
     function myfunction(that){
         // that.style.backgroundColor = "#d6d6d6"; need?
         // save mark
-        var csrf = $("input[name='csrfmiddlewaretoken']").val();
+        let csrf = $("input[name='csrfmiddlewaretoken']").val();
+        let id = "button[name='"+ that.name.toString()+"']";
+        {#console.log(id);#}
+        let comment_btn = $(id);
+        console.log(comment_btn.html());
+        if (that.value){
+            comment_btn.css("display", "inline");
+        }else{
+            comment_btn.css("display", "none");
+        }
         $.ajax({
             url:'http://{{request.get_host}}/api/ajax/save_mark',
             method: 'POST',

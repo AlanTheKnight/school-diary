@@ -9,7 +9,7 @@ class SaveMark(APIView):
     def post(self, request):
         data = request.POST
         print(data['name'])
-        student_lesson_ids = data['name'][5:].split('|')
+        student_lesson_ids = data['name'].split('|')
         student_id, lesson_id = int(student_lesson_ids[0]), int(student_lesson_ids[1])
         student = Students.objects.get(pk=student_id)
         lesson = Lessons.objects.get(pk=lesson_id)
