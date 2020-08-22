@@ -28,8 +28,10 @@ class SaveMark(APIView):
 
         #     MAKE RESPONSE
         marks = student.marks_set.filter(subject=subject, lesson__quarter=term)
-        sm_avg, avg, _, _, _, _ = get_marks_data(marks)
-        print(student.pk)
+        try:
+            sm_avg, avg, _, _, _, _ = get_marks_data(marks)
+        except ZeroDivisionError:
+            sm_avg = avg = '-'
         data = {
             "id": str(student.pk),
             "sm_avg": sm_avg,
