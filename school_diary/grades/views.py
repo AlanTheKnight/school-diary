@@ -22,6 +22,10 @@ def add_student(request, i):
         if request.method == "POST":
             grade = request.user.teacher.grade
             s.grade = grade
+            # Adding new student to every group in this class.
+            groups = models.Groups.objects.filter(grade=grade)
+            for group in groups:
+                group.students.add(s)
             s.save()
             return redirect('my_grade')
         return render(request, 'grades/add_student.html', {'s': s})
@@ -113,21 +117,24 @@ def students_marks(request, student_id):
         current = functions.get_current_quarter()
         term = current if current != 0 else 1
     term = int(term)
-    subjects = student.grade.subjects.all()
+    groups = models.Groups.objects.filter(grade=student.grade, students=student)
     all_marks = student.marks_set.filter(lesson__quarter=term)
     if not all_marks:
         return render(request, 'grades/marks.html', {'no_marks': True, 'term': term})
+
     d = {}
     max_length, total_missed = 0, 0
-    for s in subjects:
-        marks = all_marks.filter(subject=s.id).order_by('lesson__date')
+    for group in groups:
+        marks = all_marks.filter(lesson__group=group).order_by("lesson__date")
         if len(marks) > max_length:
             max_length = len(marks)
         data = functions.get_marks_data(marks)
-        d[s] = [data[1], data[0], marks]
+        d[group] = [data[1], data[0], marks]
         total_missed += data[5]
-    for subject in d:
-        d[subject].append(range(max_length - len(d[subject][2])))
+
+    for group in d:
+        d[group].append(range(max_length - len(d[group][2])))
+
     context = {
         'student': student,
         'd': d,
@@ -155,6 +162,10 @@ def delete_student(request, pk: int):
         return HttpResponseForbidden("Вы пытаетесь удалить ученика из другого класса.")
     if request.method == "POST":
         student.grade = None
+        # Prevent this student from displaying in the grade.
+        groups = models.Groups.objects.filter(grade=me.grade)
+        for group in groups:
+            group.remove(student)
         student.save()
         return redirect('my_grade')
     return render(request, 'grades/delete_student.html', {'s': student})

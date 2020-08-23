@@ -82,11 +82,12 @@
     
     <!--Big table form with choosing marks.-->
 
-    <form method="POST" >
     {% csrf_token %}
     <div class="my-3">
-{#        <button type="submit" class="btn btn-success" name="save_marks">Сохранить изменения</button>#}
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">Добавить урок</button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">
+            <i class="fas fa-plus"></i> Добавить урок
+        </button>
+        <a href="{% url 'visible-students' %}" class="btn btn-primary"><i class="fas fa-tasks"></i> Настроить</a>
     </div>
 
     {% if lessons %}
@@ -118,10 +119,10 @@
                 <tr>
                     <td scope="row" style="width: 20%;">{{ student.surname }} {{ student.first_name }}</td>
                     <td id="{{ student.pk }}">
-                        {{ avg|lookup:student.pk|average }}
+                        {{ small_scope|lookup:"avg"|lookup:0 }}
                     </td>
                     <td id = "s_{{ student.pk }}">
-                        {{ avg|lookup:student.pk|smart_average }}
+                        {{ small_scope|lookup:"avg"|lookup:1 }}
                     </td>
                     {% for lk, lesson in lessons.items %}
                         {% with mark=small_scope|lookup:lesson %}
@@ -144,8 +145,10 @@
             </tbody>
             </table>
     </div>
-    <p><small class="text-muted">Серым цветом выделяются поля с оценками, которые Вы изменили. Перед выходом с этой страницы не забудьте сохранить
-        все изменения.<br>Вы можете нажать на дату урока и редактировать информацию о выбранном уроке.
+    <p><small class="text-muted">
+        Выставленные оценки сохраняются автоматически.
+        <br>
+        Нажмите на любой из уроков, чтобы редактировать его.
     </small></p>
     {% else %}
     <div class="alert alert-info mt-5">
@@ -153,7 +156,6 @@
     </div>
     {% endif %}
 
-    </form>
 
     {% include 'teacher_page/create_lesson.html' %}
 
@@ -186,12 +188,17 @@
     </div>
 </div>
 <script>
+    function renderAvg(s) {
+        if (s != "-")
+            return s.toPrecision(2).replace(".", ",")
+        return s;
+    }
+
     function myfunction(that){
         // that.style.backgroundColor = "#d6d6d6"; need?
         // save mark
         let csrf = $("input[name='csrfmiddlewaretoken']").val();
         let id = "button[name='"+ that.name.toString()+"']";
-        {#console.log(id);#}
         let comment_btn = $(id);
         console.log(comment_btn.html());
         if (that.value){
@@ -199,19 +206,22 @@
         }else{
             comment_btn.css("display", "none");
         }
+        let value = null;
+        if (that.value != "")
+            value = that.value;
         $.ajax({
             url:'http://{{request.get_host}}/api/ajax/save_mark',
             method: 'POST',
             data:{
                 "csrfmiddlewaretoken": csrf,
                 "name": that.name,
-                "value": that.value,
+                "value": value,
                 },
             success: function (data){
-                let sm_avg = $("#s_"+data.id);
-                let avg = $("#"+data.id);
-                sm_avg.html(data.sm_avg);
-                avg.html(data.avg);
+                let sm_avg = $("#s_"+data.pk);
+                let avg = $("#"+data.pk);
+                sm_avg.html(renderAvg(data.sm_avg));
+                avg.html(renderAvg(data.avg));
             }
         })
     };

@@ -77,9 +77,9 @@
 
             </thead>
             <tbody>
-                {% for subject, marks in d.items %}
+                {% for group, marks in d.items %}
                     <tr>
-                        <td class="md-width">{{ subject }}</td>
+                        <td class="md-width">{{ group.subject }}</td>
                         <td class="text-center md-width">{{ marks.0 }}</td>
                         <td class="text-center md-width">{{ marks.1 }}</td>
                         {% for mark in marks.2 %}

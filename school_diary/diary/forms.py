@@ -23,7 +23,7 @@ class LessonCreationForm(forms.ModelForm):
         widgets = {
             'h_file': forms.FileInput(attrs=bts4attr_file),
             'date': forms.DateInput(attrs={
-                'class': 'form-control',
+                'class': 'form-control', 'type': 'date'
             }),
             'theme': forms.TextInput(attrs=bts4attr),
             'homework': forms.Textarea(attrs=bts4attr),
@@ -47,8 +47,7 @@ class LessonCreationForm(forms.ModelForm):
     def save(self, commit=True, **kwargs):
         instance = super(LessonCreationForm, self).save(commit=False)
         instance.quarter = functions.get_quarter_by_date(str(self.cleaned_data['date']))
-        instance.subject = kwargs['subject']
-        instance.grade = kwargs['grade']
+        instance.group = kwargs['group']
         if kwargs.get('deletefile'):
             instance.h_file = None
         if commit:
@@ -62,3 +61,12 @@ class QuarterSelectionForm(forms.Form):
         choices=[(1, "I"), (2, "II"), (3, "III"), (4, "IV")],
         widget=forms.Select(attrs=bts4attr)
     )
+
+
+class VisibleStudentsForm(forms.ModelForm):
+    class Meta:
+        model = models.Groups
+        fields = ['students']
+        widgets = {
+            "students": forms.CheckboxSelectMultiple(attrs={"class": "check-input"})
+        }

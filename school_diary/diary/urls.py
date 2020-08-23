@@ -10,6 +10,7 @@ urlpatterns = [
     path('diary/', views.diary, name='diary'),
     path('diary/<int:pk>/<int:term>/', views.stats, name='statistics'),
     path('diary/homework/', views.homework, name='homework'),
+    path('diary/visible-students/', views.visible_students, name="visible-students")
 
 ]
 

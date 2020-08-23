@@ -20,6 +20,23 @@ NO_GRADE_CONTEXT = {
 
 @teacher_only
 @login_required(login_url="/login/")
+def visible_students(request):
+    grade, subject, term = functions.get_session_data(
+        request.session, models.Grades.objects.all(), models.Subjects.objects.all()
+    )
+    group = models.Groups.objects.get(subject=subject, grade=grade)
+    form = forms.VisibleStudentsForm(instance=group)
+    form.fields["students"].queryset = grade.students_set.all()
+    if request.method == "POST":
+        form = forms.VisibleStudentsForm(request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            return redirect("diary")
+    return render(request, "visible_students.html", context={"form": form})
+
+
+@teacher_only
+@login_required(login_url="/login/")
 @transaction.atomic
 def lesson_page(request, pk):
     """Page where teachers can edit lesson."""
@@ -33,12 +50,13 @@ def lesson_page(request, pk):
         })
     form = forms.LessonCreationForm(instance=lesson)
     grade, subject, term = functions.get_session_data(request.session)
-    form.fields["control"].queryset = functions.create_controls(grade, subject, term)
+    group = models.Groups.objects.get(subject=subject, grade=grade)
+    form.fields["control"].queryset = functions.create_controls(group, term)
     if request.method == "POST":
         form = forms.LessonCreationForm(request.POST, request.FILES, instance=lesson)
         if form.is_valid():
             deletefile = request.POST.get("deletefile") is not None
-            form.save(subject=subject, grade=grade, deletefile=deletefile)
+            form.save(group=group, deletefile=deletefile)
             return redirect('diary')
     context = {'form': form, 'lesson': lesson}
     return render(request, 'lesson_page.html', context)
@@ -72,21 +90,24 @@ def students_diary(request):
         Попросите Вашего классного руководителя добавить Вас в класс."})
     if request.method == "POST" and 'all' in request.POST:
         chosen_quarter = int(request.POST.get('term'))
-        subjects = grade.subjects.all()
+        groups = models.Groups.objects.filter(students=student, grade=grade)
         all_marks = student.marks_set.filter(lesson__quarter=chosen_quarter)
         if not all_marks:
             return render(request, 'no_marks.html')
+
         d = {}
         max_length, total_missed = 0, 0
-        for s in subjects:
-            marks = all_marks.filter(subject=s.id).order_by('lesson__date')
+        for group in groups:
+            marks = all_marks.filter(lesson__group=group).order_by("lesson__date")
             if len(marks) > max_length:
                 max_length = len(marks)
             data = functions.get_marks_data(marks)
-            d[s] = [data[1], data[0], marks]
+            d[group] = [data[1], data[0], marks]
             total_missed += data[5]
-        for subject in d:
-            d[subject].append(range(max_length - len(d[subject][2])))
+
+        for group in d:
+            d[group].append(range(max_length - len(d[group][2])))
+
         context = {
             'student': student,
             'd': d,
@@ -99,50 +120,78 @@ def students_diary(request):
 
 
 def teachers_diary(request):
-    teacher = models.Teachers.objects.get(account=request.user)  # Current teacher
-    available_classes = models.Grades.objects.filter(teachers=teacher).order_by('number', 'letter')
+    """
+    Returns:
+        If teacher doesn't have any grades or subjects available, return
+        access denied page.
+        Otherwise it returns "teacher.html" rendered page.
+    """
+
+    # Current teacher and it's available subjects & grades
+    teacher = models.Teachers.objects.get(account=request.user)
     available_subjects = teacher.subjects.all().order_by('name')
-    if not (available_classes and available_subjects):
+    available_grades = models.Grades.objects.filter(
+        teachers=teacher).order_by('number', 'letter')
+
+    if not (available_grades and available_subjects):
         return render(request, 'access_denied.html', {
             'message': "Пока что вы не указаны как учитель ни в одном классе."
         })
+
+    # If teacher've just chosen grade, subject & quarter, update these
+    # values in current session.
     if request.method == 'POST' and 'getgrade' in request.POST:
         subject = available_subjects.get(name=request.POST.get('subject'))
         grade = request.POST.get('grade')
         term = int(request.POST.get('term'))
-        grade = available_classes.get(number=int(grade[0:-1]), subjects=subject, letter=grade[-1])
+        grade = available_grades.get(number=int(grade[0:-1]), letter=grade[-1])
         functions.load_to_session(
             request.session,
             term=term, subject=subject.id, grade=grade.id
         )
         return redirect('diary')
-    if not functions.each_contains(request.session, NEEDED_IN_SESSION):
+
+    if not functions.session_is_ok(request.session):
         current_quarter = functions.get_current_quarter()
         if not current_quarter:
             current_quarter = 1
         request.session['subject'] = available_subjects[0].id  # Loading default data into session
-        request.session['grade'] = available_classes[0].id
+        request.session['grade'] = available_grades[0].id
         request.session['term'] = current_quarter
-    # Creating table with marks and setting up available controls.
-    grade_, subject_, term_ = functions.get_session_data(
-        request.session, grades=available_classes, subjects=available_subjects)
+
+    # Finally, grade, subject & term chosen by teacher
+    grade, subject, term = functions.get_session_data(
+        request.session, grades=available_grades, subjects=available_subjects)
+
+    if subject not in grade.subjects.all():
+        return render(request, 'access_denied.html', {
+            'message': "Предмет \"{}\" не изучается в {} классе".format(subject, grade)
+        })
+
+    # UPDATE: group retrieving
+    group = models.Groups.objects.get_or_create(grade=grade, subject=subject)
+    if group[1]:  # If it hasn't been created yet
+        group[0].set_default_students()
+    group = group[0]
+
+    # New lesson creation
     form = forms.LessonCreationForm()
     if request.method == "POST" and 'createlesson' in request.POST:
         form = forms.LessonCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save(subject=subject_, grade=grade_)
+            form.save(group=group)
+
     context = {
         'TEACHER': teacher, 'subjects': available_subjects,
-        'grades': available_classes, 'current_class': grade_,
-        'current_term': term_, 'current_subject': subject_,
+        'grades': available_grades, 'current_class': grade,
+        'current_term': term, 'current_subject': subject,
         'form': form
     }
-    if request.method == "POST":
-        if 'addcomment' in request.POST:
-            functions.add_comment_to_mark(request.POST)
-        else:
-            functions.save_marks(request.POST, grade_, subject_)
-    functions.update_context(context, grade_, term_, subject_)
+
+    # Add comment to mark (TODO: replace this code with Ajax request to API)
+    if request.method == "POST" and 'addcomment' in request.POST:
+        functions.add_comment_to_mark(request.POST)
+    functions.update_context(context, group, term)
     return render(request, 'teacher.html', context)
 
 
@@ -173,8 +222,9 @@ def stats(request, pk, term):
     if subject not in student.grade.subjects.all():
         return render(request, 'access_denied.html', {'message': "В вашем классе\
             не преподают запрашиваемый предмет."})
-    lessons = models.Lessons.objects.filter(grade=grade, subject=subject, quarter=term)
-    marks = student.marks_set.filter(subject=subject, lesson__quarter=term)
+    group = get_object_or_404(models.Groups, grade=grade, subject=subject)
+    lessons = models.Lessons.objects.filter(group=group, quarter=term)
+    marks = student.marks_set.filter(lesson__group=group, lesson__quarter=term)
 
     # If student has no marks than send him a page with info.
     # Otherwise, student will get a page with statistics and his results.
