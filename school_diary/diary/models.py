@@ -195,7 +195,7 @@ class Administrators(models.Model):
 
 class Controls(models.Model):
     name = models.CharField(max_length=120, verbose_name='Вид работы')
-    weight = models.FloatField(verbose_name=' Коэффицент', default=1)
+    weight = models.FloatField(verbose_name='Коэффицент', default=1)
 
     class Meta:
         verbose_name = "Вид работы"
@@ -214,10 +214,10 @@ class Lessons(models.Model):
     quarter = models.SmallIntegerField(verbose_name='Четверть', null=True, default=None)
     homework = models.TextField(blank=True, verbose_name='ДЗ')
     theme = models.CharField(max_length=120, verbose_name='Тема')
-    subject = models.ForeignKey(Subjects, on_delete=models.PROTECT, verbose_name='Предмет')
-    grade = models.ForeignKey(
-        Grades, on_delete=models.CASCADE,
-        verbose_name='Класс')
+    group = models.ForeignKey(
+        "Groups", on_delete=models.PROTECT,
+        verbose_name="Группа", null=True, default=None
+    )
     control = models.ForeignKey(Controls, on_delete=models.PROTECT, verbose_name='Контроль')
     h_file = models.FileField(
         null=True, default=None, blank=True,
@@ -229,15 +229,15 @@ class Lessons(models.Model):
         ordering = ['date']
 
     def __str__(self):
-        return '{} {} {}'.format(self.subject, self.grade, self.date)
+        return '{} {}'.format(str(self.group), self.date)
 
 
 class Marks(models.Model):
-    student = models.ForeignKey(Students, on_delete=models.CASCADE, verbose_name="Ученик")
+    # If student is deleted, delete all his marks
+    student = models.ForeignKey("Students", on_delete=models.CASCADE, verbose_name="Ученик")
     amount = models.IntegerField(verbose_name="Балл", null=True, default=None)
-    lesson = models.ForeignKey(Lessons, on_delete=models.CASCADE, verbose_name='Урок')
-    subject = models.ForeignKey(
-        Subjects, on_delete=models.PROTECT, verbose_name='Предмет', null=True, default=None)
+    # Delete all marks if lesson is deleted
+    lesson = models.ForeignKey("Lessons", on_delete=models.CASCADE, verbose_name='Урок')
     comment = models.TextField(blank=True, verbose_name='комментарий', default="")
 
     class Meta():
@@ -278,3 +278,29 @@ class Quarters(models.Model):
 
     def __str__(self):
         return "Четверть #{}".format(self.number)
+
+# TODO: When new student is added to grade, add him to group's students
+
+
+class Groups(models.Model):
+    """
+    Class that combines grades and subjects.
+    """
+    grade = models.ForeignKey(
+        "Grades", on_delete=models.PROTECT, verbose_name="Класс")
+    subject = models.ForeignKey(
+        "Subjects", on_delete=models.PROTECT, verbose_name="Предмет")
+    students = models.ManyToManyField(
+        "Students", verbose_name="Отображаемые ученики")
+
+    def set_default_students(self):
+        qs = self.grade.students_set.all()
+        self.students.set(qs)
+
+    def __str__(self):
+        return "{} - {}".format(self.grade, self.subject)
+
+    class Meta:
+        verbose_name = "Группа"
+        verbose_name_plural = "Группы"
+        unique_together = ("grade", "subject")

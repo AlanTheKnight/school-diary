@@ -13,18 +13,18 @@ class UsersAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Students)
-class UsersAdmin(admin.ModelAdmin):
+class StudentsAdmin(admin.ModelAdmin):
     list_display = ('account', 'first_name', 'surname', 'grade')
     list_filter = ('grade',)
 
 
 @admin.register(models.Administrators)
-class UsersAdmin(admin.ModelAdmin):
+class AdministratorsAdmin(admin.ModelAdmin):
     list_display = ('account', 'first_name', 'surname')
 
 
 @admin.register(models.Teachers)
-class UsersAdmin(admin.ModelAdmin):
+class TeachersAdmin(admin.ModelAdmin):
     list_display = ('account', 'first_name', 'surname')
     list_filter = ('subjects',)
 
@@ -36,4 +36,4 @@ admin.site.register(models.AdminMessages)
 admin.site.register(models.Controls)
 admin.site.register(models.Subjects)
 admin.site.register(models.Quarters)
-
+admin.site.register(models.Groups)

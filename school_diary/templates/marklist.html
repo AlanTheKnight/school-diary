@@ -36,9 +36,9 @@
 
             </thead>
             <tbody>
-                {% for subject, marks in d.items %}
+                {% for group, marks in d.items %}
                     <tr>
-                        <td class="md-width"><a href="{% url 'statistics' subject.id term %}">{{ subject }}</a></td>
+                        <td class="md-width"><a href="{% url 'statistics' group.subject.id term %}">{{ group.subject }}</a></td>
                         <td class="text-center md-width">{{ marks.0 }}</td>
                         <td class="text-center md-width">{{ marks.1 }}</td>
                         {% for mark in marks.2 %}
