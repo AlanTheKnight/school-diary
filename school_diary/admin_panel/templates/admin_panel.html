@@ -113,7 +113,7 @@
                     <i class="fas fa-download" style="color: black;"></i>
                 </td>
                 <td>
-                    <a href="{% url 'export_marks' %}">Выгрузка оценок</a>
+                    <a class="text-muted" href="#">Выгрузка оценок (обновление 1.2.1)</a>
                 </td>
             </tr>
             <tr>
@@ -121,7 +121,7 @@
                     <i class="fas fa-users" style="color: black;"></i>
                 </td>
                 <td>
-                    <a href="#">Классы</a>
+                    <a href="{% url 'grades:dashboard' %}">Классы</a>
                 </td>
             </tr>
             <tr>
@@ -129,18 +129,20 @@
                     <i class="fas fa-table" style="color: black;"></i>
                 </td>
                 <td>
-                    <a href="#">Оценки</a>
+                    <a href="#" class="text-muted">Оценки (обновление 1.2.1)</a>
                 </td>
             </tr>
         </tbody>
         
     </table>
+    {% if request.user.account_type == 0 %}
     <div class="alert alert-secondary">
-        <i class="fas fa-info px-3"></i>Вы можете перейти в <a href="/admin-extended">расширенную версию</a> панели
+        <i class="fas fa-info px-3"></i>Как admin, вы можете перейти в <a href="/admin-extended">расширенную версию</a> панели
     </div>
-    <div class="alert alert-secondary">
+    {% endif %}
+    <!-- <div class="alert alert-secondary">
         <i class="fas fa-question px-3"></i>Узнать как пользоваться панелью
-    </div>
+    </div> -->
 
 </div>
 {% endblock %}
