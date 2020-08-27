@@ -1,9 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from diary.decorators import admin_only, unauthenticated_user, allowed_users
 from django.contrib import messages
 from . import forms
+from diary import models
+from diary.decorators import student_only
 
 
 @unauthenticated_user
@@ -114,3 +116,10 @@ def admin_message(request):
             return redirect('profile')
     form = forms.AdminMessageCreationForm()
     return render(request, 'admin_messages.html', {'form': form})
+
+
+@student_only
+def teacher_page(request, pk: int):
+    t = get_object_or_404(models.Teachers, account_id=pk)
+    context = {'teacher': t}
+    return render(request, "teacher_page.html", context)

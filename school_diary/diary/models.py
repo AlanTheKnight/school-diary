@@ -131,11 +131,11 @@ class Grades(models.Model):
     letter = models.CharField(max_length=2, choices=LITERAS, verbose_name="Буква")
     teachers = models.ManyToManyField(
         Teachers, verbose_name="Учителя",
-        related_name="subjects_chosen")
+        related_name="grades")
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
     main_teacher = models.OneToOneField(
         Teachers, verbose_name='Классный руководитель',
-        on_delete=models.SET_NULL, null=True, default=None, related_name='grade')
+        on_delete=models.SET_NULL, null=True, default=None, related_name='grade_curated')
 
     class Meta:
         ordering = ['number', 'letter']

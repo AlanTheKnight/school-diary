@@ -14,7 +14,7 @@
 {% block content %}
 <div class="container my-5">
     <h1 class="text-center">{{ subject.name }}</h1>
-    <p class="lead">Ваши оценки за {{ term }} четверть:</p>
+    <h2 class="mb-4">Оценки за {{ term }} четверть</h2>
     <div class="table-responsive">
     <table class="table table-sm text-center">
         <thead>
@@ -45,7 +45,7 @@
         </tbody>
     </table>
     </div>
-    <p class="lead mt-3">Статистика:</p>
+    <h2 class="mt-3">Статистика</h2>
     <div class="container w-75">
         <p>Оценки за эту четверть:</p>
         <canvas id="MyChart"></canvas>
@@ -94,6 +94,19 @@
         });
 
     </script>
+    <div class="mt-3">
+        <h2>Учителя</h2>
+        {% if not teachers %}
+            В вашем классе нет учителей, преподающих этот предмет.
+        {% endif %}
+        <ul>
+            {% for teacher in teachers %}
+            <li><a href="{% url 'teacher_page' teacher.pk %}">
+                {{ teacher.surname }} {{ teacher.first_name }} {{ teacher.second_name }}
+            </a></li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
 <script>
     $(document).ready(function(){

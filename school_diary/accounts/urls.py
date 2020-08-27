@@ -11,6 +11,7 @@ urlpatterns = [
     path('admins/create', views.admin_register, name='admins_create'),
     path('teachers/create/', views.teacher_register, name='teachers_create'),
     path('new-message/', views.admin_message, name="message_to_admin"),
+    path('teacher/<int:pk>', views.teacher_page, name="teacher_page"),
 
     path(
         'reset_password/', auth_views.PasswordResetView.as_view(

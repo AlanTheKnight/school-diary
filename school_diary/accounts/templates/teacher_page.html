@@ -1,0 +1,50 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="card card-body">
+        <div class="text-center">
+            {% if teacher.avatar %}
+                <img src="{{ teacher.avatar.url }}" alt="" id="profile-picture">
+            {% else %}
+                <img src="{% static 'user.png' %}" alt="" id="profile-picture">
+            {% endif %}
+        </div>
+        <div class="mt-2">
+            <h1 class="text-center">{{ teacher.surname }} {{ teacher.first_name }} {{ teacher.second_name }}</h1>
+            <h3>Преподаваемые предметы</h3>
+            <ul>
+                {% for subject in teacher.subjects.all %}
+                    <li>{{ subject.name }}</li>
+                {% endfor %}
+            </ul>
+            <h3>Классы</h3>
+            <ul>
+                {% for grade in teacher.grades.all %}
+                    <li>{{ grade }}</li>
+                {% endfor %}
+            </ul>
+            {% if teacher.grade_curated %}
+            <p>Является классным руководителем в {{ teacher.grade_curated }}</p>
+            {% endif %}
+            <h3>Контактная информация</h3>
+            <p>Электронная почта: {{ teacher.account.email }}</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block css %}
+<style>
+    #profile-picture {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        object-position: center center;
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}

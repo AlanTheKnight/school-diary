@@ -235,6 +235,7 @@ def stats(request, pk, term):
         for i in range(5, 1, -1):
             data.append(amounts.count(i))
         data.append(missed)
+        teachers = grade.teachers.filter(subjects=subject)
         context = {
             'term': term,
             'lessons': lessons,
@@ -245,9 +246,9 @@ def stats(request, pk, term):
             'smartavg': sm_avg,
             'quantity': quantity,
             'needed': needed,
-            'missed': missed
+            'missed': missed,
+            'teachers': teachers
         }
-
         return render(request, 'results.html', context)
     return render(request, 'no_marks.html')
 
