@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from diary.decorators import admin_only, unauthenticated_user, allowed_users
 from django.contrib import messages
 from . import forms
-import diary.models as models
 
 
 @unauthenticated_user
@@ -52,22 +51,14 @@ def user_profile(request):
     """
     User profile page (diary56.ru/profile/)
     """
-    if request.user.account_type == 0:
-        data = models.Users.objects.get(email=request.user)
-    if request.user.account_type == 1:
-        data = models.Administrators.objects.get(account=request.user)
     if request.user.account_type == 2:
-        data = models.Teachers.objects.get(account=request.user)
         if request.method == "POST":
             if 'image-upload' in request.POST:
-                data.avatar = request.FILES.get('avatar')
-                data.save()
+                request.user.teacher.avatar = request.FILES.get('avatar')
+                request.user.teacher.save()
             elif 'image-delete' in request.POST:
-                data.avatar.delete()
-    if request.user.account_type == 3:
-        data = models.Students.objects.get(account=request.user)
-    context = {'data': data}
-    return render(request, 'profile.html', context)
+                request.user.teacher.avatar.delete()
+    return render(request, 'profile.html')
 
 
 @login_required(login_url="/login/")

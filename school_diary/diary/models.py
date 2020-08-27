@@ -180,7 +180,7 @@ class Students(models.Model):
 class Administrators(models.Model):
     account = models.OneToOneField(
         Users, on_delete=models.CASCADE,
-        verbose_name="Пользователь", primary_key=True)
+        verbose_name="Пользователь", primary_key=True, related_name="admin")
     first_name = models.CharField(verbose_name="Имя", max_length=100)
     surname = models.CharField(verbose_name="Фамилия", max_length=100)
     second_name = models.CharField(verbose_name="Отчество", max_length=100, blank=True, default="")

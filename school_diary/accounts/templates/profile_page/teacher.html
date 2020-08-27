@@ -1,0 +1,64 @@
+{% load static %}
+
+{% with teacher=request.user.teacher %}
+    <div class="profile">
+        <div class="text-center">
+            {% if teacher.avatar %}
+            <img src="{{ teacher.avatar.url }}" alt="Учитель" height=100 width=100 style="object-fit: cover;" class="avatar">
+            {% else %}
+            <img src="{% static 'user_types/teachers.png' %}" alt="Учитель" height=100 width=100 style="object-fit: cover;" class="avatar">
+            {% endif %}
+            <p class="text-muted">Учитель</p>
+        </div>
+    
+        <ul class="nav nav-tabs" id="accounttab" role="tablist">
+            <li class="nav-item">
+            <a class="nav-link active" id="account-tab" data-toggle="tab" href="#account" role="tab" aria-controls="account" aria-selected="false">Профиль</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Настройки</a>
+            </li>
+        </ul>
+        <div class="tab-content my-3" id="accounttabcontent">
+            <div class="tab-pane fase show active" id="account" role="tabpanel" aria-labelledby="account-tab">
+                <h4><i class="fas fa-user-circle"></i> Данные аккаунта</h4>
+                <div class="my-3" >
+                <p>Адрес электронной почты: {{ user.email }}</p>
+                <p>Имя: {{ teacher.first_name }}</p>
+                <p>Фамилия: {{ teacher.surname }}</p>
+                <p>Отчество: {{ teacher.second_name }}</p>
+                </div>
+                
+            </div>
+            <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                <h4><i class="fas fa-user"></i> Изменить аватар</h4>
+                {% if teacher.avatar.url != '/media/teachers/teachers.png' %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm" name='image-delete'>Удалить аватар</button>
+                </form>
+                {% else %}
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="custom-file">
+                            <input class="custom-file-input" name='avatar' type="file" accept="image/*" id="avatar-upload">
+                            <label class="custom-file-label avatar-upload" for="avatar-upload">Загрузите аватар</label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-sm" name='image-upload'>Изменить</button>
+                </form>
+                {% endif %}
+                <hr>
+                <h4><i class="fas fa-key"></i> Сбросить пароль</h4>
+                <p>Перейдите по ссылке для сброса пароля:</p>
+                <a href="{% url 'reset_password' %}" class="btn btn-primary btn-sm">Сбросить пароль</a>
+                <hr>
+                <h4 class="mt-3"><i class="fas fa-edit"></i> Изменить данные</h4>
+                <p>Вы не можете изменять свои данные самостоятельно, но если в указанной информации есть ошибка, отправьте
+                    администратору просьбу изменить Ваши данные.</p>
+                <a href="{% url 'message_to_admin' %}" class="btn btn-primary btn-sm">Отправить</a>
+            </div>
+        </div>
+    </div>
+{% endwith %}

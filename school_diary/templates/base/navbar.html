@@ -29,7 +29,11 @@
             </ul>
             {% if user.is_authenticated %}
             <div class="btn-group dropdown">
+                {% if request.user.account_type == 2 and request.user.teacher.avatar %}
+                <img class="dropdown-toggle" src="{{ request.user.teacher.avatar.url }}" alt="" width="45" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" title="Аккаунт" id="avatar"></button>
+                {% else %}
                 <img class="dropdown-toggle" src="{% static 'user.png' %}" alt="" width="45" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" title="Аккаунт"></button>
+                {% endif %}
                 <div class="dropdown-menu" style="margin-top: 0px;">
                 <a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Аккаунт</a>
                 <a class="dropdown-item" href="{% url 'logout' %}" onclick="clearstorage();"><i class="fas fa-sign-out-alt"></i> Выйти</a>
@@ -42,3 +46,16 @@
         </div>
     </div>
 </nav>
+
+
+{% block css %}
+<style>
+#avatar {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+}
+</style>
+{% endblock %}
