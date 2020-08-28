@@ -22,7 +22,7 @@ class LessonCreationForm(forms.ModelForm):
         )
         widgets = {
             'h_file': forms.FileInput(attrs=bts4attr_file),
-            'date': forms.DateInput(attrs={
+            'date': forms.DateInput(format=('%Y-%m-%d'), attrs={
                 'class': 'form-control', 'type': 'date'
             }),
             'theme': forms.TextInput(attrs=bts4attr),
