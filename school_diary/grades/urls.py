@@ -6,7 +6,6 @@ urlpatterns = [
     path('add-grade/', views.create_grade_page, name='create_grade'),
     path('my-grade/', views.my_grade, name='my_grade'),
     path('delete-student/<int:pk>', views.delete_student, name='delete_student'),
-    path('students_marks/', views.view_students_marks, name='students_marks'),
     path('view_marks/<int:student_id>/', views.students_marks, name='view_marks'),
     path('settings', views.settings, name='grade-settings'),
 ]
