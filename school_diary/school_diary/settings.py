@@ -189,11 +189,9 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Administrators list and their emails to get Django reports.
 ADMINS = [
-    (
-        'Maxim', 'alantheknight2@gmail.com',
-        'IdeaSoft', 'ideasoft-spb@yandex.ru',
-        'Pasha', 'pashs.ba@gmail.com'
-    )
+    ('Maxim', 'alantheknight2@gmail.com'),
+    ('IdeaSoft', 'ideasoft-spb@yandex.ru'),
+    ('Pasha', 'pashs.ba@gmail.com')
 ]
 
 if not DEBUG:

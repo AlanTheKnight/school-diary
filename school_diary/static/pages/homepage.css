@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600&display=swap');
+#join-us-jumbotron > *{
+    font-family: 'Nunito', sans-serif;
+    opacity: 0;
+    animation: show 3s ease-out 1s forwards;
+}
+#join-us-jumbotron {
+    background-image: url('/static/Cover.png');
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.13);
+    display: none;
+}
+@keyframes show {
+    from {opacity: 0;}
+    to {opacity: 100;}
+}
