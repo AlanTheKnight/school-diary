@@ -14,7 +14,7 @@ def add_student(request, i):
     """
     Function defining the process of adding new student to a grade and confirming it.
     """
-    if not hasattr(request.user.teacher, 'grade'):
+    if not hasattr(request.user.teacher, 'grade_curated'):
         context = {'message': "Вы не классный руководитель."}
         return render(request, 'access_denied.html', context)
     s = models.Students.objects.get(account__email=i)
@@ -28,7 +28,7 @@ def add_student(request, i):
                 group.students.add(s)
             s.save()
             return redirect('my_grade')
-        return render(request, 'grades/add_student.html', {'s': s})
+        return render(request, 'grades/add_student.htmls', {'s': s})
     context = {
         'message': "Вы пытаетесь добавить к себе в класс ученика, который уже состоит в классе."
     }
@@ -60,10 +60,10 @@ def my_grade(request):
     Page with information about teacher's grade.
     """
     me = request.user.teacher
-    if not hasattr(me, 'grade') or me.grade is None:
+    if not hasattr(me, 'grade_curated') or me.grade_curated is None:
         # Teacher has no grade connected.
         return render(request, 'grades/no_grade.html')
-    grade = me.grade
+    grade = me.grade_curated
     students = grade.students_set.all()
     context = {
         'grade': grade,
@@ -84,31 +84,12 @@ def my_grade(request):
     return render(request, 'grades/my_grade.html', context)
 
 
-def view_students_marks(request):
-    me = models.Teachers.objects.get(account=request.user)
-    if request.method == "POST":
-        term = int(request.POST.get('term'))
-    else:
-        term = functions.get_quarter_by_date(str(datetime.date.today()))
-
-    class_ = functions.check_if_teacher_has_class(me)
-    if class_:
-        students = models.Students.objects.filter(grade=class_)
-        context = {
-            'students': students,
-            'term': term,
-        }
-        return render(request, 'grades/grade_marks.html', context)
-    else:
-        return render(request, 'access_denied.html', {
-                'message': 'Вы не являетесь классным руководителем.'
-            })
-
-
 def students_marks(request, student_id):
     teacher = request.user.teacher
+    if not hasattr(teacher, 'grade_curated') or teacher.grade_curated is None:
+        return render(request, 'grades/no_grade.html')
     student = get_object_or_404(models.Students, pk=student_id)
-    if student.grade != teacher.grade:
+    if student.grade != teacher.grade_curated:
         return render(request, 'access_denied.html', {
             'message': 'Вы не можете просматривать оценки учеников из другого класса.'
         })
@@ -155,15 +136,15 @@ def delete_student(request, pk: int):
         pk - primary key of student to be deleted.
     """
     me = request.user.teacher
-    if not hasattr(me, 'grade') or me.grade is None:
+    if not hasattr(me, 'grade_curated') or me.grade_curated is None:
         return render(request, 'grades/no_grade.html')
     student = models.Users.objects.get(pk=pk).student
-    if student.grade != me.grade:
+    if student.grade != me.grade_curated:
         return HttpResponseForbidden("Вы пытаетесь удалить ученика из другого класса.")
     if request.method == "POST":
         student.grade = None
         # Prevent this student from displaying in the grade.
-        groups = models.Groups.objects.filter(grade=me.grade)
+        groups = models.Groups.objects.filter(grade=me.grade_curated)
         for group in groups:
             group.remove(student)
         student.save()
@@ -175,12 +156,12 @@ def delete_student(request, pk: int):
 @teacher_only
 def settings(request):
     me = request.user.teacher
-    if not hasattr(me, 'grade') or me.grade is None:
+    if not hasattr(me, 'grade_curated') or me.grade_curated is None:
         return render(request, 'grades/no_grade.html')
     if request.method == "POST":
         form = forms.ClassSettingsForm(request.POST, instance=me.grade)
         if form.is_valid():
             form.save()
             return redirect('my_grade')
-    form = forms.ClassSettingsForm(instance=me.grade)
+    form = forms.ClassSettingsForm(instance=me.grade_curated)
     return render(request, 'grades/settings.html', {'form': form})
