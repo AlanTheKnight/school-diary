@@ -14,7 +14,7 @@ def add_student(request, i):
     """
     Function defining the process of adding new student to a grade and confirming it.
     """
-    if not hasattr(request.user.teacher, 'grade'):
+    if not hasattr(request.user.teacher, 'grade_curated'):
         context = {'message': "Вы не классный руководитель."}
         return render(request, 'access_denied.html', context)
     s = models.Students.objects.get(account__email=i)
@@ -28,7 +28,7 @@ def add_student(request, i):
                 group.students.add(s)
             s.save()
             return redirect('my_grade')
-        return render(request, 'grades/add_student.html', {'s': s})
+        return render(request, 'grades/add_student.htmls', {'s': s})
     context = {
         'message': "Вы пытаетесь добавить к себе в класс ученика, который уже состоит в классе."
     }
@@ -60,7 +60,7 @@ def my_grade(request):
     Page with information about teacher's grade.
     """
     me = request.user.teacher
-    if not hasattr(me, 'grade') or me.grade is None:
+    if not hasattr(me, 'grade_curated') or me.grade_curated is None:
         # Teacher has no grade connected.
         return render(request, 'grades/no_grade.html')
     grade = me.grade
