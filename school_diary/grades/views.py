@@ -27,7 +27,7 @@ def add_student(request, i):
                 group.students.add(s)
             s.save()
             return redirect('my_grade')
-        return render(request, 'grades/add_student.htmls', {'s': s})
+        return render(request, 'grades/add_student.html', {'s': s})
     context = {
         'message': "Вы пытаетесь добавить к себе в класс ученика, который уже состоит в классе."
     }
@@ -144,7 +144,7 @@ def delete_student(request, pk: int):
         # Prevent this student from displaying in the grade.
         groups = models.Groups.objects.filter(grade=me.grade_curated)
         for group in groups:
-            group.remove(student)
+            group.students.remove(student)
         student.save()
         return redirect('my_grade')
     return render(request, 'grades/delete_student.html', {'s': student})
