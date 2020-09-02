@@ -4,5 +4,5 @@ from .views import *
 app_name = 'ajax_api'
 
 urlpatterns = [
-    path('save_mark', SaveMark.as_view()),
+    path('save_mark', SaveMark.as_view(), name="save-mark"),
 ]
