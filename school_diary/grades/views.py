@@ -1,4 +1,3 @@
-import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import diary.models as models
@@ -14,13 +13,13 @@ def add_student(request, i):
     """
     Function defining the process of adding new student to a grade and confirming it.
     """
-    if not hasattr(request.user.teacher, 'grade_curated'):
-        context = {'message': "Вы не классный руководитель."}
-        return render(request, 'access_denied.html', context)
+    me = request.user.teacher
+    if not hasattr(me, 'grade_curated') or me.grade_curated is None:
+        return render(request, 'grades/no_grade.html')
     s = models.Students.objects.get(account__email=i)
     if s.grade is None:
         if request.method == "POST":
-            grade = request.user.teacher.grade
+            grade = me.grade_curated
             s.grade = grade
             # Adding new student to every group in this class.
             groups = models.Groups.objects.filter(grade=grade)
@@ -61,7 +60,6 @@ def my_grade(request):
     """
     me = request.user.teacher
     if not hasattr(me, 'grade_curated') or me.grade_curated is None:
-        # Teacher has no grade connected.
         return render(request, 'grades/no_grade.html')
     grade = me.grade_curated
     students = grade.students_set.all()
