@@ -5,7 +5,3 @@ from django.shortcuts import render
 def timetable(request):
     form = GetTimeTableForm()
     return render(request, 'timetable/timetable.html', {'form': form})
-
-
-def download(request):
-    return render(request, 'timetable/download.html')
