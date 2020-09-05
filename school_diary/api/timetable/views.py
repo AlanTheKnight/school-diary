@@ -32,12 +32,6 @@ class TimeTableList(generics.ListAPIView):
             next_day_name = DAYWEEK_NAMES[(CURRENT_DAY + 1) % 7]
         my_grade = get_object_or_404(Grades, number=class_number, letter=class_letter)
         all_lessons = models.Lessons.objects.filter(connection=my_grade.id)
-        data = [
-            {
-                "weekday": weekday,
-                "lessons": all_lessons.filter(day=weekday)
-            } for weekday in DAYWEEK_NAMES.values() if weekday != "Воскресенье"
-        ]
         data.extend([
             {
                 "weekday": "today",
@@ -47,5 +41,11 @@ class TimeTableList(generics.ListAPIView):
                 "weekday": "tomorrow",
                 "lessons": all_lessons.filter(day=next_day_name) if CURRENT_DAY != 6 else []
             }
+        ])
+        data.extend([
+            {
+                "weekday": weekday,
+                "lessons": all_lessons.filter(day=weekday)
+            } for weekday in DAYWEEK_NAMES.values() if weekday != "Воскресенье"
         ])
         return data
