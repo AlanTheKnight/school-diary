@@ -17,34 +17,26 @@ def students_dashboard_first_page(request):
 def students_dashboard(request, page):
     """
     Send a dashboard with up to 100 students.
-    TODO: Test a pagination.
     """
     students = models.Students.objects.all()
-    classes = models.Grades.objects.all()
+    grades = models.Grades.objects.all()
     if request.method == "POST":
         fn = request.POST.get('first_name')
         s = request.POST.get('surname')
         email = request.POST.get('email')
-        s_class = int(request.POST.get('class'))
-        if fn or s or email or s_class:
-            if s_class == -2:
-                students = students.filter(
-                    first_name__icontains=fn,
-                    surname__icontains=s,
-                    account__email__icontains=email)
-            elif s_class == -1:
-                students = students.filter(
-                    first_name__icontains=fn,
-                    surname__icontains=s,
-                    account__email__icontains=email,
-                    grade=None)
-            else:
-                students = students.filter(
-                    first_name__icontains=fn, surname__icontains=s,
-                    account__email__icontains=email, grade__id=s_class)
+        grade = int(request.POST.get('class'))
+        if grade == -1:
+            grade = None
+        if grade == -2:  # Grade isn't chosen
+            kwargs = {}
+        else:
+            kwargs = {"grade": grade}
+        students = students.filter(
+            first_name__icontains=fn, surname__icontains=s,
+            account__email__icontains=email, **kwargs)
     students = Paginator(students, 100)
     students = students.get_page(page)
-    context = {'students': students, 'classes': classes}
+    context = {'students': students, 'classes': grades}
     return render(request, 'students/dashboard.html', context)
 
 

@@ -19,11 +19,9 @@ def user_register(request):
             form.save()
             messages.success(request, "Учётная запись была создана успешно.")
             return redirect('login')
-    if request.POST:
-        form = forms.StudentSignUpForm(request.POST)
-    else:
+    if request.method != 'POST':
         form = forms.StudentSignUpForm()
-    return render(request, 'registration.html', {'form': form, 'error': 0})
+    return render(request, 'registration.html', {'form': form})
 
 
 @unauthenticated_user

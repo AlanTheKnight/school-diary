@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     'debug_toolbar',  # Displaying debug info
     'django_extensions',  # Advances manage.py functions
     'django_filters',  # Filtering support for API
+    'widget_tweaks',
+    # TODO: Deprecate crispy forms
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
