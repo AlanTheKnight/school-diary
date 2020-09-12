@@ -22,7 +22,7 @@ class TestStudentLogin(TestCase):
 
     def test_login(self):
         login_response = self.client.login(email=EMAIL, password=PASSWORD)
-        self.assertEqual(login_response, True)
+        self.assertTrue(login_response)
         self.client.logout()
 
     def test_login_url(self):

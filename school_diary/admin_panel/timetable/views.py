@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
-from diary.decorators import admin_only
 from django.contrib.auth.decorators import login_required
+from diary.decorators import admin_only
+from diary.models import Grades
 from admin_panel.timetable import forms
 from timetable.forms import GetTimeTableForm
 from timetable import models
-from diary.models import Grades
 
 
 SCHOOLS = dict([
