@@ -102,10 +102,7 @@ class AdminSignUpForm(UserCreationForm):
         user.is_superuser = False
         user.is_staff = True
         user.save()
-        try:
-            user_group = Group.objects.get(name='admins')
-        except ObjectDoesNotExist:
-            user_group = Group.objects.create(name='admins')
+        user_group = Group.objects.get_or_create(name='admins')[0]
         user.save()
         user.groups.add(user_group)
         models.Administrators.objects.create(
@@ -153,7 +150,7 @@ class TeacherSignUpForm(UserCreationForm):
         user.is_superuser = False
         user.is_staff = False
         user.save()
-        user_group = Group.objects.get_or_create(name='teachers')
+        user_group = Group.objects.get_or_create(name='teachers')[0]
         user.save()
         user.groups.add(user_group)
         admin = models.Teachers.objects.create(
