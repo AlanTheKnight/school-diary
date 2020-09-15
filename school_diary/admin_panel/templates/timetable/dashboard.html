@@ -12,7 +12,7 @@
 
 {% block content %}
 <div class="container my-5">
-    <div class="card my-5 card-50">
+    <div class="card mt-5 card-50">
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
@@ -20,6 +20,9 @@
                 <button class="btn btn-primary" type="submit">Показать</button>
             </form>
         </div>
+    </div>
+    <div class="my-3">
+        <a href="{% url 'timetable_create' %}" class="btn btn-success text-white"><i class="fas fa-plus mx-2"></i>Добавить урок</a>
     </div>
     {% if lessons %}
     <h4 class="text-center my-3" colspan="6">Показано расписание {{ number }} "{{ letter }}" класса</h4>
@@ -55,8 +58,5 @@
         <p>Уроки для этого класса еще не были добавлены.</p>
     </div>
     {% endif %}
-    <div class="text-center my-3">
-        <a href="{% url 'timetable_create' %}" class="btn btn-success text-white"><i class="fas fa-plus"></i></a>
-    </div>
 </div>
 {% endblock %}

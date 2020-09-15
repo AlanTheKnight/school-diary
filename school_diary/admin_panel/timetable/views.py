@@ -65,6 +65,8 @@ def tt_lesson_create(request):
         form = forms.LessonCreateForm(request.POST)
         if form.is_valid():
             form.save()
+            if "editmore" in request.POST:
+                return redirect("timetable_create")
             return redirect('timetable_dashboard')
     form = forms.LessonCreateForm()
     return render(request, 'timetable/create.html', {'form': form})
@@ -76,6 +78,6 @@ def tt_lesson_delete(request, pk):
     lesson = models.Lessons.objects.get(id=pk)
     if request.method == "POST":
         lesson.delete()
-        return redirect('tmetable_dashboard')
+        return redirect('timetable_dashboard')
     context = {'item': lesson}
     return render(request, 'timetable/delete.html', context)
