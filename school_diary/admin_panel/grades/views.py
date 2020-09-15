@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
+from django.db.models import ProtectedError
 
 from diary.decorators import admin_only
 from diary import models
@@ -72,12 +73,14 @@ def dashboard(request, page):
 @admin_only
 def delete(request, pk):
     obj = MODEL.objects.get(pk=pk)
+    context = {"object": obj}
     if request.method == "POST":
-        obj.delete()
+        try:
+            obj.delete()
+        except ProtectedError:
+            context["protected"] = True
+            return render(request, DATA['delete']['template'], context)
         return redirect(DATA['dashboard']['url'])
-    context = {
-        "object": obj,
-    }
     return render(request, DATA['delete']['template'], context)
 
 

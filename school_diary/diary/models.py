@@ -287,7 +287,7 @@ class Groups(models.Model):
     Class that combines grades and subjects.
     """
     grade = models.ForeignKey(
-        "Grades", on_delete=models.PROTECT, verbose_name="Класс")
+        "Grades", on_delete=models.CASCADE, verbose_name="Класс")
     subject = models.ForeignKey(
         "Subjects", on_delete=models.PROTECT, verbose_name="Предмет")
     students = models.ManyToManyField(

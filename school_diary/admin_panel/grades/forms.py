@@ -5,7 +5,6 @@ bts4attr = {'class': 'form-control'}
 
 
 class GradeCreationForm(forms.ModelForm):
-
     class Meta:
         model = models.Grades
         fields = ['number', 'letter', 'main_teacher', 'subjects', 'teachers']

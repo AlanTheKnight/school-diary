@@ -8,13 +8,19 @@
 <div class="container">
     <div class="card my-5">
         <div class="card-body">
-            <p>{{ help_text }}</p>
+            {% if protected %}
+            <div class="alert alert-danger py-2">
+                Вы не можете удалить этот класс, так как к нему привяны уроки.
+            </div>
+            {% endif %}
+            <p>Вы действительно хотите удалить класc {{ object }}?</p>
             <form action="{% url 'grades:delete' object.pk %}" method="POST">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Подтвердить</button>
                 <a href="{% url 'grades:dashboard' %}" class="btn btn-success">Отмена</a>
             </form>
         </div>
+        
     </div>
 </div>
 {% endblock %}
