@@ -20,27 +20,27 @@
             <form method="POST">
                 {% csrf_token %}
                 <div class="form-group">
-                    {% with field=form.connection auto_save=True %}
+                    {% with field=form.connection %}
                         {% include 'field_template.html' %}
                     {% endwith %}
                 </div>
                 <div class="form-group">
-                    {% with field=form.day auto_save=True %}
+                    {% with field=form.day %}
                         {% include 'field_template.html' %}
                     {% endwith %}
                 </div>
                 <div class="form-group">
-                    {% with field=form.number auto_save=True %}
+                    {% with field=form.number %}
                         {% include 'field_template.html' %}
                     {% endwith %}
                 </div>
                 <div class="form-group">
-                    {% with field=form.subject auto_save=True %}
+                    {% with field=form.subject %}
                         {% include 'field_template.html' %}
                     {% endwith %}
                 </div>
                 <div class="form-group">
-                    {% with field=form.classroom auto_save=True %}
+                    {% with field=form.classroom %}
                         {% include 'field_template.html' %}
                     {% endwith %}
                 </div>

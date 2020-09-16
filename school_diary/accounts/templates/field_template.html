@@ -14,11 +14,7 @@
     {% render_field field class="form-control is-valid" %}
 {% endif %}
 {% else %}
-    {% if not auto_save %}
         {% render_field field class="form-control" %}
-    {% else %}
-        {% render_field field class="form-control auto-save" %}
-    {% endif %}
 {% endif %}
 
 {% if field.help_text %}
