@@ -35,7 +35,7 @@
             {% if lessons %}
             {% for lesson in lessons %}
             <h5>{{ lesson.subject }}</h5>
-            <p>{{ lesson.text }}</p>
+            <p>{{ lesson.homework }}</p>
             {% if lesson.file_exists %}
             <p class="text-muted" style="margin-top: -15px;">
                 Ваш учитель приложил файл к домашнему заданию. <a href="{{ lesson.file.url }}" download>
