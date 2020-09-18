@@ -249,7 +249,7 @@ def fool_teacher_protection(teacher, lesson: models.Lessons):
     Return False if teacher doesn't have an access to the lesson.
     """
     teacher = models.Teachers.objects.get(pk=teacher)
-    grades = models.Grades.objects.filter(main_teacher=teacher)
+    grades = models.Grades.objects.filter(teachers=teacher)
     subjects = teacher.subjects.all()
     if lesson.group.grade not in grades or lesson.group.subject not in subjects:
         return False
