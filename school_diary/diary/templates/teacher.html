@@ -29,6 +29,9 @@
     .mark-plus-btn{
         border: none;
     }
+    .important-mark {
+        background-color: red;
+    }
 </style>
 
 {% endblock %}
@@ -102,7 +105,7 @@
                     <th title="Взвешенный средний балл" style="width:5%;">SM.AVG</th>
                     {% for k, lesson in lessons.items %}
 
-                        <th scope="col" {%  if lesson.control.name == 'Четвертная'  %} style="background-color: #e9ecef;" {% endif %} {%  if lesson.control_id == 5  %} style="background-color: rgb(250, 84, 55);" {% endif %}> {# Need to change id #}
+                        <th scope="col" {% if lesson.control.weight == 100 %} style="background-color: rgb(204, 204, 204);" {% endif %}>
                         
                             <a href="{% url 'lesson-page' lesson.pk %}">
                                 <p>{{ lesson.date|date:'d M' }}</p>
@@ -128,7 +131,13 @@
                         {% with mark=small_scope|lookup:lesson %}
 
                             <td {% if lesson.control.name == 'Четвертная оценка' %} class="quater-mark" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="year-mark" {% endif %}>
-                                <select name="{{ student.account_id }}|{{ lesson.id }}" class="inp_table select" onchange="myfunction(this)" {%  if lesson.control.name == 'Четвертная оценка' %} class="inp_table select quater-mark" style="background-color: #e9ecef;" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="inp_table select year-mark" style="background-color: rgb(233,236,239);" {% endif %}>
+                                <select 
+                                    name="{{ student.account_id }}|{{ lesson.id }}"
+                                    class="inp_table select"
+                                    onchange="myfunction(this)"
+                                    {%  if lesson.control.weight == 'Четвертная оценка' %}
+                                        class="inp_table select quater-mark" style="background-color: #c3c3c3;" 
+                                    {% endif %}>
                                     <option value="" {% if not mark %}selected{%endif%}></option>
                                     <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
                                     <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</option>
