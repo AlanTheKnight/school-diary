@@ -134,10 +134,7 @@
                                 <select 
                                     name="{{ student.account_id }}|{{ lesson.id }}"
                                     class="inp_table select"
-                                    onchange="myfunction(this)"
-                                    {%  if lesson.control.weight == 'Четвертная оценка' %}
-                                        class="inp_table select quater-mark" style="background-color: #c3c3c3;" 
-                                    {% endif %}>
+                                    onchange="myfunction(this)">
                                     <option value="" {% if not mark %}selected{%endif%}></option>
                                     <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
                                     <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</option>
