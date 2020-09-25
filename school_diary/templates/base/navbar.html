@@ -24,7 +24,7 @@
                 <a class="nav-link" href="{% url 'news' %}">Новости</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/news/articles/help" tabindex="-1" aria-disabled="true">Помощь</a>
+                <a class="nav-link" href="{% url 'news_post_details' url='help' %}" tabindex="-1" aria-disabled="true">Помощь</a>
             </li>
             </ul>
             {% if user.is_authenticated %}

@@ -19,20 +19,15 @@
     <a href="{% url 'news' %}" class="btn btn-primary">Отмена</a>
     {% endif %}
 
-    <!--Search-->
-    <a class="btn btn-primary expand-search-btn" data-toggle="collapse" href="#search-news-form" role="button" aria-expanded="false" aria-controls="search-news-form">
-        Показать поиск
-    </a>
-    <div class="collapse" id="search-news-form">
-        <div class="card my-4 card-body">
-            <form method="GET">
-                <div class="form-group">
-                    <input type="text" name="search" class="form-control">
-                </div>
-                <button type="submit" class="btn btn-primary">Поиск</button>
-            </form>
-        </div>
-    </div>
+
+    <form method="GET">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" name="search">
+            <div class="input-group-append">
+              <button class="btn btn-outline-primary" type="button">Search</button>
+            </div>
+          </div>
+    </form>
     
     <!--News list-->
     <div class="card my-4">
@@ -49,7 +44,9 @@
                     <img src="{{ post.image.url }}" class="align-self-center mr-3 post-image" alt="" height="70" width="70">
                     {% endif %}
                 </li>
+                {% if news.1 %}
                 <hr>
+                {% endif %}
                 {% endfor %}
             </ul>
         </div>

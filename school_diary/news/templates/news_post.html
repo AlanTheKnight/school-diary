@@ -15,21 +15,35 @@
 
 {% block content %}
 <div class="container my-5">
-    <div class="card text-center card-75">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"> <a href="{% url 'news' %}">Новости</a></li>
+            <li class="breadcrumb-item active"><a href="{{ request.path }}">{{ post.title|truncatechars:50 }}</a></li>
+        </ol>
+    </nav>
+
+    {% if request.user.account_type < 3 %}
+        <div class="mb-3">
+            <a href="{% url 'news_update' pk=post.id %}" class="btn btn-outline-primary"><i class="fas fa-edit mr-2"></i>Редактировать</a>
+            <a href="{% url 'news_dashboard' %}" class="btn btn-outline-primary"><i class="fas fa-list mr-2"></i>Все новости</a>
+        </div>
+    {% endif %}
+
+    <div class="card">
         {% if post.image %}
         <img class="card-img-top post-image" src="{{ post.image.url }}" alt="Изображение" height="200">
         {% endif %}
-        <div class="card-body">
+        <div class="card-body text-center">
             <div class="card-title">
-                <h1 class="dispay-4 my-0">{{ post.title }}</h1>
+                <h1 class="dispay-4 my-0 px-5">{{ post.title }}</h1>
                 <p class="my-0">{{ post.author }}</p>
                 <p class="text-muted">{{ post.date }}</p>
                 <div class="text-left">
-                    <p>{{ post.content| markdown | safe }}</p>
+                    <p>{{ post.content|markdown |safe }}</p>
                 </div>
             </div>
         </div>
     </div>
-    <p class="my-5 text-muted">Спасибо, что прочитали эту запись. <a class="text-decoration-none" href="{% url 'news' %}">Перейти к другим новостям.</a></p>
+
 </div>
 {% endblock %}
