@@ -157,7 +157,7 @@ def settings(request):
     if not hasattr(me, 'grade_curated') or me.grade_curated is None:
         return render(request, 'grades/no_grade.html')
     if request.method == "POST":
-        form = forms.ClassSettingsForm(request.POST, instance=me.grade)
+        form = forms.ClassSettingsForm(request.POST, instance=me.grade_curated)
         if form.is_valid():
             form.save()
             return redirect('my_grade')

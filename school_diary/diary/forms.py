@@ -64,6 +64,10 @@ class QuarterSelectionForm(forms.Form):
 
 
 class VisibleStudentsForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['students'].queryset = self.instance.grade.students_set.all()
+
     class Meta:
         model = models.Groups
         fields = ['students']
