@@ -44,9 +44,9 @@
                     <img src="{{ post.image.url }}" class="align-self-center mr-3 post-image" alt="" height="70" width="70">
                     {% endif %}
                 </li>
-                {% if news.1 %}
+                {% ifnotequal forloop.counter news|length %}
                 <hr>
-                {% endif %}
+                {% endifnotequal %}
                 {% endfor %}
             </ul>
         </div>
