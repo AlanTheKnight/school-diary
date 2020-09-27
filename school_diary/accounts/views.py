@@ -26,17 +26,19 @@ def user_register(request):
 
 @unauthenticated_user
 def user_login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect("/")
-        else:
-            messages.info(
-                request, 'Неправильный адрес электронной почты или пароль.')
     form = forms.UsersLogin()
+    if request.method == 'POST':
+        form = forms.UsersLogin(data=request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect("/")
+            else:
+                messages.info(
+                    request, 'Проверьте, что вы ввели правильный логин и пароль.')
     context = {'form': form}
     return render(request, 'login.html', context)
 

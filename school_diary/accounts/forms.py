@@ -12,8 +12,8 @@ bts4attr_file = {'class': 'custom-file-input'}
 
 class UsersLogin(forms.Form):
     email = forms.EmailField(
-        label="Электронная почта: ", max_length=50, widget=forms.EmailInput(attrs=bts4attr))
-    password = forms.CharField(label="Пароль: ", widget=forms.PasswordInput(attrs=bts4attr))
+        label="Электронная почта", max_length=50, widget=forms.EmailInput(attrs=bts4attr))
+    password = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs=bts4attr))
 
 
 class StudentSignUpForm(UserCreationForm):
