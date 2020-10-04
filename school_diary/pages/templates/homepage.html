@@ -17,14 +17,6 @@
     </div>
     {% endfor %}
 
-    {% if type == 3 %}
-    <div class="jumbotron my-5 text-center" id="join-us-jumbotron">
-        <h1>Дневник, сделанный учениками для учеников</h1>
-        <a href="{% url 'help_us' %}">Помочь развитию проекта</a><br>
-        <a id="hide-jumbotron">Скрыть</a>
-    </div>
-    {% endif %}
-
     {% if type == 3 and grade is None %}
     <div class="alert alert-warning mt-5">
         Вы не состоите в классе. Попросите вашего классного руководителя добавить вас в класс - 

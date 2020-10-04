@@ -16,16 +16,8 @@ def homepage(request):
     return render(request, 'homepage.html', context)
 
 
-def get_help(request):
-    return render(request, 'docs.html')
-
-
 def about(request):
     return render(request, 'about_us.html')
-
-
-def help_us(request):
-    return render(request, 'help_us.html')
 
 
 def error404(request):
