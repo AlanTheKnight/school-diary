@@ -14,23 +14,27 @@
 
 {% block content %}
 <div class="container my-5">
-    <div class="card card-50">
-        <div class="card-body">
-            <form method="GET">
-                <div class="form-group">
-                    {{ form.date.label_tag }}
-                    {{ form.date }}
+
+    <form method="GET">
+    <div class="row" id="search-wrapper">
+
+        <div class="col-12 col-md-6">
+            <div class="input-group mb-3">
+                {{ form.date }}
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-outline-primary">Найти</button>
                 </div>
-                <button type="submit" class="btn btn-primary">Найти</button>
-                <a href="{% url 'homework' %}" class="btn btn-primary">Д/з на неделю</a>
-            </form>
+            </div>
+        </div>
+        <div class="col-12 col-sm-auto">
+            <a href="{% url 'homework' %}" class="btn btn-outline-primary">Д/з на неделю</a>
         </div>
     </div>
+    </form>
 
-    {% if "date" in request.GET %}
-    <div class="card  card-50">
-        <div class="card-body">
-            <h2 class="card-title">Домашнее задание на {{ date|date:"d.m, D" }}</h2>
+    <div class="my-5" id="homework-wrapper">
+        {% if "date" in request.GET %}
+            <h2 class="">Домашнее задание на {{ date|date:"d.m, D" }}</h2>
             <hr>
             {% if lessons %}
             {% for lesson in lessons %}
@@ -50,12 +54,8 @@
                 <p>Домашнее задание не задано.</p>
             </div>
             {% endif %}
-        </div>
-    </div>
-    {% else %}
-    <div class="card  card-50">
-        <div class="card-body">
-            <h2 class="card-title">Домашнее задание на неделю:</h2>
+        {% else %}
+            <h2 class="">Домашнее задание на неделю:</h2>
             <hr>
             {% if lessons %}
             {% for lesson in lessons %}
@@ -72,8 +72,7 @@
                 <p>Домашнее задание не задано.</p>
             </div>
             {% endif %}
-        </div>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 {% endblock %}
