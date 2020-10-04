@@ -16,16 +16,6 @@
                         <div class="input-group-append">
                             <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                         </div>
-                        <script>
-                            'use strict'
-                            $(function() {
-                                $('#id_date').datepicker({
-                                    autoHide: true,
-                                    format: 'dd.mm.yyyy',
-                                    language: 'ru-RU',
-                                });
-                            });
-                        </script>
                         <div class="invalid-feedback">
                             {{ form.date.errors }}
                         </div>

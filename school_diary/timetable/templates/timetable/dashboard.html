@@ -1,0 +1,171 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+<title>Расписание</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<style>
+    .field-input {
+        border: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    <div class="mt-5">
+        <div class="">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-sm-3 col-12">
+                        {{ form.grade }}
+                    </div>
+                    <div class="form-group col-sm-3 col-12">
+                        {{ form.litera }}
+                    </div>
+                    <div class="col-3">
+                        <button class="btn btn-primary" type="submit">Показать</button>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+
+    <div id="app" class="my-5 table-responsive">
+        <table class="table table-sm table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Номер</th>
+                    <th v-for="weekday in weekdays" colspan="2">
+                        [[ weekday ]]
+                    </th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <template v-for="weekday in weekdays">
+                        <th>Предмет</th>
+                        <th>Кабинет</th>
+                    </template>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="index in indexes">
+                    <td>
+                        [[ index ]]
+                    </td>
+                    <template v-for="(weekday, i) in weekdays">
+                        <td>
+                            <input type="text" class="field-input" :id="index + '-' + i" :value="getLesson(i + 2, index)"  onchange="showId(this.id);">
+                        </td>
+                        <td>
+                            <input type="text" class="field-input" :id="'cab-' + index + '-' + i" :value="getRoom(i + 2, index)" onchange="showId(this.id);" style="width: 80px">
+                        </td>
+                    </template>
+                </tr>
+            </tbody>
+        </table>
+        {% csrf_token %}
+        <input type="hidden" value="{{ number }} {{ letter }}" id="grade-id">
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    let indexes = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    let weekdays = [
+        "Понедельник",
+        "Вторник",
+        "Среда",
+        "Четверг",
+        "Пятница",
+        "Суббота"
+    ]
+
+    function findLessonByN(n, element, index, array) {
+        return element.n == n
+    }
+
+    const app = new Vue({
+        el: "#app",
+        delimiters: ["[[", "]]"],
+        data: {
+            tt: undefined,
+            getLesson(day, index) {
+                if (this.tt && this.tt[day]) {
+                    let r = this.tt[day].lessons.find(findLessonByN.bind(this, index))
+                    if (r) return r.subject
+                }
+                return ""
+            },
+            getRoom(day, index) {
+                if (this.tt && this.tt[day]) {
+                    let r = this.tt[day].lessons.find(findLessonByN.bind(this, index))
+                    if (r) return r.classroom
+                }
+                return ""
+            },
+            indexes: indexes,
+            weekdays: weekdays
+        }
+    })
+
+    function showId(id) {
+        let subj_id, room_id, subj_val, room_val;
+        if (id.startsWith("cab")) {
+            room_id = '#' + id
+            subj_id = "#" + room_id.substring(5, room_id.length)
+        } else {
+            subj_id = "#" + id
+            room_id = '#cab-' + id
+        }
+        
+        room_val = $(room_id).val()
+        subj_val = $(subj_id).val()
+        let number = $("#grade-id").val().split(' ')[0]
+        let letter = $("#grade-id").val().split(' ')[1]
+        let day = weekdays[subj_id.split('-')[1]]
+        let n = Number(subj_id[1])
+        
+        if (day && number && letter && n) {
+            $.ajax({
+                method: "POST",
+                url: "/api/timetable/create/",
+                format: 'json',
+                data: {
+                    'subject': subj_val,
+                    'letter': letter,
+                    'number': Number(number),
+                    'classroom': room_val,
+                    'day': day,
+                    'n': n,
+                    'csrfmiddlewaretoken': $("input[name='csrfmiddlewaretoken']").val(),
+                },
+                success: function (data) {
+                    console.log("OK")
+                },
+            })
+        }
+    }
+
+    $(document).ready(function() {
+        let number = $("#grade-id").val().split(' ')[0]
+        let letter = $("#grade-id").val().split(' ')[1]
+        $.ajax({
+            url: "/api/timetable/" + number + '/' + letter + '/',
+            format: 'json',
+            success: function (data) {
+                app.tt = data
+            },
+        })
+    })
+</script>
+{% endblock %}

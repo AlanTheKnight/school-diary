@@ -206,7 +206,6 @@
         let csrf = $("input[name='csrfmiddlewaretoken']").val();
         let id = "button[name='"+ that.name.toString()+"']";
         let comment_btn = $(id);
-        console.log(comment_btn.html());
         if (that.value){
             comment_btn.css("display", "inline");
         }else{

@@ -37,4 +37,3 @@ class SaveMark(APIView):
             return Response(data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
-

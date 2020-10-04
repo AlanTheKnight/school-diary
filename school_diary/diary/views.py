@@ -269,8 +269,8 @@ def homework(request):
             lessons = functions.get_homework(grade, date)
             context = {'form': form, 'lessons': lessons, 'date': date}
             return render(request, 'homework.html', context)
-    start_date = datetime.date.today()
-    end_date = start_date + datetime.timedelta(days=6)
+    start_date = datetime.date.today() + datetime.timedelta(days=1)
+    end_date = start_date + datetime.timedelta(days=7)
     lessons = functions.get_homework(grade, start_date, end_date)
     form = forms.DatePickForm()
     return render(request, 'homework.html', {'form': form, 'lessons': lessons})

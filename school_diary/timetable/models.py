@@ -53,6 +53,7 @@ class BellsTimeTable(models.Model):
 
     class Meta:
         ordering = ['school', 'n']
+        unique_together = ['school', 'n']
         verbose_name = "Звонок"
         verbose_name_plural = "Звонки"
 
@@ -62,7 +63,7 @@ class BellsTimeTable(models.Model):
 
 class Lessons(models.Model):
     connection = models.ForeignKey(
-        diary_models.Grades, on_delete=models.CASCADE,
+        "Grades", default=None, on_delete=models.CASCADE, null=True,
         related_name="t_grade", verbose_name="Класс")
     day = models.CharField(max_length=11, choices=DAYS, verbose_name="День недели", blank=False)
     number = models.ForeignKey(BellsTimeTable, on_delete=models.CASCADE, verbose_name="Номер урока")
@@ -79,3 +80,23 @@ class Lessons(models.Model):
             return str(self.number.n) + "й урок в " + self.day.lower() + " у " + str(self.connection)
         else:
             return str(self.number.n) + "й урок во " + self.day.lower() + " у " + str(self.connection)
+
+
+class Grades(models.Model):
+    """
+    Model that represents a grade in a timetable.
+
+    Fields:
+        id (PK), number (int), letter (str)
+    """
+    number = models.IntegerField(choices=GRADES, verbose_name="Класс")
+    letter = models.CharField(max_length=2, choices=LITERAS, verbose_name="Буква")
+
+    class Meta:
+        ordering = ['number', 'letter']
+        verbose_name = "Класс"
+        verbose_name_plural = "Классы"
+        unique_together = ('number', 'letter')
+
+    def __str__(self):
+        return '{}{}'.format(self.number, self.letter)
