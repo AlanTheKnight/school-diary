@@ -15,8 +15,15 @@
 {% block content %}
 <div class="container my-5">
 
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"> <a href="{% url 'homepage' %}">Главная</a></li>
+            <li class="breadcrumb-item active"><a href="{{ request.path }}">Домашнее задание</a></li>
+        </ol>
+    </nav>
+
     <form method="GET">
-    <div class="row" id="search-wrapper">
+    <div class="row my-5" id="search-wrapper">
 
         <div class="col-12 col-md-6">
             <div class="input-group mb-3">
