@@ -32,51 +32,53 @@
     </div>
     </form>
 
-    <div class="my-5" id="homework-wrapper">
-        {% if "date" in request.GET %}
-            <h2>Домашнее задание на {{ date|date:"d.m, D" }}</h2>
-            <hr>
-            {% if lessons %}
-                {% for lesson in lessons %}
-                    <h5>{{ lesson.subject }}</h5>
-                    <p>{{ lesson.text|linebreaks }}</p>
-                    {% if lesson.file_exists %}
-                        <p class="text-muted" style="margin-top: -10px;">
-                            Ваш учитель приложил файл к домашнему заданию. <a href="{{ lesson.file.url }}" download>
-                            Скачать</a>
-                        </p>
-                    {% endif %}
-                    {% ifnotequal forloop.counter lessons|length %}
-                        <hr>
-                    {% endifnotequal %}
-                {% endfor %}
+    <div class="card card-body my-4">
+        <div id="homework-wrapper">
+            {% if "date" in request.GET %}
+                <h2 class="card-title">Домашнее задание на {{ date|date:"d.m, D" }}</h2>
+                <hr>
+                {% if lessons %}
+                    {% for lesson in lessons %}
+                        <h5>{{ lesson.subject }}</h5>
+                        <p>{{ lesson.text|linebreaks }}</p>
+                        {% if lesson.file_exists %}
+                            <p class="text-muted" style="margin-top: -10px;">
+                                Ваш учитель приложил файл к домашнему заданию. <a href="{{ lesson.file.url }}" download>
+                                Скачать</a>
+                            </p>
+                        {% endif %}
+                        {% ifnotequal forloop.counter lessons|length %}
+                            <hr>
+                        {% endifnotequal %}
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center my-3">
+                        <img src="{% static 'book.svg' %}" alt="" width="100">
+                        <p>Домашнее задание не задано.</p>
+                    </div>
+                {% endif %}
             {% else %}
-                <div class="text-center my-3">
-                    <img src="{% static 'book.svg' %}" alt="" width="100">
-                    <p>Домашнее задание не задано.</p>
-                </div>
+                <h2 class="card-title">Домашнее задание на неделю:</h2>
+                <hr>
+                {% if lessons %}
+                    {% for lesson in lessons %}
+                        <h5><span class="badge badge-secondary" style="display: inline;">{{ lesson.date|date:"d.m, D" }}</span> {{ lesson.subject }}</h5>
+                        <p>{{ lesson.text|linebreaks }}</p>
+                        {% if lesson.file_exists %}
+                            <p class="text-muted" style="margin-top: -10px;">Ваш учитель приложил файл к домашнему заданию. <a href="{{ lesson.file.url }}">Скачать</a></p>
+                        {% endif %}
+                        {% ifnotequal forloop.counter lessons|length %}
+                            <hr>
+                        {% endifnotequal %}
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center my-3">
+                        <img src="{% static 'book.svg' %}" alt="" width="100">
+                        <p>Домашнее задание не задано.</p>
+                    </div>
+                {% endif %}
             {% endif %}
-        {% else %}
-            <h2 class="">Домашнее задание на неделю:</h2>
-            <hr>
-            {% if lessons %}
-                {% for lesson in lessons %}
-                    <h5><span class="badge badge-secondary" style="display: inline;">{{ lesson.date|date:"d.m, D" }}</span> {{ lesson.subject }}</h5>
-                    <p>{{ lesson.text|linebreaks }}</p>
-                    {% if lesson.file_exists %}
-                        <p class="text-muted" style="margin-top: -10px;">Ваш учитель приложил файл к домашнему заданию. <a href="{{ lesson.file.url }}">Скачать</a></p>
-                    {% endif %}
-                    {% ifnotequal forloop.counter lessons|length %}
-                        <hr>
-                    {% endifnotequal %}
-                {% endfor %}
-            {% else %}
-                <div class="text-center my-3">
-                    <img src="{% static 'book.svg' %}" alt="" width="100">
-                    <p>Домашнее задание не задано.</p>
-                </div>
-            {% endif %}
-        {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}
