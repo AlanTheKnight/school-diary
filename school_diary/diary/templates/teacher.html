@@ -210,6 +210,7 @@
     function commentDialog(that) {
         let mark_id = that.name.split("|").map(x => Number(x))[2]
         let csrf = $("input[name='csrfmiddlewaretoken']").val()
+        if (!mark_id) return false 
         $.ajax({
             url: "{% url 'api:inbuilt:get-comment' %}",
             method: "POST",
@@ -221,7 +222,6 @@
                 $("#comment-text").val(data.comment)
             },
         })
-        if (!mark_id) return false 
         $("#comment-hidden").val(mark_id)
         $("#comment-modal").modal('show')
     };
