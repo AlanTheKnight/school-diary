@@ -24,10 +24,10 @@
 {% block content %}
 <div class="container my-5 text-center">
     <div class="error">
-        <h1 class="dispay-4" id="title">{{ title }}</h1>
-        <h1 id="code">{{ error }}</h1>
-        <p class="text-break">{{ description }}</p>
+        <h1 class="dispay-4" id="title">Страница не найдена</h1>
+        <h1 id="code">404</h1>
+        <p class="text-break">Такой страницы не существует</p>
     </div>
-    <a class="btn btn-primary" href="{% url 'homepage' %}">Домашняя страница</a>
+    <a class="btn btn-outline-primary" href="{% url 'homepage' %}">Домашняя страница</a>
 </div>
 {% endblock %}
