@@ -199,35 +199,19 @@ ADMINS = [
 if not DEBUG:
     LOGGING = {
         'version': 1,
-        'filters': {
-            'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse',
-            }
-        },
         'disable_existing_loggers': False,
         'handlers': {
             'file': {
-                'level': 'WARNING',
+                'level': 'DEBUG',
                 'class': 'logging.FileHandler',
                 'filename': '/home/alan/diary/logs/warning.log',
             },
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['require_debug_false'],
-                'class': 'django.utils.log.AdminEmailHandler',
-                'include_html': True,
-            }
         },
         'loggers': {
             'django': {
                 'handlers': ['file'],
-                'level': 'WARNING',
+                'level': 'DEBUG',
                 'propagate': True,
-            },
-            'django.request': {
-                'handlers': ['mail_admins'],
-                'level': 'ERROR',
-                'propagate': False,
             },
         },
     }
