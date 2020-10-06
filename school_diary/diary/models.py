@@ -238,7 +238,7 @@ class Marks(models.Model):
     amount = models.IntegerField(verbose_name="Балл", null=True, default=None)
     # Delete all marks if lesson is deleted
     lesson = models.ForeignKey("Lessons", on_delete=models.CASCADE, verbose_name='Урок')
-    comment = models.TextField(blank=True, verbose_name='комментарий', default="")
+    comment = models.TextField(blank=True, verbose_name='Комментарий', default="")
 
     class Meta():
         verbose_name_plural = "Оценки"

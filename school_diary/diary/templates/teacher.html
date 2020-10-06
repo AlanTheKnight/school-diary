@@ -90,7 +90,8 @@
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonmodal">
             <i class="fas fa-plus"></i> Добавить урок
         </button>
-        <a href="{% url 'visible-students' %}" class="btn btn-primary"><i class="fas fa-tasks"></i> Настроить</a>
+        <a href="{% url 'visible-students' %}" class="btn btn-outline-primary"><i class="fas fa-tasks"></i> Настроить</a>
+        <!-- <a href="{% url 'lesson-editing' %}" class="btn btn-outline-primary"><i class="far fa-list-alt pr-2"></i>Уроки</a> -->
     </div>
 
     {% if lessons %}
@@ -132,17 +133,17 @@
 
                             <td {% if lesson.control.name == 'Четвертная оценка' %} class="quater-mark" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="year-mark" {% endif %}>
                                 <select 
-                                    name="{{ student.account_id }}|{{ lesson.id }}"
+                                    name="{{ student.account_id }}|{{ lesson.id }}|{{ mark.pk }}"
                                     class="inp_table select"
-                                    onchange="myfunction(this)">
-                                    <option value="" {% if not mark %}selected{%endif%}></option>
+                                    onchange="myfunction(this)"
+                                    oncontextmenu="commentDialog(this); return false;">
+                                    <option value="0" {% if not mark %}selected{%endif%}></option>
                                     <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
                                     <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</option>
                                     <option value="3" {% if mark and mark.amount == 3 %}selected{% endif %}>3</option>
                                     <option value="2" {% if mark and mark.amount == 2 %}selected{% endif %}>2</option>
                                     <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
                                 </select>
-                                <button type="button" {% if lesson.control.name == 'Четвертная оценка'  %} class="quater-mark-select" {%  elif lesson.control.name == 'Годовая оценка'  %} class="year-mark-select" {% else %} class="mark-plus-btn" {% endif %} onclick="show_confirm(this)" value="{{ student.account_id }}|{{ lesson.id }}" name = "{{ student.account_id }}|{{ lesson.id }}" comment="{{ mark.comment }}" {% if not mark %}style="display: none"{% else %} style="display: inline"{% endif %}>+</button>
                             </td>
                         {% endwith %}
                     {% endfor %}
@@ -165,33 +166,7 @@
 
     {% include 'teacher_page/create_lesson.html' %}
 
-    <div class="modal fade" id="commentmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="lessonmodalLabel">Добавить комментарий</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="comment">Текст комментария</label>
-                            <textarea name="comment" id="commenttextfield" class="form-control" maxlength="400" cols="40" rows=5></textarea>
-                        </div>
-                        <input id="commentdata" type="hidden" name="commentdata" value="">
-                        <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
-                        <button type="submit" class="btn btn-primary" name="addcomment">Создать</button>
-                        </div>
-                    </form>
-                </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'teacher_page/comment_modal.html' %}
 </div>
 <script>
     function renderAvg(s) {
@@ -201,7 +176,8 @@
     }
 
     function myfunction(that){
-        // that.style.backgroundColor = "#d6d6d6"; need?
+        that.style.backgroundColor = "#d6d6d6"
+        that.parentNode.style.backgroundColor = "#d6d6d6"
         // save mark
         let csrf = $("input[name='csrfmiddlewaretoken']").val();
         let id = "button[name='"+ that.name.toString()+"']";
@@ -211,33 +187,60 @@
         }else{
             comment_btn.css("display", "none");
         }
-        let value = null;
-        if (that.value != "")
-            value = that.value;
+        value = Number(that.value);  // Value of mark
+        let mark_data = that.name.split("|").map(x => Number(x))
         $.ajax({
-            url:"{% url 'api:ajax_api:save-mark' %}",
+            url:"{% url 'api:inbuilt:save-mark' %}",
             method: 'POST',
             data:{
                 "csrfmiddlewaretoken": csrf,
-                "name": that.name,
+                "student": mark_data[0],
+                "lesson": mark_data[1],
                 "value": value,
-                },
+            },
             success: function (data){
-                let sm_avg = $("#s_"+data.pk);
-                let avg = $("#"+data.pk);
+                let sm_avg = $("#s_"+mark_data[0]);
+                let avg = $("#"+mark_data[0]);
                 sm_avg.html(renderAvg(data.sm_avg));
                 avg.html(renderAvg(data.avg));
             }
         })
     };
-    function show_confirm(element){
-        let content = element.getAttribute('comment');
-        document.getElementById("commenttextfield").value = content;
-        document.getElementById("commentdata").value = element.value;
-        $("#commentmodal").modal('show');
+
+    function commentDialog(that) {
+        let mark_id = that.name.split("|").map(x => Number(x))[2]
+        let csrf = $("input[name='csrfmiddlewaretoken']").val()
+        $.ajax({
+            url: "{% url 'api:inbuilt:get-comment' %}",
+            method: "POST",
+            data: {
+                "csrfmiddlewaretoken": csrf,
+                "mark": mark_id,
+            },
+            success: function (data) {
+                $("#comment-text").val(data.comment)
+            },
+        })
+        $("#comment-hidden").val(mark_id)
+        $("#comment-modal").modal('show')
     };
 
-
+    function addComment() {
+        let commentText = $("#comment-text").val()
+        let mark_id = $("#comment-hidden").val()
+        let csrf = $("input[name='csrfmiddlewaretoken']").val()
+        $.ajax({
+            url: "{% url 'api:inbuilt:add-comment' %}",
+            method: "POST",
+            data: {
+                "csrfmiddlewaretoken": csrf,
+                "comment": commentText,
+                "mark": mark_id,
+            },
+        })
+        $("#comment-text").val("")
+        $("#comment-modal").modal('hide')
+    }
 
     function showdeletebutton(){
         $('#homeworkfiledeletebutton').css('display', 'block');

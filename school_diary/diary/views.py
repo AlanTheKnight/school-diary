@@ -274,3 +274,7 @@ def homework(request):
     lessons = functions.get_homework(grade, start_date, end_date)
     form = forms.DatePickForm()
     return render(request, 'homework.html', {'form': form, 'lessons': lessons})
+
+
+def lessons_editing(request):
+    return render(request, "lesson_editing.html")

@@ -27,7 +27,7 @@ def get_marks_data(marks):
             data[2] += mark.amount
             data[3] += 1
             data[4].append(mark.amount)
-    sm_avg, avg = calculate_avg(data)
+    avg, sm_avg = calculate_avg(data)
     return (
         sm_avg,
         avg,
@@ -122,8 +122,8 @@ def create_table(group, quarter):
 
 
 def calculate_avg(data: list):
-    avg = round(data[2] / data[3], 2) if data[3] != 0 else '-'
-    sm_avg = round(data[0] / data[1], 2) if data[1] != 0 else '-'
+    avg = round(data[2] / data[3], 1) if data[3] != 0 else '-'
+    sm_avg = round(data[0] / data[1], 1) if data[1] != 0 else '-'
     return (avg, sm_avg)
 
 
