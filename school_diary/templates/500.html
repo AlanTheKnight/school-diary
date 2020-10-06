@@ -24,8 +24,9 @@
 {% block content %}
 <div class="container my-5 text-center">
     <div class="error">
-        <h1 class="dispay-4" id="title">Страница не найдена</h1>
-        <h1 id="code">404</h1>
+        <h1 class="dispay-4" id="title">Ошибка сервера</h1>
+        <h1 id="code">500</h1>
+        <p class="text-break">Ошибка будет исправлена в ближайшее время</p>
     </div>
     <a class="btn btn-outline-primary" href="{% url 'homepage' %}">Домашняя страница</a>
 </div>
