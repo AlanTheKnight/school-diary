@@ -221,6 +221,7 @@
                 $("#comment-text").val(data.comment)
             },
         })
+        if (!mark_id) return false 
         $("#comment-hidden").val(mark_id)
         $("#comment-modal").modal('show')
     };
