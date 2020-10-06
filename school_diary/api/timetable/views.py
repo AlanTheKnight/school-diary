@@ -68,7 +68,6 @@ class CreateLesson(views.APIView):
         let = serializer.validated_data['letter']
         grade = models.Grades.objects.get_or_create(number=num, letter=let)[0]
         n = utils.generate_bell(serializer.validated_data['n'], num)
-        print(n, serializer.validated_data['n'])
         response = {'created': bool(n[1])}
         n = n[0]
 
@@ -81,7 +80,6 @@ class CreateLesson(views.APIView):
                 connection=grade,
                 day=serializer.validated_data['day']
             )
-            print("Object retrieved")
             if classroom or subject:
                 lesson.subject = subject
                 lesson.classroom = classroom
@@ -91,7 +89,6 @@ class CreateLesson(views.APIView):
         except models.Lessons.DoesNotExist:
             if not (classroom or subject):
                 return Response(response, 200)
-            print("Object created")
             models.Lessons.objects.create(
                 number=n,
                 subject=subject,
