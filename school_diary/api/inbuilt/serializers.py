@@ -9,9 +9,11 @@ class SaveMarkSerializer(serializers.Serializer):
 
 
 class AddCommentSerializer(serializers.Serializer):
-    mark = serializers.IntegerField(required=True)
+    student = serializers.IntegerField(required=True)
+    lesson = serializers.IntegerField(required=True)
     comment = serializers.CharField(required=True, max_length=400)
 
 
 class GetCommentSerializer(serializers.Serializer):
-    mark = serializers.IntegerField(required=True)
+    student = serializers.IntegerField(required=True)
+    lesson = serializers.IntegerField(required=True)

@@ -133,7 +133,7 @@
 
                             <td {% if lesson.control.name == 'Четвертная оценка' %} class="quater-mark" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="year-mark" {% endif %}>
                                 <select 
-                                    name="{{ student.account_id }}|{{ lesson.id }}|{{ mark.pk }}"
+                                    name="{{ student.account_id }}|{{ lesson.id }}"
                                     class="inp_table select"
                                     onchange="myfunction(this)"
                                     oncontextmenu="commentDialog(this); return false;">
@@ -208,27 +208,28 @@
     };
 
     function commentDialog(that) {
-        let mark_id = that.name.split("|").map(x => Number(x))[2]
+        let data = that.name.split("|").map(x => Number(x))
         let csrf = $("input[name='csrfmiddlewaretoken']").val()
-        if (!mark_id) return false 
         $.ajax({
             url: "{% url 'api:inbuilt:get-comment' %}",
             method: "POST",
             data: {
                 "csrfmiddlewaretoken": csrf,
-                "mark": mark_id,
+                "lesson": data[1],
+                "student": data[0],
             },
             success: function (data) {
+                if (data.status == "aborted") return 
                 $("#comment-text").val(data.comment)
+                $("#comment-hidden").val(that.name)
+                $("#comment-modal").modal('show')
             },
         })
-        $("#comment-hidden").val(mark_id)
-        $("#comment-modal").modal('show')
     };
 
     function addComment() {
         let commentText = $("#comment-text").val()
-        let mark_id = $("#comment-hidden").val()
+        let data = $("#comment-hidden").val().split("|").map(x => Number(x))
         let csrf = $("input[name='csrfmiddlewaretoken']").val()
         $.ajax({
             url: "{% url 'api:inbuilt:add-comment' %}",
@@ -236,7 +237,8 @@
             data: {
                 "csrfmiddlewaretoken": csrf,
                 "comment": commentText,
-                "mark": mark_id,
+                "lesson": data[1],
+                "student": data[0],
             },
         })
         $("#comment-text").val("")

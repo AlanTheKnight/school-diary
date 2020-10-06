@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework import authentication
 from diary.models import Marks, Students, Lessons
 from diary.functions import get_marks_data
+from django.shortcuts import get_object_or_404
 from . import serializers
 
 
@@ -46,10 +47,17 @@ class AddComment(APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         serializer = serializers.AddCommentSerializer(data=request.POST)
         serializer.is_valid(raise_exception=True)
-        mark = Marks.objects.get(pk=serializer.validated_data['mark'])
-        mark.comment = serializer.validated_data['comment']
-        mark.save()
-        return Response(status=status.HTTP_200_OK)
+        try:
+            mark = Marks.objects.get(
+                student_id=serializer.validated_data['student'],
+                lesson_id=serializer.validated_data['lesson']
+            )
+            mark.comment = serializer.validated_data['comment']
+            mark.save()
+            data = {"status": "success"}
+        except Marks.DoesNotExist:
+            data = {"status": "aborted"}
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class GetCommentText(APIView):
@@ -60,6 +68,12 @@ class GetCommentText(APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         serializer = serializers.GetCommentSerializer(data=request.POST)
         serializer.is_valid(raise_exception=True)
-        mark = Marks.objects.get(pk=serializer.validated_data['mark'])
-        data = {"comment": mark.comment}
+        try:
+            mark = Marks.objects.get(
+                student_id=serializer.validated_data['student'],
+                lesson_id=serializer.validated_data['lesson']
+            )
+            data = {"status": "success", "comment": mark.comment}
+        except Marks.DoesNotExist:
+            data = {"status": "aborted"}
         return Response(data, status=status.HTTP_200_OK)
