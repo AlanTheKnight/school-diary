@@ -17,3 +17,22 @@
 .edit {
   display: inline-block;
 }
+
+.quater-mark{
+  background-color: #e9ecef;
+}
+.year-mark{
+  background-color: rgb(233,236,239);
+}
+.quater-mark-select{
+  border: none;
+  background-color: #e9ecef;
+}
+.year-mark-select{
+  border: none;
+  background-color: rgb(233,236,239);
+}
+
+.important-mark {
+  background-color: red;
+}

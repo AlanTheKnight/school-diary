@@ -1,6 +1,5 @@
 {% extends 'base/base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
 {% load templateLibs %}
 
 {% block title %}
@@ -8,32 +7,14 @@
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/teacher.css' %}">
-<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<link href="{% static 'css/teacher.css' %}" rel="stylesheet">
+<link href="{% static 'css/card_width.css' %}" rel="stylesheet">
 
 <style>
-    .quater-mark{
-        background-color: #e9ecef;
-    }
-    .year-mark{
-        background-color: rgb(233,236,239);
-    }
-    .quater-mark-select{
-        border: none;
-        background-color: #e9ecef;
-    }
-    .year-mark-select{
-        border: none;
-        background-color: rgb(233,236,239);
-    }
-    .mark-plus-btn{
-        border: none;
-    }
-    .important-mark {
-        background-color: red;
+    .lesson-link {
+        display: block;
     }
 </style>
-
 {% endblock %}
 
 {% block content %}
@@ -41,47 +22,7 @@
 
     <!--Form for choosing subject, class and quarter. -->
 
-    <div class="card card-50 my-5">
-        <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
-                <div class="row">
-                    <div class="col-6 col-sm-4">
-                        <div class="form-group">
-                            <label for="subject">Предмет</label>
-                            <select name="subject" id="subject" class="form-control auto-save">
-                                {% for subject in subjects %}
-                                    <option>{{ subject }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-6 col-sm-4">
-                        <div class="form-group">
-                            <label for="grade">Класс</label>
-                            <select name="grade" id="grade" class="form-control auto-save">
-                                {% for grade in grades %}
-                                    <option >{{ grade }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-6 col-sm-4">
-                        <div class="form-group">
-                            <label for="term">Четверть</label>
-                            <select name="term" id="term" class="form-control auto-save">
-                                <option value="1">I</option>
-                                <option value="2">II</option>
-                                <option value="3">III</option>
-                                <option value="4">IV</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary" name="getgrade">Найти</button>
-            </form>
-        </div>
-    </div>
+    {% include 'teacher_page/select_form.html' %}
     
     <!--Big table form with choosing marks.-->
 
@@ -106,11 +47,19 @@
                     <th title="Взвешенный средний балл" style="width:5%;">SM.AVG</th>
                     {% for k, lesson in lessons.items %}
 
-                        <th scope="col" {% if lesson.control.weight == 100 %} style="background-color: rgb(204, 204, 204);" {% endif %}>
-                        
-                            <a href="{% url 'lesson-page' lesson.pk %}">
-                                <p>{{ lesson.date|date:'d M' }}</p>
-                                <p></p>{{ lesson.control }}
+                        <th scope="col">
+                            <a
+                            href="{% url 'lesson-page' lesson.pk %}"
+                            tabindex="0" class="lesson-link"
+                            oncontextmenu="$(this).popover({html: true}); $(this).popover('toggle'); return false;"
+                            onfocusout="$(this).popover('dispose')" title="{{ lesson.date|date:'j M, l' }}"
+                            data-content="
+                                {{ lesson.control.name }}<br>
+                                {% if lesson.theme %}
+                                <b>Тема урока: </b>{{ lesson.theme }}
+                                {% endif %}
+                            ">
+                                {{ lesson.date|date:'d M' }}
                             </a>
                         </th>
                     {% endfor %}
@@ -130,21 +79,7 @@
                     </td>
                     {% for lk, lesson in lessons.items %}
                         {% with mark=small_scope|lookup:lesson %}
-
-                            <td {% if lesson.control.name == 'Четвертная оценка' %} class="quater-mark" {% endif %} {% if lesson.control.name == 'Годовая оценка' %} class="year-mark" {% endif %}>
-                                <select 
-                                    name="{{ student.account_id }}|{{ lesson.id }}"
-                                    class="inp_table select"
-                                    onchange="myfunction(this)"
-                                    oncontextmenu="commentDialog(this); return false;">
-                                    <option value="0" {% if not mark %}selected{%endif%}></option>
-                                    <option value="5" {% if mark and mark.amount == 5 %}selected{% endif %}>5</option>
-                                    <option value="4" {% if mark and mark.amount == 4 %}selected{% endif %}>4</option>
-                                    <option value="3" {% if mark and mark.amount == 3 %}selected{% endif %}>3</option>
-                                    <option value="2" {% if mark and mark.amount == 2 %}selected{% endif %}>2</option>
-                                    <option value="-1" {% if mark and mark.amount == -1 %}selected{% endif %}>Н</option>
-                                </select>
-                            </td>
+                            {% include "teacher_page/mark_td.html" %}
                         {% endwith %}
                     {% endfor %}
                 </tr>
@@ -245,13 +180,5 @@
         $("#comment-modal").modal('hide')
     }
 
-    function showdeletebutton(){
-        $('#homeworkfiledeletebutton').css('display', 'block');
-    };
-
-    function deleteinputvalue(){
-        $('#homeworkfiledeletebutton').css('display', 'none');
-        $('#homeworkfileinput').val('');
-    };
 </script>
 {% endblock %}
