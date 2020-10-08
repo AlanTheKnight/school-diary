@@ -1,4 +1,3 @@
-import datetime
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
@@ -186,10 +185,6 @@ def teachers_diary(request):
         'current_term': term, 'current_subject': subject,
         'form': form
     }
-
-    # Add comment to mark (TODO: replace this code with Ajax request to API)
-    if request.method == "POST" and 'addcomment' in request.POST:
-        functions.add_comment_to_mark(request.POST)
     functions.update_context(context, group, term)
     return render(request, 'teacher.html', context)
 
@@ -250,30 +245,6 @@ def stats(request, pk, term):
         }
         return render(request, 'results.html', context)
     return render(request, 'no_marks.html')
-
-
-@login_required(login_url="login")
-@student_only
-def homework(request):
-    """
-    Page where students can see their homework.
-    """
-    student = request.user.student
-    grade = student.grade
-    if grade is None:
-        return render(request, 'access_denied.html', NO_GRADE_CONTEXT)
-    if "date" in request.GET:
-        form = forms.DatePickForm(request.GET)
-        if form.is_valid():
-            date = form.cleaned_data['date']
-            lessons = functions.get_homework(grade, date)
-            context = {'form': form, 'lessons': lessons, 'date': date}
-            return render(request, 'homework.html', context)
-    start_date = datetime.date.today() + datetime.timedelta(days=1)
-    end_date = start_date + datetime.timedelta(days=7)
-    lessons = functions.get_homework(grade, start_date, end_date)
-    form = forms.DatePickForm()
-    return render(request, 'homework.html', {'form': form, 'lessons': lessons})
 
 
 def lessons_editing(request):
