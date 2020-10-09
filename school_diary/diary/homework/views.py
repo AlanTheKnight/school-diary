@@ -28,7 +28,7 @@ def homework(request):
             date = form.cleaned_data['date']
             lessons = utils.get_homework(grade, date)
             context = {'form': form, 'lessons': lessons, 'date': date}
-            return render(request, 'homework.html', context)
+            return render(request, 'homework/homework.html', context)
     start_date = datetime.date.today() + datetime.timedelta(days=1)
     end_date = start_date + datetime.timedelta(days=7)
     lessons = utils.get_homework(grade, start_date, end_date)
