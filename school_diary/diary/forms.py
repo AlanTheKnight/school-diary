@@ -33,7 +33,7 @@ class LessonCreationForm(forms.ModelForm):
             'h_file': 'Файл с домашним заданием',
             'date': 'Дата',
             'theme': 'Тема урока',
-            'homework': 'Домашнее задание',
+            'homework': 'Домашнее задание на создаваемый урок',
             'control': 'Вид работы',
         }
 
@@ -53,6 +53,31 @@ class LessonCreationForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class HomeworkForm(forms.ModelForm):
+    class Meta:
+        model = models.Lessons
+        fields = ('homework', 'h_file', 'date')
+        labels = {
+            'h_file': 'Файл с домашним заданием',
+            'homework': 'Домашнее задание на создаваемый урок',
+            'date': 'Дата'
+        }
+        widgets = {
+            'h_file': forms.FileInput(attrs=bts4attr_file),
+            'homework': forms.Textarea(attrs=bts4attr),
+            'date': forms.DateInput(format=('%Y-%m-%d'), attrs={
+                'class': 'form-control', 'type': 'date'
+            }),
+        }
+
+    def clean_date(self):
+        date = self.cleaned_data['date']
+        if not functions.get_quarter_by_date(str(date)):
+            self.fields['date'].widget.attrs['class'] += ' is-invalid'
+            raise forms.ValidationError("Урок не может быть на каникулах")
+        return date
 
 
 class QuarterSelectionForm(forms.Form):

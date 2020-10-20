@@ -17,33 +17,58 @@
                             <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                         </div>
                         <div class="invalid-feedback">
-                            {{ form.date.errors }}
+                            Урок не может быть на каникулах
                         </div>
                     </div>
                     <div class="form-group">
                         {{ form.theme.label_tag }}
                         {{ form.theme }}
                     </div>
-                    <div class="form-group">
-                        {{ form.homework.label_tag }}
-                        {{ form.homework }}
-                    </div>
-                    <div class="form-group">
-                        <div class="custom-file">
-                            {{ form.h_file }}
-                            <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
-                        </div>
-                    </div>
+
                     <div class="form-group">
                         {{ form.control.label_tag }}
                         {{ form.control }}
                     </div>
-                    <a href="{% url 'diary' %}" class="btn btn-secondary">Отменить</a>
+
+                    <div class="my-3">
+                        <a href="#collapse-hw" data-toggle="collapse" class="my-5" id="hwbutton" onclick="changeBtnText();">Домашнее задание</a>
+                    </div>
+
+                    <div id="collapse-hw" class="collapse">
+                        <div class="form-group">
+                            <label for="id_homework">Домашнее задание <i>на этот урок</i></label>
+                            {{ form.homework }}
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-file">
+                                {{ form.h_file }}
+                                <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="#" data-dismiss="modal" class="btn btn-secondary">Отменить</a>
                     <button type="submit" class="btn btn-primary" name="createlesson">Добавить</button>
                 </form>
-                
             </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    let value = false;
+    function changeBtnText() {
+        if (!value)
+            $("#hwbutton").text("Скрыть")
+        else
+            $("#hwbutton").text("Домашнее задание")
+        value = !value
+    }
+</script>
+
+{% if form.errors %}
+    <script>
+        $("#lessonmodal").modal("show")
+    </script>
+{% endif %}

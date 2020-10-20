@@ -1,0 +1,49 @@
+<div class="modal fade" id="homeworkmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="homeworkmodalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="homeworkmodalLabel">Добавить домашнее задание</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <label for="id_date">Дата, на которую вы задаете д/з</label>
+                    <div class="input-group mb-3">
+                        {{ hw_form.date }}
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                        </div>
+                        <div class="invalid-feedback">
+                            Урок не может быть на каникулах
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_homework">Домашнее задание</label>
+                        {{ hw_form.homework }}
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-file">
+                            {{ hw_form.h_file }}
+                            <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
+                        </div>
+                    </div>
+
+                    <a href="#" data-dismiss="modal" class="btn btn-secondary">Отменить</a>
+                    <button type="submit" class="btn btn-primary" name="addhomework">Добавить</button>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% if 'addhomework' in request.POST and hw_form.errors %}
+<script>
+    $('#homeworkmodal').modal("show");
+</script>
+{% endif %}

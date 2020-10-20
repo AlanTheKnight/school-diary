@@ -213,7 +213,7 @@ class Lessons(models.Model):
     date = models.DateField(verbose_name='Дата')
     quarter = models.SmallIntegerField(verbose_name='Четверть', null=True, default=None)
     homework = models.TextField(blank=True, verbose_name='ДЗ')
-    theme = models.CharField(max_length=120, verbose_name='Тема')
+    theme = models.CharField(max_length=120, verbose_name='Тема', blank=True)
     group = models.ForeignKey(
         "Groups", on_delete=models.PROTECT,
         verbose_name="Группа", null=True, default=None

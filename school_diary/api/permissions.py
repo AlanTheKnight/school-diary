@@ -15,3 +15,10 @@ class APIUserPermission(permissions.BasePermission):
         return request.user.is_authenticated and (
             request.user.is_superuser or
             models.AllowedToUseAPIList.objects.filter(user=request.user).exists())
+
+
+class InBuiltAPIPermission(permissions.BasePermission):
+    message = "Request to in-built API must be called with Ajax"
+
+    def has_permission(self, request, view):
+        return request.is_ajax()

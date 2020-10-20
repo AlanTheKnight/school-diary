@@ -2,10 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import authentication
-from diary.models import Marks, Students, Lessons
+from rest_framework import generics
+from diary import models
 from diary.functions import get_marks_data
-from django.shortcuts import get_object_or_404
 from . import serializers
+from api import permissions
 
 
 class SaveMark(APIView):
@@ -16,13 +17,13 @@ class SaveMark(APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         serializer = serializers.SaveMarkSerializer(data=request.POST)
         serializer.is_valid(raise_exception=True)
-        student = Students.objects.get(pk=serializer.validated_data['student'])
-        lesson = Lessons.objects.get(pk=serializer.validated_data['lesson'])
+        student = models.Students.objects.get(pk=serializer.validated_data['student'])
+        lesson = models.Lessons.objects.get(pk=serializer.validated_data['lesson'])
         group = lesson.group
         term = lesson.quarter
 
         value = int(serializer.validated_data['value'])
-        mark = Marks.objects.get_or_create(student=student, lesson=lesson)[0]
+        mark = models.Marks.objects.get_or_create(student=student, lesson=lesson)[0]
         if value != 0:  # Otherwise we need to delete mark
             mark.amount = value
             mark.save()
@@ -48,14 +49,14 @@ class AddComment(APIView):
         serializer = serializers.AddCommentSerializer(data=request.POST)
         serializer.is_valid(raise_exception=True)
         try:
-            mark = Marks.objects.get(
+            mark = models.Marks.objects.get(
                 student_id=serializer.validated_data['student'],
                 lesson_id=serializer.validated_data['lesson']
             )
             mark.comment = serializer.validated_data['comment']
             mark.save()
             data = {"status": "success"}
-        except Marks.DoesNotExist:
+        except models.Marks.DoesNotExist:
             data = {"status": "aborted"}
         return Response(data, status=status.HTTP_200_OK)
 
@@ -69,11 +70,29 @@ class GetCommentText(APIView):
         serializer = serializers.GetCommentSerializer(data=request.POST)
         serializer.is_valid(raise_exception=True)
         try:
-            mark = Marks.objects.get(
+            mark = models.Marks.objects.get(
                 student_id=serializer.validated_data['student'],
                 lesson_id=serializer.validated_data['lesson']
             )
             data = {"status": "success", "comment": mark.comment}
-        except Marks.DoesNotExist:
+        except models.Marks.DoesNotExist:
             data = {"status": "aborted"}
         return Response(data, status=status.HTTP_200_OK)
+
+
+class LessonsList(generics.ListAPIView):
+    authentication_classes = (authentication.SessionAuthentication,)
+    serializer_class = serializers.LessonsListSerializer
+    permission_classes = (permissions.InBuiltAPIPermission,)
+
+    def get_queryset(self):
+        group_id = self.request.GET['group']
+        term = self.request.GET['term']
+        return models.Lessons.objects.filter(group_id=group_id, quarter=term)
+
+
+class ListControls(generics.ListAPIView):
+    authentication_classes = (authentication.SessionAuthentication,)
+    serializer_class = serializers.ControlSerializer
+    permission_classes = (permissions.InBuiltAPIPermission,)
+    queryset = models.Controls.objects.all()

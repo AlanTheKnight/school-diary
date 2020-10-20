@@ -256,12 +256,6 @@ def fool_teacher_protection(teacher, lesson: models.Lessons):
     return True
 
 
-
-
-
-
-
-
 def session_is_ok(session):
     """Show if session contains values needed to render teacher.html"""
     return (

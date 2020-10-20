@@ -5,11 +5,13 @@ from . import forms
 from .decorators import teacher_only, student_only
 from . import models
 from . import functions
+from . import homework
+import utils
 
 
 # Tuple of keys needed to be in request.session
 # when teachers work with diary.
-NEEDED_IN_SESSION = ('grade', 'subject', 'term')
+NEEDED_IN_SESSION = ('subject', 'grade', 'term')
 # Context which is used when student doesn't belong to any grade.
 NO_GRADE_CONTEXT = {
     "message": ("Вы не состоите в классе. Попросите Вашего"
@@ -51,7 +53,8 @@ def lesson_page(request, pk):
     group = models.Groups.objects.get(subject=subject, grade=grade)
     form.fields["control"].queryset = functions.create_controls(group, term)
     if request.method == "POST":
-        form = forms.LessonCreationForm(request.POST, request.FILES, instance=lesson)
+        form = forms.LessonCreationForm(
+            request.POST, request.FILES, instance=lesson)
         if form.is_valid():
             deletefile = request.POST.get("deletefile") is not None
             form.save(group=group, deletefile=deletefile)
@@ -96,7 +99,8 @@ def students_diary(request):
         d = {}
         max_length, total_missed = 0, 0
         for group in groups:
-            marks = all_marks.filter(lesson__group=group).order_by("lesson__date")
+            marks = all_marks.filter(
+                lesson__group=group).order_by("lesson__date")
             if len(marks) > max_length:
                 max_length = len(marks)
             data = functions.get_marks_data(marks)
@@ -153,9 +157,11 @@ def teachers_diary(request):
         current_quarter = functions.get_current_quarter()
         if not current_quarter:
             current_quarter = 1
-        request.session['subject'] = available_subjects[0].id  # Loading default data into session
-        request.session['grade'] = available_grades[0].id
-        request.session['term'] = current_quarter
+        utils.load_into_session(request.session, {
+            'subject': available_subjects[0].id,
+            'grade': available_grades[0].id,
+            'term': current_quarter,
+        })
 
     # Finally, grade, subject & term chosen by teacher
     grade, subject, term = functions.get_session_data(
@@ -171,6 +177,7 @@ def teachers_diary(request):
     if group[1]:  # If it hasn't been created yet
         group[0].set_default_students()
     group = group[0]
+    utils.load_into_session(request.session, {'group': group.id})
 
     # New lesson creation
     form = forms.LessonCreationForm()
@@ -179,11 +186,21 @@ def teachers_diary(request):
         if form.is_valid():
             form.save(group=group)
 
+    hw_form = forms.HomeworkForm()
+    if request.method == "POST" and 'addhomework' in request.POST:
+        hw_form = forms.HomeworkForm(request.POST, request.FILES)
+        if hw_form.is_valid():
+            homework.add_homework(hw_form.cleaned_data, group.id)
+
     context = {
-        'TEACHER': teacher, 'subjects': available_subjects,
-        'grades': available_grades, 'current_class': grade,
-        'current_term': term, 'current_subject': subject,
-        'form': form
+        'teacher': teacher,
+        'subjects': available_subjects,
+        'grades': available_grades,
+        'current_class': grade,
+        'current_term': term,
+        'current_subject': subject,
+        'form': form,
+        'hw_form': hw_form
     }
     functions.update_context(context, group, term)
     return render(request, 'teacher.html', context)
@@ -223,7 +240,8 @@ def stats(request, pk, term):
     # If student has no marks than send him a page with info.
     # Otherwise, student will get a page with statistics and his results.
     if marks:
-        sm_avg, avg, quantity, amounts, needed, missed = functions.get_marks_data(marks)
+        sm_avg, avg, quantity, amounts, needed, missed = functions.get_marks_data(
+            marks)
 
         data = []
         for i in range(5, 1, -1):
@@ -245,7 +263,3 @@ def stats(request, pk, term):
         }
         return render(request, 'results.html', context)
     return render(request, 'no_marks.html')
-
-
-def lessons_editing(request):
-    return render(request, "lesson_editing.html")

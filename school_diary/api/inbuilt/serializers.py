@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from diary import models
 
 
 class SaveMarkSerializer(serializers.Serializer):
@@ -17,3 +18,17 @@ class AddCommentSerializer(serializers.Serializer):
 class GetCommentSerializer(serializers.Serializer):
     student = serializers.IntegerField(required=True)
     lesson = serializers.IntegerField(required=True)
+
+
+class LessonsListSerializer(serializers.ModelSerializer):
+    control_name = serializers.CharField(source="control.name")
+
+    class Meta:
+        model = models.Lessons
+        fields = '__all__'
+
+
+class ControlSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Controls
+        exclude = ('weight', )
