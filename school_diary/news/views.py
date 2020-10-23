@@ -11,17 +11,18 @@ def first_page(request):
     return redirect('news', page=1)
 
 
-def get_posts(request, page):
+def get_posts(request, page=1):
     """Page where posts are displayed."""
     news = models.Publications.objects.all()
     if "search" in request.GET:  # Posts search
-        search_text = request.GET.get("search")
-        news = news.filter(title__icontains=search_text)
-        search = True
-        context = {'news': news, "search": search, "search_text": search_text}
-        return render(request, 'news_list.html', context)
+        search_text: str = request.GET.get("search")
+        if search_text and not search_text.isspace():
+            news = news.filter(title__icontains=search_text)
+            search = True
+            context = {'news': news, "search": search, "search_text": search_text}
+            return render(request, 'news_list.html', context)
     search = False
-    news = Paginator(news, 10)  # 10 posts per page.
+    news = Paginator(news, 20)
     news = news.get_page(page)
     return render(request, 'news_list.html', {'news': news, "search": search})
 
@@ -69,7 +70,7 @@ def news_delete(request, pk):
     article = models.Publications.objects.get(id=pk)
     if request.method == "POST":
         article.delete()
-        return redirect('/news/dashboard')
+        return redirect('news')
     context = {'item': article}
     return render(request, 'news_delete.html', context)
 
@@ -87,6 +88,6 @@ def news_update(request, pk):
             if request.POST.get('deleteimage') is not None:
                 article.image = ''
                 article.save()
-            return redirect('news_dashboard')
+            return redirect('news')
     context = {'form': form, 'data': article}
     return render(request, 'news_editor.html', context)

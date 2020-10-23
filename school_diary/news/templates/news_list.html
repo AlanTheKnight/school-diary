@@ -12,25 +12,31 @@
 
 {% block content %}
 <div class="container my-5">
-    {% if news %}
-
-    {% if search %}
-    <p class="text-muted text-center">Показаны новости по запросу "{{ search_text }}"</p>
-    <a href="{% url 'news' %}" class="btn btn-primary">Отмена</a>
-    {% endif %}
-
 
     <form method="GET">
         <div class="input-group mb-3">
-            <input type="text" class="form-control" name="search">
+            <input type="text" class="form-control" name="search" value="{{ search_text }}">
             <div class="input-group-append">
-              <button class="btn btn-outline-primary" type="button">Search</button>
+              <button class="btn btn-outline-primary" type="submit">Поиск</button>
             </div>
           </div>
     </form>
+
+    {% if request.user.account_type == 0 or request.user.account_type == 1 %}
+    <div class="mb-3">
+            <a href="{% url 'news_create' %}" class="btn btn-outline-primary"><i class="fas fa-edit mr-2"></i>Новая новость</a>
+    </div>
+    {% endif %}
+
+    {% if search %}
+    <div class="mb-3">
+        <a href="{% url 'news' %}">Отменить поиск</a>
+    </div>
+    {% endif %}
     
+    {% if news %}
     <!--News list-->
-    <div class="card my-4">
+    <div class="card my-3">
         <div class="card-body">
             <ul class="list-unstyled">
                 {% for post in news %}
@@ -64,23 +70,21 @@
     {% endif %}
 
     <!--Paginator-->
-    {% if not search %}
+    {% if news and not search %}
     <nav>
         <ul class="pagination justify-content-center">
             {% if news.has_previous %}
-                <li class="page-item"><a href="{% url 'news' 1 %}" class="page-link">&laquo; first</a></li>
+                <li class="page-item"><a href="{% url 'news' 1 %}" class="page-link">&lt;&lt;</a></li>
                 <li class="page-item"></li><a href="{% url 'news' news.previous_page_number %}" class="page-link">&lt;</a>
             {% endif %}
 
             {% if news %}
-            <span class="current">
                 <li class="page-item active"><a href="#" class="page-link">{{ news.number }}</a></li>
-            </span>
             {% endif %}
 
             {% if news.has_next %}
                 <li class="page-item"><a href="{% url 'news' news.next_page_number %}" class="page-link">&gt;</a></li>
-                <li class="page-item"><a href="{% url 'news' news.paginator.num_pages %}" class="page-link">&raquo;</a></li>
+                <li class="page-item"><a href="{% url 'news' news.paginator.num_pages %}" class="page-link">&gt;&gt;</a></li>
             {% endif %}
         </ul>
     </nav>
