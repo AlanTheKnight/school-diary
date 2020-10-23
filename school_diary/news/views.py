@@ -22,7 +22,7 @@ def get_posts(request, page=1):
             context = {'news': news, "search": search, "search_text": search_text}
             return render(request, 'news_list.html', context)
     search = False
-    news = Paginator(news, 1)  # 10 posts per page.
+    news = Paginator(news, 20)
     news = news.get_page(page)
     return render(request, 'news_list.html', {'news': news, "search": search})
 
