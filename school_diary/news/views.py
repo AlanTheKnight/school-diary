@@ -70,7 +70,7 @@ def news_delete(request, pk):
     article = models.Publications.objects.get(id=pk)
     if request.method == "POST":
         article.delete()
-        return redirect('/news/dashboard')
+        return redirect('news')
     context = {'item': article}
     return render(request, 'news_delete.html', context)
 
@@ -88,6 +88,6 @@ def news_update(request, pk):
             if request.POST.get('deleteimage') is not None:
                 article.image = ''
                 article.save()
-            return redirect('news_dashboard')
+            return redirect('news')
     context = {'form': form, 'data': article}
     return render(request, 'news_editor.html', context)

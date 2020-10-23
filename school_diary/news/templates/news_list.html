@@ -25,7 +25,6 @@
     {% if request.user.account_type == 0 or request.user.account_type == 1 %}
     <div class="mb-3">
             <a href="{% url 'news_create' %}" class="btn btn-outline-primary"><i class="fas fa-edit mr-2"></i>Новая новость</a>
-            <a href="{% url 'news_dashboard' %}" class="btn btn-outline-primary"><i class="fas fa-list mr-2"></i>Все новости</a>
     </div>
     {% endif %}
 

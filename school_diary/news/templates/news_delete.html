@@ -13,7 +13,7 @@
             <form action="{% url 'news_delete' item.id  %}" method="POST">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Подтвердить</button>
-                <a href="{% url 'news_dashboard' %}" class="btn btn-success">Отмена</a>
+                <a href="{% url 'news_post_details' item.slug %}" class="btn btn-success">Отмена</a>
             </form>
         </div>
     </div>
