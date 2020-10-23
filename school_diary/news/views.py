@@ -16,10 +16,11 @@ def get_posts(request, page):
     news = models.Publications.objects.all()
     if "search" in request.GET:  # Posts search
         search_text = request.GET.get("search")
-        news = news.filter(title__icontains=search_text)
-        search = True
-        context = {'news': news, "search": search, "search_text": search_text}
-        return render(request, 'news_list.html', context)
+        if search_text:
+            news = news.filter(title__icontains=search_text)
+            search = True
+            context = {'news': news, "search": search, "search_text": search_text}
+            return render(request, 'news_list.html', context)
     search = False
     news = Paginator(news, 10)  # 10 posts per page.
     news = news.get_page(page)
