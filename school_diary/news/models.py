@@ -15,4 +15,4 @@ class Publications(models.Model):
         verbose_name = "Новость"
 
     def __str__(self):
-        return '{} {}'.format(str(self.publication_date), self.title)
+        return '{} {}'.format(str(self.date), self.title)

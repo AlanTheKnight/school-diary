@@ -1,18 +1,6 @@
 from django.db import models
 
 
-SUBJECT_CODE = {
-    "Информатика": 1,
-    "История": 2,
-    "Литература": 3,
-    "Математика": 4,
-    "Обществознание": 5,
-    "Русский язык": 6,
-    "Химия и биология": 7,
-    "Экономика": 8,
-    "Физика": 9
-}
-
 SUBJECTS = [
     ("Информатика", "Информатика"),
     ("История", "История"),
@@ -43,6 +31,7 @@ TERMS = [
     (4, "IV")
 ]
 
+
 class Documents(models.Model):
     subject = models.CharField(max_length=20, choices=SUBJECTS, verbose_name="Предмет")
     grade = models.IntegerField(choices=GRADES, verbose_name="Класс")
@@ -53,6 +42,7 @@ class Documents(models.Model):
         ordering = ['subject', 'grade', 'term']
         verbose_name = "Минимум"
         verbose_name_plural = "Минимумы"
-    
+
     def __str__(self):
-        return self.subject + " | " + str(self.grade) + " класс | " + str(self.term) + " четверть"
+        return (self.subject + " | " + str(self.grade) +
+                " класс | " + str(self.term) + " четверть")

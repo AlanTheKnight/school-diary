@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'rest_framework',  # Working with API
     'rest_framework.authtoken',  # Token authentication for REST API
     'django_cleanup',  # Deleting unused files in storage
-    'debug_toolbar',  # Displaying debug info
+    # 'debug_toolbar',  # Displaying debug info
     'django_extensions',  # Advances manage.py functions
     'django_filters',  # Filtering support for API
     'widget_tweaks',
@@ -75,7 +75,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.BrokenLinkEmailsMiddleware',
 ]
 

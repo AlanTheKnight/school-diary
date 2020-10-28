@@ -4,6 +4,7 @@ from . import models
 
 admin.site.site_header = "Электронный дневник"
 admin.site.index_title = "Панель администратора"
+admin.site.enable_nav_sidebar = False
 
 
 @admin.register(models.Users)
