@@ -43,7 +43,12 @@
     <input type="hidden" value="{{ request.session.term }}" id="term">
 
     <div id="app">
-        <div v-if="lessons">
+        <div v-if="lessons === undefined" class="text-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div v-else-if="lessons.length != 0">
             <div class="table-responsive">
                 <table table class="table table-sm">
                     <thead class="thead-dark">
@@ -69,11 +74,6 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
-        </div>
-        <div v-else-if="lessons === undefined" class="text-center my-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">Loading...</span>
             </div>
         </div>
         <div v-else>

@@ -1,12 +1,11 @@
 from django.shortcuts import render
 from diary.forms import LessonCreationForm
 import utils
-from diary import utils as diary_utils
 
 
 def lessons(request):
     subjects, grades = \
-        diary_utils.default_grades_and_subjects(request.user.teacher)
+        utils.grades_and_subjects(request.user.teacher)
 
     if not (grades and subjects):
         return render(request, 'access_denied.html', {

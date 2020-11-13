@@ -67,6 +67,32 @@ def get_default_quarter():
 
 def each_contains(d: dict, values: list):
     for i in values:
-        if i in d:
+        if i not in d:
             return False
     return True
+
+
+def grades_and_subjects(teacher: models.Teachers) -> tuple:
+    """
+    Return all subjects & grades where user is a
+    teacher.
+    """
+    available_subjects = teacher.subjects.all().order_by('name')
+    available_grades = models.Grades.objects.filter(
+        teachers=teacher).order_by('number', 'letter')
+    return available_subjects, available_grades
+
+
+def get_group(subject, grade):
+    """
+    Return group from given subject and class.
+    If group hasn't been created yet, set
+    default students for new group and return it.
+    """
+    group, created = models.Groups.objects.get_or_create(
+        grade=grade,
+        subject=subject
+    )
+    if created:
+        group.set_default_students()
+    return group

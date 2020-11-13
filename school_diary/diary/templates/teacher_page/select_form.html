@@ -5,33 +5,20 @@
             <div class="row">
                 <div class="col-6 col-sm-4">
                     <div class="form-group">
-                        <label for="subject">Предмет</label>
-                        <select name="subject" id="subject" class="form-control auto-save">
-                            {% for subject in subjects %}
-                                <option>{{ subject }}</option>
-                            {% endfor %}
-                        </select>
+                        {{ group_form.subjects.label_tag }}
+                        {{ group_form.subjects }}
                     </div>
                 </div>
                 <div class="col-6 col-sm-4">
                     <div class="form-group">
-                        <label for="grade">Класс</label>
-                        <select name="grade" id="grade" class="form-control auto-save">
-                            {% for grade in grades %}
-                                <option >{{ grade }}</option>
-                            {% endfor %}
-                        </select>
+                        {{ group_form.classes.label_tag }}
+                        {{ group_form.classes }}
                     </div>
                 </div>
                 <div class="col-6 col-sm-4">
                     <div class="form-group">
-                        <label for="term">Четверть</label>
-                        <select name="term" id="term" class="form-control auto-save">
-                            <option value="1">I</option>
-                            <option value="2">II</option>
-                            <option value="3">III</option>
-                            <option value="4">IV</option>
-                        </select>
+                        {{ group_form.quarters.label_tag }}
+                        {{ group_form.quarters }}
                     </div>
                 </div>
             </div>

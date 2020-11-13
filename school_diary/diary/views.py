@@ -130,54 +130,71 @@ def teachers_diary(request):
     """
 
     # Current teacher and it's available subjects & grades
-    teacher = models.Teachers.objects.get(account=request.user)
-    available_subjects = teacher.subjects.all().order_by('name')
-    available_grades = models.Grades.objects.filter(
-        teachers=teacher).order_by('number', 'letter')
+    teacher = request.user.teacher
+    available_subjects, available_grades \
+        = utils.grades_and_subjects(teacher)
 
+    # If teacher doesn't have available classes or subjects,
+    # user is redirected to Access Denied page.
     if not (available_grades and available_subjects):
         return render(request, 'access_denied.html', {
             'message': "Пока что вы не указаны как учитель ни в одном классе."
         })
 
-    # If teacher've just chosen grade, subject & quarter, update these
+    # Initialising a form for selecting classes and subjects
+    # and filling it with initial values (available subjects & classes)
+    selectionForm = forms.GroupSelectionForm(
+        classes=available_grades,
+        subjects=available_subjects
+    )
+
+    # If teacher has just chosen grade, subject & quarter, update these
     # values in current session.
     if request.method == 'POST' and 'getgrade' in request.POST:
-        subject = available_subjects.get(name=request.POST.get('subject'))
-        grade = request.POST.get('grade')
-        term = int(request.POST.get('term'))
-        grade = available_grades.get(number=int(grade[0:-1]), letter=grade[-1])
-        functions.load_to_session(
-            request.session,
-            term=term, subject=subject.id, grade=grade.id
-        )
+        selectionForm = forms.GroupSelectionForm(request.POST)
+        if selectionForm.is_valid():
+            functions.load_to_session(
+                request.session,
+                term=selectionForm.cleaned_data['quarters'],
+                group=selectionForm.get_group().id
+            )
+            # We got data from form, saved it into the session,
+            # now we teacher is redirected back to this page.
         return redirect('diary')
 
-    if not functions.session_is_ok(request.session):
-        current_quarter = functions.get_current_quarter()
+    # Assume that teacher hasn't selected any class/subject yet.
+    # If current session doesn't have values we need (group & quarter),
+    # we load defaults.
+    if not utils.each_contains(request.session, ("term", "group")):
+        # Get current quarter and change it to 1 if it's holidays now
+        current_quarter = utils.get_current_quarter()
         if not current_quarter:
             current_quarter = 1
+        group = utils.get_group(
+            available_subjects[0], available_grades[0])
         utils.load_into_session(request.session, {
-            'subject': available_subjects[0].id,
-            'grade': available_grades[0].id,
+            'group': group.id,
             'term': current_quarter,
         })
+        # Now we can redirect teacher back to diary page.
+        # After the redirect, we will get all needed session data.
+        return redirect('diary')
 
     # Finally, grade, subject & term chosen by teacher
-    grade, subject, term = functions.get_session_data(
-        request.session, grades=available_grades, subjects=available_subjects)
+    data = utils.load_from_session(request.session, {'group': None, 'term': None})
+    group = models.Groups.objects.get(id=data['group'])
+    quarter = data['term']
 
-    if subject not in grade.subjects.all():
+    selectionForm = forms.GroupSelectionForm(initial={
+        'classes': group.grade,
+        'subjects': group.subject,
+        'quarters': quarter
+    })
+
+    if group.subject not in group.grade.subjects.all():
         return render(request, 'access_denied.html', {
-            'message': "Предмет \"{}\" не изучается в {} классе".format(subject, grade)
+            'message': "Предмет \"{}\" не изучается в {} классе".format(group.subject, group.grade)
         })
-
-    # UPDATE: group retrieving
-    group = models.Groups.objects.get_or_create(grade=grade, subject=subject)
-    if group[1]:  # If it hasn't been created yet
-        group[0].set_default_students()
-    group = group[0]
-    utils.load_into_session(request.session, {'group': group.id})
 
     # New lesson creation
     form = forms.LessonCreationForm()
@@ -196,13 +213,14 @@ def teachers_diary(request):
         'teacher': teacher,
         'subjects': available_subjects,
         'grades': available_grades,
-        'current_class': grade,
-        'current_term': term,
-        'current_subject': subject,
+        'current_class': group.grade,
+        'current_term': quarter,
+        'current_subject': group.subject,
         'form': form,
-        'hw_form': hw_form
+        'hw_form': hw_form,
+        'group_form': selectionForm
     }
-    functions.update_context(context, group, term)
+    functions.update_context(context, group, quarter)
     return render(request, 'teacher.html', context)
 
 
