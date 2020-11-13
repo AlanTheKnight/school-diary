@@ -141,13 +141,6 @@ def teachers_diary(request):
             'message': "Пока что вы не указаны как учитель ни в одном классе."
         })
 
-    # Initialising a form for selecting classes and subjects
-    # and filling it with initial values (available subjects & classes)
-    selectionForm = forms.GroupSelectionForm(
-        classes=available_grades,
-        subjects=available_subjects
-    )
-
     # If teacher has just chosen grade, subject & quarter, update these
     # values in current session.
     if request.method == 'POST' and 'getgrade' in request.POST:
@@ -185,11 +178,17 @@ def teachers_diary(request):
     group = models.Groups.objects.get(id=data['group'])
     quarter = data['term']
 
-    selectionForm = forms.GroupSelectionForm(initial={
-        'classes': group.grade,
-        'subjects': group.subject,
-        'quarters': quarter
-    })
+    # Initialising a form for selecting classes and subjects
+    # and filling it with initial values (available subjects & classes)
+    selectionForm = forms.GroupSelectionForm(
+        classes=available_grades,
+        subjects=available_subjects,
+        initial={
+            'classes': group.grade,
+            'subjects': group.subject,
+            'quarters': quarter
+        }
+    )
 
     if group.subject not in group.grade.subjects.all():
         return render(request, 'access_denied.html', {
