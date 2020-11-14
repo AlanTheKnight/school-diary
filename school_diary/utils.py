@@ -96,3 +96,33 @@ def get_group(subject, grade):
     if created:
         group.set_default_students()
     return group
+
+
+def session_ok(session) -> bool:
+    return each_contains(session, ("term", "group"))
+
+
+def set_default_session(session, subjects, grades) -> None:
+    if not grades:
+        raise ValueError("Grades length needs to be > 0.")
+    if not subjects:
+        raise ValueError("Subjects length needs to be > 0.")
+    if not each_contains(session, ("term", "group")):
+        current_quarter = get_current_quarter()
+        if not current_quarter:
+            current_quarter = 1
+        group = get_group(subjects[0], grades[0])
+        load_into_session(session, {
+            'group': group.id,
+            'term': current_quarter,
+        })
+
+
+def fool_teacher_protection(teacher: models.Teachers, lesson: models.Lessons):
+    """
+    Return False if teacher doesn't have an access to the lesson.
+    """
+    subjects, grades = grades_and_subjects(teacher)
+    if lesson.group.grade not in grades or lesson.group.subject not in subjects:
+        return False
+    return True

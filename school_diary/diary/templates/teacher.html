@@ -18,13 +18,12 @@
 {% endblock %}
 
 {% block content %}
+<input type="hidden" value="{% url 'api:inbuilt:save-mark' %}" name="save-mark-url">
+<input type="hidden" value="{% url 'api:inbuilt:add-comment' %}" name="add-comment-url">
+<input type="hidden" value="{% url 'api:inbuilt:get-comment' %}" name="get-comment-url">
+
 <div class="container-fluid my-5">
-
-    <!--Form for choosing subject, class and quarter. -->
-
     {% include 'teacher_page/select_form.html' %}
-    
-    <!--Big table form with choosing marks.-->
 
     {% csrf_token %}
     <div class="my-3">
@@ -39,63 +38,57 @@
     </div>
 
     {% if lessons %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm ">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Ученики</th>
+                        <th title="Среднее арифметическое" style="width:4%;">AVG</th>
+                        <th title="Взвешенный средний балл" style="width:5%;">SM.AVG</th>
+                        {% for k, lesson in lessons.items %}
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-sm ">
-
-            <thead class="thead-light">
-                <tr>
-                    <th scope="col">Ученики</th>
-                    <th title="Среднее арифметическое" style="width:4%;">AVG</th>
-                    <th title="Взвешенный средний балл" style="width:5%;">SM.AVG</th>
-                    {% for k, lesson in lessons.items %}
-
-                        <th scope="col">
-                            <a
-                            href="{% url 'lesson-page' lesson.pk %}"
-                            tabindex="0" class="lesson-link"
-                            oncontextmenu="$(this).popover({html: true}); $(this).popover('toggle'); return false;"
-                            onfocusout="$(this).popover('dispose')" title="{{ lesson.date|date:'j M, l' }}"
-                            data-content="
-                                {{ lesson.control.name }}<br>
-                                {% if lesson.theme %}
-                                <b>Тема урока: </b>{{ lesson.theme }}
-                                {% endif %}">
-                                {{ lesson.date|date:'d M' }}
-                            </a>
-                        </th>
-                    {% endfor %}
-                </tr>
-            </thead>
-
-
-            <tbody>
-            {% for student, small_scope in scope %}
-                <tr>
-                    <td scope="row" style="width: 20%;">{{ student.surname }} {{ student.first_name }}</td>
-                    <td id="{{ student.pk }}">
-                        {{ small_scope|lookup:"avg"|lookup:0 }}
-                    </td>
-                    <td id = "s_{{ student.pk }}">
-                        {{ small_scope|lookup:"avg"|lookup:1 }}
-                    </td>
-                    {% for lk, lesson in lessons.items %}
-                        {% with mark=small_scope|lookup:lesson %}
-                            {% include "teacher_page/mark_td.html" %}
-                        {% endwith %}
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-            </tbody>
-            </table>
-    </div>
-    
+                            <th scope="col">
+                                <a
+                                href="{% url 'lesson-page' lesson.pk %}"
+                                tabindex="0" class="lesson-link"
+                                oncontextmenu="$(this).popover({html: true}); $(this).popover('toggle'); return false;"
+                                onfocusout="$(this).popover('dispose')" title="{{ lesson.date|date:'j M, l' }}"
+                                data-content="
+                                    {{ lesson.control.name }}<br>
+                                    {% if lesson.theme %}
+                                    <b>Тема урока: </b>{{ lesson.theme }}
+                                    {% endif %}">
+                                    {{ lesson.date|date:'d M' }}
+                                </a>
+                            </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for student, small_scope in scope %}
+                    <tr>
+                        <td scope="row" style="width: 20%;">{{ student.surname }} {{ student.first_name }}</td>
+                        <td id="{{ student.pk }}">
+                            {{ small_scope|lookup:"avg"|lookup:0 }}
+                        </td>
+                        <td id = "s_{{ student.pk }}">
+                            {{ small_scope|lookup:"avg"|lookup:1 }}
+                        </td>
+                        {% for lk, lesson in lessons.items %}
+                            {% with mark=small_scope|lookup:lesson %}
+                                {% include "teacher_page/mark_td.html" %}
+                            {% endwith %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+        </div>
     {% else %}
-    <div class="alert alert-info mt-5">
-        Уроки еще не были добавлены.
-    </div>
+        <div class="alert alert-info mt-5">
+            Уроки еще не были добавлены.
+        </div>
     {% endif %}
-
 
     {% include 'teacher_page/create_lesson.html' %}
 
@@ -103,82 +96,5 @@
 
     {% include 'teacher_page/homework_modal.html' %}
 </div>
-<script>
-    function renderAvg(s) {
-        if (s != "-")
-            return s.toPrecision(2).replace(".", ",")
-        return s;
-    }
-
-    function myfunction(that){
-        that.style.backgroundColor = "#d6d6d6"
-        that.parentNode.style.backgroundColor = "#d6d6d6"
-        // save mark
-        let csrf = $("input[name='csrfmiddlewaretoken']").val();
-        let id = "button[name='"+ that.name.toString()+"']";
-        let comment_btn = $(id);
-        if (that.value){
-            comment_btn.css("display", "inline");
-        }else{
-            comment_btn.css("display", "none");
-        }
-        value = Number(that.value);  // Value of mark
-        let mark_data = that.name.split("|").map(x => Number(x))
-        $.ajax({
-            url:"{% url 'api:inbuilt:save-mark' %}",
-            method: 'POST',
-            data:{
-                "csrfmiddlewaretoken": csrf,
-                "student": mark_data[0],
-                "lesson": mark_data[1],
-                "value": value,
-            },
-            success: function (data){
-                let sm_avg = $("#s_"+mark_data[0]);
-                let avg = $("#"+mark_data[0]);
-                sm_avg.html(renderAvg(data.sm_avg));
-                avg.html(renderAvg(data.avg));
-            }
-        })
-    };
-
-    function commentDialog(that) {
-        let data = that.name.split("|").map(x => Number(x))
-        let csrf = $("input[name='csrfmiddlewaretoken']").val()
-        $.ajax({
-            url: "{% url 'api:inbuilt:get-comment' %}",
-            method: "POST",
-            data: {
-                "csrfmiddlewaretoken": csrf,
-                "lesson": data[1],
-                "student": data[0],
-            },
-            success: function (data) {
-                if (data.status == "aborted") return 
-                $("#comment-text").val(data.comment)
-                $("#comment-hidden").val(that.name)
-                $("#comment-modal").modal('show')
-            },
-        })
-    };
-
-    function addComment() {
-        let commentText = $("#comment-text").val()
-        let data = $("#comment-hidden").val().split("|").map(x => Number(x))
-        let csrf = $("input[name='csrfmiddlewaretoken']").val()
-        $.ajax({
-            url: "{% url 'api:inbuilt:add-comment' %}",
-            method: "POST",
-            data: {
-                "csrfmiddlewaretoken": csrf,
-                "comment": commentText,
-                "lesson": data[1],
-                "student": data[0],
-            },
-        })
-        $("#comment-text").val("")
-        $("#comment-modal").modal('hide')
-    }
-
-</script>
+<script src="{% static 'js/teacher.js' %}"></script>
 {% endblock %}

@@ -1,6 +1,4 @@
 import datetime
-from typing import List
-from django.db.models import Q
 from . import models
 
 
@@ -224,36 +222,12 @@ def check_if_student_in_class(student: models.Students) -> bool:
     return student.grade is not None
 
 
-def get_session_data(session, grades=None, subjects=None):
-    """
-    Get current grade, subject and term stored in session.
-    """
-    grade = grades.get(id=session['grade']) if grades else \
-        models.Grades.objects.get(id=session['grade'])
-    subject = subjects.get(id=session['subject']) if subjects else \
-        models.Subjects.objects.get(id=session['subject'])
-    term = session['term']
-    return grade, subject, term
-
-
 def load_to_session(session, **kwargs):
     """
     Take some kwargs and load them into current session.
     """
     for i in kwargs:
         session[i] = kwargs[i]
-
-
-def fool_teacher_protection(teacher, lesson: models.Lessons):
-    """
-    Return False if teacher doesn't have an access to the lesson.
-    """
-    teacher = models.Teachers.objects.get(pk=teacher)
-    grades = models.Grades.objects.filter(teachers=teacher)
-    subjects = teacher.subjects.all()
-    if lesson.group.grade not in grades or lesson.group.subject not in subjects:
-        return False
-    return True
 
 
 def session_is_ok(session):

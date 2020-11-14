@@ -22,10 +22,11 @@ NO_GRADE_CONTEXT = {
 @teacher_only
 @login_required(login_url="/login/")
 def visible_students(request):
-    grade, subject, term = functions.get_session_data(
-        request.session, models.Grades.objects.all(), models.Subjects.objects.all()
-    )
-    group = models.Groups.objects.get(subject=subject, grade=grade)
+    if not utils.session_ok(request.session):
+        return redirect('diary')
+    data = utils.load_from_session(request.session, {'group': None, 'term': None})
+    group = models.Groups.objects.get(id=data['group'])
+
     form = forms.VisibleStudentsForm(instance=group)
     if request.method == "POST":
         form = forms.VisibleStudentsForm(request.POST, instance=group)
@@ -41,16 +42,19 @@ def visible_students(request):
 def lesson_page(request, pk):
     """Page where teachers can edit lesson."""
     # If teacher haven't chosen grade, term and subject, redirect back to diary.
-    if not functions.each_contains(request.session, NEEDED_IN_SESSION):
+    if not utils.session_ok(request.session):
         return redirect('diary')
+    data = utils.load_from_session(request.session, {'group': None, 'term': None})
+    group = models.Groups.objects.get(id=data['group'])
+    term = data['term']
+
     lesson = models.Lessons.objects.get(pk=pk)
-    if not functions.fool_teacher_protection(request.user.id, lesson):
+    if not utils.fool_teacher_protection(request.user.teacher, lesson):
         return render(request, 'access_denied.html', {
             'message': "Вы не можете удалить этот урок.",
         })
+
     form = forms.LessonCreationForm(instance=lesson)
-    grade, subject, term = functions.get_session_data(request.session)
-    group = models.Groups.objects.get(subject=subject, grade=grade)
     form.fields["control"].queryset = functions.create_controls(group, term)
     if request.method == "POST":
         form = forms.LessonCreationForm(
@@ -69,11 +73,8 @@ def delete_lesson(request, pk):
     """
     Asks teacher's confirmation and then deletes the selected lesson.
     """
-    if not functions.each_contains(request.session, NEEDED_IN_SESSION):
-        return redirect('diary')
     lesson = models.Lessons.objects.get(pk=pk)
-    # Fool protection for users who will try to delete a lesson of another teacher.
-    if not functions.fool_teacher_protection(request.user.id, lesson):
+    if not utils.fool_teacher_protection(request.user.teacher, lesson):
         return render(request, 'access_denied.html', {
             'message': "Вы не можете удалить этот урок.",
         })
@@ -146,10 +147,12 @@ def teachers_diary(request):
     if request.method == 'POST' and 'getgrade' in request.POST:
         selectionForm = forms.GroupSelectionForm(request.POST)
         if selectionForm.is_valid():
-            functions.load_to_session(
+            utils.load_into_session(
                 request.session,
-                term=selectionForm.cleaned_data['quarters'],
-                group=selectionForm.get_group().id
+                {
+                    'term': selectionForm.cleaned_data['quarters'],
+                    'group': selectionForm.get_group().id
+                }
             )
             # We got data from form, saved it into the session,
             # now we teacher is redirected back to this page.
@@ -158,20 +161,10 @@ def teachers_diary(request):
     # Assume that teacher hasn't selected any class/subject yet.
     # If current session doesn't have values we need (group & quarter),
     # we load defaults.
-    if not utils.each_contains(request.session, ("term", "group")):
-        # Get current quarter and change it to 1 if it's holidays now
-        current_quarter = utils.get_current_quarter()
-        if not current_quarter:
-            current_quarter = 1
-        group = utils.get_group(
-            available_subjects[0], available_grades[0])
-        utils.load_into_session(request.session, {
-            'group': group.id,
-            'term': current_quarter,
-        })
-        # Now we can redirect teacher back to diary page.
-        # After the redirect, we will get all needed session data.
-        return redirect('diary')
+    utils.set_default_session(
+        request.session, available_subjects, available_grades)
+    # Now we can redirect teacher back to diary page.
+    # After the redirect, we will get all needed session data.
 
     # Finally, grade, subject & term chosen by teacher
     data = utils.load_from_session(request.session, {'group': None, 'term': None})
@@ -209,12 +202,6 @@ def teachers_diary(request):
             homework.add_homework(hw_form.cleaned_data, group.id)
 
     context = {
-        'teacher': teacher,
-        'subjects': available_subjects,
-        'grades': available_grades,
-        'current_class': group.grade,
-        'current_term': quarter,
-        'current_subject': group.subject,
         'form': form,
         'hw_form': hw_form,
         'group_form': selectionForm
