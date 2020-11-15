@@ -59,6 +59,11 @@ class HomeworkForm(forms.ModelForm):
                 )
         return content
 
+    def clean(self):
+        super().clean()
+        if self.cleaned_data['h_file'] is None and not self.cleaned_data['homework']:
+            raise forms.ValidationError("Укажите задание или прикрепите файл")
+
     def add_homework(self, grade: models.Grades) -> models.Lessons:
         """
         Add homework to specified date.
@@ -102,5 +107,7 @@ class HomeworkForm(forms.ModelForm):
         group = utils.get_group(
             self.cleaned_data['subject'], self.instance.group.grade)
         data.group = group
+        if not self.data.get("deleteFile") is None:
+            data.h_file.delete()
         data.save()
         return data

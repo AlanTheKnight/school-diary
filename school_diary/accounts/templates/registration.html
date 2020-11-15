@@ -63,7 +63,7 @@
                 </div>
                 <hr>
                 <div class="form-group">
-                    {% with field=form.password1 hide_label=True %}
+                    {% with field=form.password1 hide_label=True hide_errors=True %}
                     {{ field.label_tag }}
                     <div class="input-group" id="show_hide_password">
                         {% include 'field_template.html' %}

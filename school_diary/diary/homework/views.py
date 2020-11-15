@@ -101,11 +101,11 @@ def homework_delete(request, pk: int):
 def homework_edit(request, pk: int):
     subjects = request.user.student.grade.subjects.all()
     lesson = models.Lessons.objects.get(id=pk)
+    form = HomeworkForm(subjects, instance=lesson)
     if request.method == "POST":
+        print(request.POST.get("deleteFile"))
         form = HomeworkForm(subjects, request.POST, request.FILES, instance=lesson)
         if form.is_valid():
             form.save()
             return redirect('homework-list')
-    else:
-        form = HomeworkForm(subjects, instance=lesson)
     return render(request, 'homework/edit.html', {'form': form})

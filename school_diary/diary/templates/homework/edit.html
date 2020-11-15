@@ -46,6 +46,17 @@
                 {% endwith %}
                 <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
             </div>
+            {% if form.instance.h_file %}
+            <div class="mt-3">
+                К заданию был приложен файл. <a href="{{ form.instance.h_file.url }}">Просмотреть</a>
+                <div class="mt-2">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="customSwitch1" name="deleteFile">
+                        <label class="custom-control-label" for="customSwitch1">Удалить файл</label>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <a href="{% url 'homework-list' %}" data-dismiss="modal" class="btn btn-secondary">Отменить</a>

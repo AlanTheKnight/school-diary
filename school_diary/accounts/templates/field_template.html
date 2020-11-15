@@ -12,11 +12,13 @@
             {% render_field field class="custom-file-input is-invalid" %}
         {% endif %}
 
+        {% if not hide_errors %}
         {% for error in field.errors %}
             <div class="invalid-feedback">
                 {{ error }}
             </div>
         {% endfor %}
+        {% endif %}
     {% else %}
         {% if not isFile %}
             {% render_field field class="form-control is-valid" %}
