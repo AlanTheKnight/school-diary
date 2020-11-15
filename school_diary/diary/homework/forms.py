@@ -50,12 +50,13 @@ class HomeworkForm(forms.ModelForm):
 
     def clean_h_file(self):
         content = self.cleaned_data['h_file']
-        if content.size > MAX_FILE_SIZE * 1024 * 1024:
-            current_size = round(content.size / 1024 / 1024, 1)
-            raise forms.ValidationError(
-                "Размер файла не должен превышать %s Мб. Текущий размер: %s Мб" % (
-                    MAX_FILE_SIZE, current_size)
-            )
+        if content is not None:
+            if content.size > MAX_FILE_SIZE * 1024 * 1024:
+                current_size = round(content.size / 1024 / 1024, 1)
+                raise forms.ValidationError(
+                    "Размер файла не должен превышать %s Мб. Текущий размер: %s Мб" % (
+                        MAX_FILE_SIZE, current_size)
+                )
         return content
 
     def add_homework(self, grade: models.Grades) -> models.Lessons:
