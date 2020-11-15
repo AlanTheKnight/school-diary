@@ -40,24 +40,26 @@
             Домашнее задание ещё не было добавлено.
         </div>
     {% else %}
-    <table class="table text-center">
-        <thead class="thead thead-dark">
-            <th>Дата</th>
-            <th>Предмет</th>
-            <th>Удалить</th>
-            <th>Изменить</th>
-        </thead>
-        <tbody>
-            {% for lesson in lessons %}
-                <tr>
-                    <td>{{ lesson.date|date:"j E, l"|lower }}</td>
-                    <td>{{ lesson.subject }}</td>
-                    <td><a href="{% url 'homework-delete' lesson.id %}" class="stretched-link"><i class="fas fa-trash text-danger"></i></a></td>
-                    <td><a href="{% url 'homework-edit' lesson.id %}" class="stretched-link"><i class="fas fa-edit text-primary"></i></a></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table text-center">
+            <thead class="thead thead-dark">
+                <th>Дата</th>
+                <th>Предмет</th>
+                <th>Удалить</th>
+                <th>Изменить</th>
+            </thead>
+            <tbody>
+                {% for lesson in lessons %}
+                    <tr>
+                        <td>{{ lesson.date|date:"j E, l"|lower }}</td>
+                        <td>{{ lesson.subject }}</td>
+                        <td><a href="{% url 'homework-delete' lesson.id %}" class="stretched-link"><i class="fas fa-trash text-danger"></i></a></td>
+                        <td><a href="{% url 'homework-edit' lesson.id %}" class="stretched-link"><i class="fas fa-edit text-primary"></i></a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% endif %}
 </div>
 {% endblock %}
