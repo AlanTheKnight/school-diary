@@ -68,19 +68,19 @@ def homework_list(request, quarter=utils.get_default_quarter()):
         raise http.Http404
     if "quarter" in request.GET:
         return redirect('homework-list', int(request.GET.get("quarter")))
-    form = forms.QuarterSelectionForm(initial={
+    termform = forms.QuarterSelectionForm(initial={
         'quarter': quarter
     })
     subjects = request.user.student.grade.subjects.all()
     hw_form = HomeworkForm(subjects)
     if request.method == "POST":
-        hw_form = HomeworkForm(subjects, request.POST)
+        hw_form = HomeworkForm(subjects, request.POST, request.FILES)
         if hw_form.is_valid():
             hw_form.add_homework(request.user.student.grade)
             hw_form = HomeworkForm(subjects)
     lessons = homework.get_homework(request.user.student.grade, quarter=quarter, reverse=True)
     return render(request, 'homework/list.html', {
-        'form': form, 'lessons': lessons, 'hw_form': hw_form
+        'termform': termform, 'lessons': lessons, 'form': hw_form
     })
 
 
@@ -101,10 +101,11 @@ def homework_delete(request, pk: int):
 def homework_edit(request, pk: int):
     subjects = request.user.student.grade.subjects.all()
     lesson = models.Lessons.objects.get(id=pk)
-    hw_form = HomeworkForm(subjects, instance=lesson)
     if request.method == "POST":
-        hw_form = HomeworkForm(subjects, request.POST, request.FILES, instance=lesson)
-        if hw_form.is_valid():
-            hw_form.save()
+        form = HomeworkForm(subjects, request.POST, request.FILES, instance=lesson)
+        if form.is_valid():
+            form.save()
             return redirect('homework-list')
-    return render(request, 'homework/edit.html', {'hw_form': hw_form})
+    else:
+        form = HomeworkForm(subjects, instance=lesson)
+    return render(request, 'homework/edit.html', {'form': form})

@@ -4,9 +4,13 @@ from diary import functions
 import utils
 
 
+# 20 Mb
+MAX_FILE_SIZE = 20
+
+
 class HomeworkForm(forms.ModelForm):
     subject = forms.ModelChoiceField(
-        queryset=models.Subjects.objects.all(), label="Предмет: ",
+        queryset=models.Subjects.objects.all(), label="Предмет",
         widget=forms.Select(
             attrs={'class': 'form-control', 'id': 'f_subject'}),
         )
@@ -21,13 +25,13 @@ class HomeworkForm(forms.ModelForm):
         }
         widgets = {
             'h_file': forms.FileInput(attrs={
-                'class': 'custom-file-input', 'id': 'f_file'
+                'id': 'f_file'
             }),
             'homework': forms.Textarea(attrs={
                 'class': 'form-control', 'id': 'f_hw'
             }),
             'date': forms.DateInput(format=('%Y-%m-%d'), attrs={
-                'class': 'form-control', 'type': 'date', 'id': 'f_date'
+                'class': 'form-control', 'type': 'date'
             }),
         }
 
@@ -43,6 +47,16 @@ class HomeworkForm(forms.ModelForm):
             self.fields['date'].widget.attrs['class'] += ' is-invalid'
             raise forms.ValidationError("Урок не может быть на каникулах")
         return date
+
+    def clean_h_file(self):
+        content = self.cleaned_data['h_file']
+        if content.size > MAX_FILE_SIZE * 1024 * 1024:
+            current_size = round(content.size / 1024 / 1024, 1)
+            raise forms.ValidationError(
+                "Размер файла не должен превышать %s Мб. Текущий размер: %s Мб" % (
+                    MAX_FILE_SIZE, current_size)
+            )
+        return content
 
     def add_homework(self, grade: models.Grades) -> models.Lessons:
         """

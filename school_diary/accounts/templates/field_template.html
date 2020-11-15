@@ -1,20 +1,35 @@
 {% load widget_tweaks %}
+
 {% if not hide_label %}
-{{ field.label_tag }}
+    {{ field.label_tag }}
 {% endif %}
+
 {% if form.is_bound %}
-{% if field.errors %}
-    {% render_field field class="form-control is-invalid" %}
-    {% for error in field.errors %}
-    <div class="invalid-feedback">
-        {{ error }}
-    </div>
-    {% endfor %}
+    {% if field.errors %}
+        {% if not isFile %}
+            {% render_field field class="form-control is-invalid" %}
+        {% else %}
+            {% render_field field class="custom-file-input is-invalid" %}
+        {% endif %}
+
+        {% for error in field.errors %}
+            <div class="invalid-feedback">
+                {{ error }}
+            </div>
+        {% endfor %}
+    {% else %}
+        {% if not isFile %}
+            {% render_field field class="form-control is-valid" %}
+        {% else %}
+            {% render_field field class="custom-file-input is-valid" %}
+        {% endif %}
+    {% endif %}
 {% else %}
-    {% render_field field class="form-control is-valid" %}
-{% endif %}
-{% else %}
+    {% if not isFile %}
         {% render_field field class="form-control" %}
+    {% else %}
+        {% render_field field class="custom-file-input" %}
+    {% endif %}
 {% endif %}
 
 {% if field.help_text %}

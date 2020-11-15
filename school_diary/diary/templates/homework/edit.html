@@ -13,14 +13,25 @@
 {% block content %}
 <div class="container my-5">
     <form method="POST" enctype="multipart/form-data">
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
         {% csrf_token %}
         <div class="form-group">
             <label for="id_subject">Предмет</label>
-            {{ hw_form.subject }}
+            {% with field=form.subject hide_label=True %}
+                {% include 'field_template.html' %}
+            {% endwith %}
         </div>
         <label for="id_date">Дата, на которую вы задаете д/з</label>
         <div class="input-group mb-3">
-            {{ hw_form.date }}
+            {% with field=form.date hide_label=True %}
+                {% include 'field_template.html' %}
+            {% endwith %}
             <div class="input-group-append">
                 <span class="input-group-text"><i class="fas fa-calendar"></i></span>
             </div>
@@ -30,17 +41,21 @@
         </div>
         <div class="form-group">
             <label for="id_homework">Домашнее задание</label>
-            {{ hw_form.homework }}
+            {% with field=form.homework hide_label=True %}
+                {% include 'field_template.html' %}
+            {% endwith %}
         </div>
         <div class="form-group">
             <div class="custom-file">
-                {{ hw_form.h_file }}
+                {% with field=form.h_file isFile=True hide_label=True %}
+                    {% include 'field_template.html' %}
+                {% endwith %}
                 <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
             </div>
         </div>
 
         <a href="{% url 'homework-list' %}" data-dismiss="modal" class="btn btn-secondary">Отменить</a>
-        <button type="submit" class="btn btn-primary" name="addhomework">Добавить</button>
+        <button type="submit" class="btn btn-primary" name="addhomework">Изменить</button>
     </form>
 </div>
 {% endblock %}
