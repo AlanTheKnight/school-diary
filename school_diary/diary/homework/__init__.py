@@ -47,8 +47,10 @@ def add_homework(cleaned_data: dict, group: int) -> models.Lessons:
 
 def get_homework(
         grade: models.Lessons,
-        start_date: datetime.date,
-        end_date: datetime.date = None) -> List[Homework]:
+        quarter=None,
+        start_date: datetime.date = None,
+        end_date: datetime.date = None,
+        reverse: bool = False) -> List[Homework]:
     """
     Get homework for specified grade. If both start_date and end_date are
     specified, search for homework in this time range. Otherwise (only start_date)
@@ -66,7 +68,15 @@ def get_homework(
     Returns:
         A list of diary.functions.Homework objects.
     """
-    if end_date is not None:
+    if not quarter and not (start_date or end_date):
+        return ValueError(
+            "At least one argument: quarter, start_date and end_date was expected.")
+    if quarter:
+        queryset = models.Lessons.objects.filter(
+            Q(homework__iregex=r'\S+') | Q(h_file__iregex=r'\S+'),
+            group__grade=grade, quarter=quarter
+        )
+    elif end_date is not None:
         queryset = models.Lessons.objects.filter(
             Q(homework__iregex=r'\S+') | Q(h_file__iregex=r'\S+'),
             group__grade=grade,
@@ -75,4 +85,6 @@ def get_homework(
         queryset = models.Lessons.objects.filter(
             Q(homework__iregex=r'\S+') | Q(h_file__iregex=r'\S+'),
             group__grade=grade, date=start_date)
+    if reverse:
+        queryset = queryset.order_by('-date')
     return [Homework(i) for i in queryset]

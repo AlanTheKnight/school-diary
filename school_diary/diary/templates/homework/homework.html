@@ -32,6 +32,13 @@
     </div>
     </form>
 
+    {% if request.user.student.special %}
+        <div class="mt-4 mb-2">Вы являетесь <i>старостой класса</i> - вам доступна новая функция:</div>
+        <div>
+            <a href="{% url 'homework-list' %}" class="btn btn-outline-danger"><i class="fas fa-list mr-2"></i>Список д/з</a>
+        </div>
+    {% endif %}
+
     <div class="card card-body my-4">
         <div id="homework-wrapper">
             {% if "date" in request.GET %}

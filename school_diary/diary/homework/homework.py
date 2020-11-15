@@ -22,6 +22,7 @@ class Homework(object):
         self.subject = lesson.group.subject
         self.text = lesson.homework
         self.file = lesson.h_file
+        self.id = lesson.id
 
     @property
     def file_exists(self):

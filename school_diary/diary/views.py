@@ -199,7 +199,7 @@ def teachers_diary(request):
     if request.method == "POST" and 'addhomework' in request.POST:
         hw_form = forms.HomeworkForm(request.POST, request.FILES)
         if hw_form.is_valid():
-            homework.add_homework(hw_form.cleaned_data, group.id)
+            hw_form.add_homework(group.id)
 
     context = {
         'form': form,

@@ -1,0 +1,26 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Домашнее задание</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                Вы уверены, что хотите удалить урок {{ lesson }}?
+            </div>
+            <a href="{% url 'homework-list' %}" class="btn btn-outline-secondary">Отмена</a>
+            <button type="submit" class="btn btn-outline-danger">Удалить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

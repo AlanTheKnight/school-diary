@@ -167,6 +167,7 @@ class Students(models.Model):
     grade = models.ForeignKey(
         Grades, on_delete=models.SET_NULL, null=True, default=None,
         verbose_name="Класс", blank=True)
+    special = models.BooleanField(verbose_name="Может ли добавлять д/з", default=False)
 
     class Meta:
         ordering = ['grade', 'surname', 'first_name', 'second_name']

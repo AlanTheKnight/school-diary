@@ -83,7 +83,7 @@ def grades_and_subjects(teacher: models.Teachers) -> tuple:
     return available_subjects, available_grades
 
 
-def get_group(subject, grade):
+def get_group(subject, grade) -> models.Groups:
     """
     Return group from given subject and class.
     If group hasn't been created yet, set

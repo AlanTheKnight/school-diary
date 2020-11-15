@@ -1,0 +1,63 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+<title>Домашнее задание</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
+<style>
+    td {
+        position: relative;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {% include 'homework/homework_modal.html' %}
+    <div class="row my-4">
+        <div class="col-12 col-md-6 col-lg-4">
+            <form method="GET">
+                <div class="input-group mb-3">
+                    {{ form.quarter }}
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-primary">Выбрать</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-outline-primary" data-toggle="modal" data-target="#homeworkmodal"><i class="fas fa-plus mr-2"></i>Добавить д/з</button>
+        </div>
+    </div>
+    
+    {% if not lessons %}
+        <div class="card card-body">
+            Домашнее задание ещё не было добавлено.
+        </div>
+    {% else %}
+    <table class="table text-center">
+        <thead class="thead thead-dark">
+            <th>Дата</th>
+            <th>Предмет</th>
+            <th>Удалить</th>
+            <th>Изменить</th>
+        </thead>
+        <tbody>
+            {% for lesson in lessons %}
+                <tr>
+                    <td>{{ lesson.date|date:"j E, l"|lower }}</td>
+                    <td>{{ lesson.subject }}</td>
+                    <td><a href="{% url 'homework-delete' lesson.id %}" class="stretched-link"><i class="fas fa-trash text-danger"></i></a></td>
+                    <td><a href="{% url 'homework-edit' lesson.id %}" class="stretched-link"><i class="fas fa-edit text-primary"></i></a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endblock %}
