@@ -42,25 +42,8 @@ def news_create(request):
         form = forms.ArticleCreationForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('news_dashboard')
+            return redirect('news')
     return render(request, 'news_editor.html', {'form': form})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def news_dashboard(request, page):
-    """Dashboard for posts."""
-    news = models.Publications.objects.all()
-    news = Paginator(news, 100)  # 100 posts per page
-    news = news.get_page(page)
-    return render(request, 'news_dashboard.html', {'news': news})
-
-
-@login_required(login_url="/login/")
-@admin_only
-def news_dashboard_first_page(request):
-    """Redirects user to the first page of the dashboard."""
-    return redirect('news_dashboard', page=1)
 
 
 @login_required(login_url="/login/")
