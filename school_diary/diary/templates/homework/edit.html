@@ -28,13 +28,10 @@
             {% endwith %}
         </div>
         <label for="id_date">Дата, на которую вы задаете д/з</label>
-        <div class="input-group mb-3">
+        <div class="form-group mb-3">
             {% with field=form.date hide_label=True %}
                 {% include 'field_template.html' %}
             {% endwith %}
-            <div class="input-group-append">
-                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-            </div>
         </div>
         <div class="form-group">
             <label for="id_homework">Домашнее задание</label>
