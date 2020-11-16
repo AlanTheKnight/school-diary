@@ -28,6 +28,7 @@ jobs:
     - name: Make migrations
       run: |
         cd school_diary
+        python manage.py makemigrations diary
         python manage.py makemigrations
         python manage.py migrate
     - name: Run Tests
