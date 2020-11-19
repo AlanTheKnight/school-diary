@@ -1,8 +1,8 @@
 from diary import models
 import utils
 import datetime
-from typing import List
-from django.db.models import Q
+from typing import List, Union
+from django.db.models import Q, QuerySet
 from .homework import Homework
 
 
@@ -50,7 +50,8 @@ def get_homework(
         quarter=None,
         start_date: datetime.date = None,
         end_date: datetime.date = None,
-        reverse: bool = False) -> List[Homework]:
+        reverse: bool = False,
+        convert: bool = True):
     """
     Get homework for specified grade. If both start_date and end_date are
     specified, search for homework in this time range. Otherwise (only start_date)
@@ -87,4 +88,6 @@ def get_homework(
             group__grade=grade, date=start_date)
     if reverse:
         queryset = queryset.order_by('-date')
+    if not convert:
+        return queryset
     return [Homework(i) for i in queryset]

@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Домашнее задание</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center my-5">Статистика по количеству домашнего задания</h1>
+    <canvas id="chart"></canvas>
+</div>
+<script>
+    let ctx = document.getElementById("chart").getContext("2d");
+    Object.defineProperty(Array.prototype, 'shuffle', {
+        value: function() {
+            for (let i = this.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [this[i], this[j]] = [this[j], this[i]];
+            }
+            return this;
+        }
+    });
+    let colors = [
+        '#d00000',
+        '#e85d04',
+        '#ffba08',
+        '#3a0ca3',
+        '#f72585',
+        '#219ebc',
+        '#8338ec'
+    ]
+    var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ subjects| safe }},
+            datasets: [{
+                data: {{ data|safe }},
+                backgroundColor: colors.shuffle(),
+                borderWidth: 2,
+                hoverBorderColor: 'black',
+            }]
+        },
+        options: {
+            legend: {
+                display: true,
+                position: 'right',
+            },
+            responsive: true,
+        }
+    });
+</script>
+{% endblock %}
