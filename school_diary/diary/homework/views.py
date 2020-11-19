@@ -117,7 +117,7 @@ def stats(request, quarter=utils.get_default_quarter()):
     if not (1 <= quarter <= 4):
         raise http.Http404
     if "quarter" in request.GET:
-        return redirect('homework-list', int(request.GET.get("quarter")))
+        return redirect('homework-stats', int(request.GET.get("quarter")))
     grade = request.user.student.grade
     groups = grade.groups_set.all()
     hw = homework.get_homework(grade=grade, quarter=quarter, convert=False)
@@ -125,5 +125,5 @@ def stats(request, quarter=utils.get_default_quarter()):
     for group in groups:
         subjects.append(group.subject.name)
         data.append(hw.filter(group=group).count())
-    context = {'subjects': subjects, 'data': data}
+    context = {'subjects': subjects, 'data': data, 'no_hw': len(hw) == 0}
     return render(request, 'homework/hw_stats.html', context)

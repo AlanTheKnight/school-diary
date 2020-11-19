@@ -16,28 +16,32 @@
 <div class="container my-5">
 
     <form method="GET">
-    <div class="row" id="search-wrapper">
+    <div class="row my-3" id="search-wrapper">
 
         <div class="col-12 col-md-6">
-            <div class="input-group mb-3">
+            <div class="input-group my-1">
                 {{ form.date }}
                 <div class="input-group-append">
                     <button type="submit" class="btn btn-outline-primary">Найти</button>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-auto">
+        <div class="col-12 col-sm-auto my-1">
             <a href="{% url 'homework' %}" class="btn btn-outline-primary">Д/з на неделю</a>
         </div>
     </div>
     </form>
 
-    {% if request.user.student.special %}
-        <div class="mt-4 mb-2">Вы являетесь <i>старостой класса</i> - вам доступна новая функция:</div>
-        <div>
+    <div class="row my-3">
+        {% if request.user.student.special %}
+        <div class="col-auto my-1">
             <a href="{% url 'homework-list' %}" class="btn btn-outline-danger"><i class="fas fa-list mr-2"></i>Список д/з</a>
         </div>
-    {% endif %}
+        {% endif %}
+        <div class="col-auto my-1">
+            <a href="{% url 'homework-stats' %}" class="btn btn-outline-primary"><i class="fas fa-chart-pie"></i></a>
+        </div>
+    </div>
 
     <div class="card card-body my-4">
         <div id="homework-wrapper">
@@ -86,10 +90,6 @@
                 {% endif %}
             {% endif %}
         </div>
-    </div>
-
-    <div class="my-4">
-        <a href="{% url 'homework-stats' %}" class="btn btn-outline-secondary"><i class="fas fa-chart-pie"></i></a>
     </div>
 </div>
 {% endblock %}

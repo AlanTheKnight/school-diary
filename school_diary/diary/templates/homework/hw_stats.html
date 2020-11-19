@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-<title>Домашнее задание</title>
+<title>Домашнее задание: Статистика</title>
 {% endblock %}
 
 {% block css %}
@@ -12,8 +12,22 @@
 
 {% block content %}
 <div class="container my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"> <a href="{% url 'homework' %}">Домашнее задание</a></li>
+            <li class="breadcrumb-item active"><a href="{{ request.path }}">Статистика</a></li>
+        </ol>
+    </nav>
+
+    {% if no_hw %}
+        <div class="card card-body text-center">
+            <img src="{% static 'icons/cactus.svg' %}" alt="" height="100" class="mb-3">
+            Домашнее задание еще не было добавлено
+        </div>
+    {% else %}
     <h1 class="text-center my-5">Статистика по количеству домашнего задания</h1>
     <canvas id="chart"></canvas>
+    {% endif %}
 </div>
 <script>
     let ctx = document.getElementById("chart").getContext("2d");
@@ -27,20 +41,11 @@
         }
     });
     let colors = [
-        '#d00000',
-        '#e85d04',
-        '#ffba08',
-        '#3a0ca3',
-        '#f72585',
-        '#219ebc',
-        '#8338ec',
-        '#90be6d',
-        '#708d81',
-        '#fb6376',
-        '#840032',
-        '#caff8a',
-        '#0b132b',
-        '#fdc5f5'
+        '#d00000', '#e85d04', '#ffba08', '#3a0ca3',
+        '#f72585', '#219ebc', '#8338ec', '#90be6d',
+        '#708d81', '#fb6376', '#840032', '#caff8a',
+        '#0b132b', '#fdc5f5', '#ceafff', '#f46036',
+        '#f4e285'
     ]
     var myChart = new Chart(ctx, {
         type: 'pie',
