@@ -1,4 +1,4 @@
-# School Diary
+# School Diary - A website made to help students!
 
 ## Setting up project on your computer
 
