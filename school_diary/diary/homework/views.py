@@ -63,7 +63,9 @@ def show_homework(request):
 @student_only
 @is_special
 @in_grade
-def homework_list(request, quarter=utils.get_default_quarter()):
+def homework_list(request, quarter=None):
+    if quarter is None:
+        quarter = utils.get_default_quarter()
     if not (1 <= quarter <= 4):
         raise http.Http404
     if "quarter" in request.GET:
@@ -113,7 +115,9 @@ def homework_edit(request, pk: int):
 
 @student_only
 @in_grade
-def stats(request, quarter=utils.get_default_quarter()):
+def stats(request, quarter=None):
+    if quarter is None:
+        utils.get_default_quarter()
     if not (1 <= quarter <= 4):
         raise http.Http404
     if "quarter" in request.GET:
