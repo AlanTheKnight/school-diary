@@ -6,8 +6,8 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <a class="navbar-brand" href="{% url 'homepage' %}" title="Главная страница">
-            <img src="{% static 'bober.png' %}" width="40" height="40" class="d-inline-block align-center" alt="">
-            Гимназия 56
+            <img src="{% static 'icons/book.png' %}" width="35" height="35" class="d-inline-block align-center" alt="" style="padding: 2px;">
+            Diary56
         </a>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
@@ -40,8 +40,11 @@
                 </div>
             </div>
             {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline-success mx-1">Войти</a>
+            <li class="nav-item">
+                <a href="{% url 'login' %}" class="btn btn-outline-success">Войти</a>
                 <a href="{% url 'register' %}" class="btn btn-success">Зарегистрироваться</a>
+            </li>
+                
             {% endif %}
         </div>
     </div>
