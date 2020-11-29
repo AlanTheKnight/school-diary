@@ -1,0 +1,70 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+<title>Изменить</title>
+<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card card-50 my-5">
+        <div class="card-body">
+            <h2 class="card-title">Изменить план урока</h2>
+            <form method="POST">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="form-group">
+
+                            <label for="grade">Класс</label>
+                            <select name="grade" class="form-control">
+                            {% for grade in grades %}
+                                {% if grade == plan.group.grade %}
+                                    <option value="{{ grade.pk}}" selected>{{ grade}}</option>
+                                {% else %}
+                                    <option value="{{ grade.pk}}">{{ grade}}</option>
+                                {% endif %}
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Предмет</label>
+
+                            <select name="subject" class="form-control">
+                            {% for subject in subjects %}
+                                {% if subject == plan.group.subject %}
+                                    <option value="{{ subject.pk}}" selected>{{ subject}}</option>
+                                {% else %}
+                                    <option value="{{ subject.pk}}">{{ subject}}</option>
+                                {% endif %}
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Дата</label>
+                            <input type="date" name="date" id="date" class="form-control" value="{{ plan.date|date:'Y-m-d' }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="theme">Тема</label>
+                            <input type="text" name="theme" id="theme" class="form-control" value="{{ plan.theme }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="control">Вид работы</label>
+                            <select name="control" class="form-control">
+
+                            {% for control in controls %}
+                                {% if control == plan.control %}
+                                    <option value="{{ control.pk}}" selected>{{control}}</option>
+                                {% else %}
+                                    <option value="{{ control.pk}}">{{control}}</option>
+                                {% endif %}
+                            {% endfor %}
+                            </select>
+                        </div>
+                <button type="submit" class="btn btn-primary">Изменить</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

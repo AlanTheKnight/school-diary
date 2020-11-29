@@ -104,7 +104,7 @@ def students_marks(request, student_id):
     d = {}
     max_length, total_missed = 0, 0
     for group in groups:
-        marks = all_marks.filter(lesson__group=group).order_by("lesson__date")
+        marks = all_marks.filter(lesson__group=group, lesson__is_plan=False).order_by("lesson__date")
         if len(marks) > max_length:
             max_length = len(marks)
         data = functions.get_marks_data(marks)

@@ -1,0 +1,160 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load templateLibs %}
+
+{% block title %}
+<title>Учебный план</title>
+{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="my-4">
+            <div class="card-body card card-50 my-3">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+{#                    TODO save search result#}
+                        <label for="grade">Класс</label>
+                        <select name="grade" class="form-control">
+                            <option value="" selected></option>
+                        {% for grade in grades %}
+                            <option value="{{ grade.pk}}">{{ grade}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Предмет</label>
+
+                        <select name="subject" class="form-control">
+                            <option value="" selected></option>
+                        {% for subject in subjects %}
+                            <option value="{{ subject.pk}}">{{ subject}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="collapse" id="search">
+                        <div class="form-group">
+                            <label for="date">Дата</label>
+                            <input type="date" name="date" id="date" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="theme">Тема</label>
+                            <input type="text" name="theme" id="theme" class="form-control">
+                        </div>
+                        <div class="form-group">
+                        <label for="control">Вид работы</label>
+                        <select name="control" class="form-control">
+                            <option value="" selected></option>
+                        {% for control in controls %}
+                            <option value="{{ control.pk}}">{{control}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    </div>
+                    <a class="btn btn-primary" data-toggle="collapse" href="#search" role="button" aria-expanded="false" aria-controls="search">
+                        Подробнее
+                    </a>
+
+                    <button class="btn btn-primary" type="submit" name="search">Найти</button>
+{#                    TODO delete button#}
+                </form>
+
+            </div>
+            {% if lessons %}
+                <div class="table-responsive">
+                    <table class="table text-center">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Дата</th>
+                                <th scope="col">Тема</th>
+                                <th scope="col">Предмет</th>
+                                <th scope="col">Класс</th>
+
+                                <th scope="col">Вид Работы</th>
+                                <th scope="col">Изменить</th>
+                                <th scope="col">Удалить</th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                        {% for lesson in lessons %}
+                            <tr>
+                                <td>{{ lesson.date }}</td>
+                                <td>{{ lesson.theme }}</td>
+                                <td>{{ lesson.group.subject }}</td>
+                                <td>{{ lesson.group.grade }}</td>
+                                <td>{{ lesson.control }}</td>
+                                <td><a class="btn btn-sm btn-primary text-" href="{% url 'update-lesson-plan' lesson.pk %}"><i class="fas fa-edit"></i></a></td>
+                                <td><a class="btn btn-sm btn-danger" href=""><i class="fas fa-trash-alt"></i></a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    </table>
+                    <div class="text-center">
+                        <a data-target="#creationModal" data-toggle="modal" class="btn btn-success text-white" role="button"><i class="fas fa-plus"></i></a>
+                    </div>
+                </div>
+
+            {% endif %}
+        <div class="modal fade" data-backdrop="static" aria-hidden="true" id="creationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Новый урок в плане</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                        <span aria-hidden="true">&times;</span>
+                    </div>
+                    <form method="POST">
+                        <input name="create" hidden>
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="form-group">
+
+                            <label for="grade">Класс</label>
+                            <select name="grade" class="form-control">
+                            {% for grade in grades %}
+                                <option value="{{ grade.pk}}">{{ grade}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Предмет</label>
+
+                            <select name="subject" class="form-control">
+                            {% for subject in subjects %}
+                                <option value="{{ subject.pk}}">{{ subject}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Дата</label>
+                            <input type="date" name="date" id="date" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="theme">Тема</label>
+                            <input type="text" name="theme" id="theme" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="control">Вид работы</label>
+                            <select name="control" class="form-control">
+
+                            {% for control in controls %}
+                                <option value="{{ control.pk}}">{{control}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                            <button class="btn btn-primary" type="submit">Создать</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        </div>
+
+    </div>
+
+
+{% endblock %}
