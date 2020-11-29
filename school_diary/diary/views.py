@@ -286,7 +286,6 @@ def lesson_plan(request):
 
         if 'create' in request.POST:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-            print()
             lesson = models.Lessons(date=date,
                                     quarter=utils.get_quarter_by_date(date),
                                     theme=theme,
@@ -316,6 +315,7 @@ def lesson_plan(request):
 
 @login_required(login_url="login")
 @teacher_only
+@transaction.atomic
 def update_lesson_plan(request, id):
     if request.method == 'POST':
         date = request.POST.get('date')
@@ -341,3 +341,14 @@ def update_lesson_plan(request, id):
         'controls': models.Controls.objects.all()
     }
     return render(request, 'lesson_plan_update.html', context)
+
+
+@login_required(login_url="login")
+@teacher_only
+@transaction.atomic
+def update_lesson_plan(request, id):
+    if request.method == 'POST':
+        lesson = models.Lessons.objects.get(pk=id)
+        lesson.delete()
+        return redirect('lesson-plan')
+    return render(request, 'delete_lesson_plan.html')

@@ -90,7 +90,7 @@
                                 <td>{{ lesson.group.grade }}</td>
                                 <td>{{ lesson.control }}</td>
                                 <td><a class="btn btn-sm btn-primary text-" href="{% url 'update-lesson-plan' lesson.pk %}"><i class="fas fa-edit"></i></a></td>
-                                <td><a class="btn btn-sm btn-danger" href=""><i class="fas fa-trash-alt"></i></a></td>
+                                <td><a class="btn btn-sm btn-danger" href="{% url 'delete-lesson-plan' lesson.pk %}"><i class="fas fa-trash-alt"></i></a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
