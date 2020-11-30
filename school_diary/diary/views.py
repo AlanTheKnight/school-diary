@@ -201,10 +201,18 @@ def teachers_diary(request):
         if hw_form.is_valid():
             hw_form.add_homework(group.id)
 
+    if request.method == 'POST' and 'plan_id' in request.POST:
+        plan = models.Lessons.objects.get(pk=request.POST.get('plan_id'))
+        plan.is_plan = False
+        plan.save()
+
+    plan_data = models.Lessons.objects.filter(is_plan=True, group=group, quarter=quarter)
+
     context = {
         'form': form,
         'hw_form': hw_form,
-        'group_form': selectionForm
+        'group_form': selectionForm,
+        'plan_data': plan_data,
     }
 
     functions.update_context(context, group, quarter)
