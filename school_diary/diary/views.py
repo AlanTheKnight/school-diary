@@ -24,7 +24,8 @@ NO_GRADE_CONTEXT = {
 def visible_students(request):
     if not utils.session_ok(request.session):
         return redirect('diary')
-    data = utils.load_from_session(request.session, {'group': None, 'term': None})
+    data = utils.load_from_session(
+        request.session, {'group': None, 'term': None})
     group = models.Groups.objects.get(id=data['group'])
 
     form = forms.VisibleStudentsForm(instance=group)
@@ -44,7 +45,8 @@ def lesson_page(request, pk):
     # If teacher haven't chosen grade, term and subject, redirect back to diary.
     if not utils.session_ok(request.session):
         return redirect('diary')
-    data = utils.load_from_session(request.session, {'group': None, 'term': None})
+    data = utils.load_from_session(
+        request.session, {'group': None, 'term': None})
     group = models.Groups.objects.get(id=data['group'])
     term = data['term']
 
@@ -93,7 +95,8 @@ def students_diary(request):
     if request.method == "POST" and 'all' in request.POST:
         chosen_quarter = int(request.POST.get('term'))
         groups = models.Groups.objects.filter(students=student, grade=grade)
-        all_marks = student.marks_set.filter(lesson__quarter=chosen_quarter, lesson__is_plan=False)
+        all_marks = student.marks_set.filter(
+            lesson__quarter=chosen_quarter, lesson__is_plan=False)
         if not all_marks:
             return render(request, 'no_marks.html')
 
@@ -167,7 +170,8 @@ def teachers_diary(request):
     # After the redirect, we will get all needed session data.
 
     # Finally, grade, subject & term chosen by teacher
-    data = utils.load_from_session(request.session, {'group': None, 'term': None})
+    data = utils.load_from_session(
+        request.session, {'group': None, 'term': None})
     group = models.Groups.objects.get(id=data['group'])
     quarter = data['term']
 
@@ -206,7 +210,8 @@ def teachers_diary(request):
         plan.is_plan = False
         plan.save()
 
-    plan_data = models.Lessons.objects.filter(is_plan=True, group=group, quarter=quarter)
+    plan_data = models.Lessons.objects.filter(
+        is_plan=True, group=group, quarter=quarter)
 
     context = {
         'form': form,
@@ -216,7 +221,6 @@ def teachers_diary(request):
     }
 
     functions.update_context(context, group, quarter)
-    print(context)
     return render(request, 'teacher.html', context)
 
 
@@ -249,7 +253,8 @@ def stats(request, pk, term):
             не преподают запрашиваемый предмет."})
     group = get_object_or_404(models.Groups, grade=grade, subject=subject)
     lessons = models.Lessons.objects.filter(group=group, quarter=term)
-    marks = student.marks_set.filter(lesson__group=group, lesson__quarter=term, lesson__is_plan=False)
+    marks = student.marks_set.filter(
+        lesson__group=group, lesson__quarter=term, lesson__is_plan=False)
 
     # If student has no marks than send him a page with info.
     # Otherwise, student will get a page with statistics and his results.
@@ -277,86 +282,3 @@ def stats(request, pk, term):
         }
         return render(request, 'results.html', context)
     return render(request, 'no_marks.html')
-
-
-@login_required(login_url="login")
-@teacher_only
-@transaction.atomic
-def lesson_plan(request):
-    teacher = request.user.teacher
-    plan = models.Lessons.objects.filter(group__grade__teachers=teacher, is_plan=True)
-    if request.method == 'POST':
-        date = request.POST.get('date')
-        theme = request.POST.get('theme')
-        subject = request.POST.get('subject')
-        grade = request.POST.get('grade')
-        control = request.POST.get('control')
-
-        if 'create' in request.POST:
-            date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-            lesson = models.Lessons(date=date,
-                                    quarter=utils.get_quarter_by_date(date),
-                                    theme=theme,
-                                    control=models.Controls.objects.get(pk=control),
-                                    is_plan=True,
-                                    group=utils.get_group(models.Subjects.objects.get(pk=subject),
-                                                          models.Grades.objects.get(pk=grade))
-                                    )
-            lesson.save()
-            redirect('lesson-plan')
-        else:
-            plan = plan.filter(date__icontains=date,
-                               theme__icontains=theme,
-                               group__subject__id__icontains=subject,
-                               group__grade__id__icontains=grade,
-                               control__id__icontains=control)
-
-    context = {
-        'lessons': plan,
-        'grades': models.Grades.objects.filter(teachers=teacher),
-        'subjects': models.Subjects.objects.filter(teachers=teacher),
-        'controls': models.Controls.objects.all()
-    }
-
-    return render(request, 'lesson_plan.html', context)
-
-
-@login_required(login_url="login")
-@teacher_only
-@transaction.atomic
-def update_lesson_plan(request, id):
-    if request.method == 'POST':
-        date = request.POST.get('date')
-        theme = request.POST.get('theme')
-        subject = request.POST.get('subject')
-        grade = request.POST.get('grade')
-        control = request.POST.get('control')
-        lesson = models.Lessons.objects.get(pk=id)
-        date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-        lesson.date = date
-        lesson.theme = theme
-        lesson.group = utils.get_group(models.Subjects.objects.get(pk=subject),
-                                models.Grades.objects.get(pk=grade))
-        lesson.control = models.Controls.objects.get(pk=control)
-        lesson.quarter = utils.get_quarter_by_date(date)
-        lesson.save()
-        return redirect('lesson-plan')
-    teacher = request.user.teacher
-    context = {
-        'plan': models.Lessons.objects.get(pk=id),
-        'grades': models.Grades.objects.filter(teachers=teacher),
-        'subjects': models.Subjects.objects.filter(teachers=teacher),
-        'controls': models.Controls.objects.all()
-    }
-    return render(request, 'lesson_plan_update.html', context)
-
-
-@login_required(login_url="login")
-@teacher_only
-@transaction.atomic
-def update_lesson_plan(request, id):
-    if request.method == 'POST':
-        lesson = models.Lessons.objects.get(pk=id)
-        lesson.delete()
-        return redirect('lesson-plan')
-    return render(request, 'delete_lesson_plan.html')

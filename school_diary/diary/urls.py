@@ -11,9 +11,6 @@ urlpatterns = [
     path('diary/visible-students/', views.visible_students, name="visible-students"),
     path('diary/', include('diary.homework.urls')),
     path('diary/lessons/', include('diary.lessons.urls')),
-    path('diary/lesson_plan', views.lesson_plan, name="lesson-plan"),
-    path('diary/lesson_plan/update/<int:id>', views.update_lesson_plan, name="update-lesson-plan"),
-    path('diary/lesson_plan/delete/<int:id>', views.update_lesson_plan, name="delete-lesson-plan"),
 ]
 
 if settings.DEBUG:
