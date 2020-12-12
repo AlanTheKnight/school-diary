@@ -144,7 +144,7 @@ class Grades(models.Model):
         unique_together = ('number', 'letter')
 
     def __str__(self):
-        return '{}{}'.format(self.number, self.letter)
+        return '{} {}'.format(self.number, self.letter)
 
 
 class Students(models.Model):
@@ -223,6 +223,7 @@ class Lessons(models.Model):
     h_file = models.FileField(
         null=True, default=None, blank=True,
         verbose_name="Файл", upload_to=lesson_upload)
+    is_plan = models.BooleanField(verbose_name='Is Plan', default=False)
 
     class Meta:
         verbose_name = "Урок"

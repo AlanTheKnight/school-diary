@@ -32,3 +32,13 @@ class ControlSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Controls
         exclude = ('weight', )
+
+
+class ChangeLessonIsPlannedSerializer(serializers.Serializer):
+    lesson = serializers.IntegerField(required=True)
+
+
+class EditLessonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Lessons
+        fields = ('date', 'theme', 'id', 'control')
