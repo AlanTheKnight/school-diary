@@ -30,6 +30,11 @@
                         {{ form.control }}
                     </div>
 
+                    <div class="custom-control custom-checkbox">
+                        {{ form.is_plan }}
+                        <label for="id_is_plan" class="custom-control-label">Отметить урок как запланированный</label>
+                    </div>
+
                     <div class="my-3">
                         <a href="#collapse-hw" data-toggle="collapse" class="my-5" id="hwbutton" onclick="changeBtnText();">Домашнее задание</a>
                     </div>
@@ -48,6 +53,7 @@
                     </div>
 
                     <a href="#" data-dismiss="modal" class="btn btn-secondary">Отменить</a>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonplan" aria-hidden="true" data-dismiss="modal">Добавить из плана</button>
                     <button type="submit" class="btn btn-primary" name="createlesson">Добавить</button>
                 </form>
             </div>

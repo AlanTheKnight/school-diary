@@ -7,7 +7,7 @@ from . import models
 from . import functions
 from . import homework
 import utils
-
+import datetime
 
 # Tuple of keys needed to be in request.session
 # when teachers work with diary.
@@ -24,7 +24,8 @@ NO_GRADE_CONTEXT = {
 def visible_students(request):
     if not utils.session_ok(request.session):
         return redirect('diary')
-    data = utils.load_from_session(request.session, {'group': None, 'term': None})
+    data = utils.load_from_session(
+        request.session, {'group': None, 'term': None})
     group = models.Groups.objects.get(id=data['group'])
 
     form = forms.VisibleStudentsForm(instance=group)
@@ -44,7 +45,8 @@ def lesson_page(request, pk):
     # If teacher haven't chosen grade, term and subject, redirect back to diary.
     if not utils.session_ok(request.session):
         return redirect('diary')
-    data = utils.load_from_session(request.session, {'group': None, 'term': None})
+    data = utils.load_from_session(
+        request.session, {'group': None, 'term': None})
     group = models.Groups.objects.get(id=data['group'])
     term = data['term']
 
@@ -93,7 +95,8 @@ def students_diary(request):
     if request.method == "POST" and 'all' in request.POST:
         chosen_quarter = int(request.POST.get('term'))
         groups = models.Groups.objects.filter(students=student, grade=grade)
-        all_marks = student.marks_set.filter(lesson__quarter=chosen_quarter)
+        all_marks = student.marks_set.filter(
+            lesson__quarter=chosen_quarter, lesson__is_plan=False)
         if not all_marks:
             return render(request, 'no_marks.html')
 
@@ -101,7 +104,7 @@ def students_diary(request):
         max_length, total_missed = 0, 0
         for group in groups:
             marks = all_marks.filter(
-                lesson__group=group).order_by("lesson__date")
+                lesson__group=group, lesson__is_plan=False).order_by("lesson__date")
             if len(marks) > max_length:
                 max_length = len(marks)
             data = functions.get_marks_data(marks)
@@ -167,7 +170,8 @@ def teachers_diary(request):
     # After the redirect, we will get all needed session data.
 
     # Finally, grade, subject & term chosen by teacher
-    data = utils.load_from_session(request.session, {'group': None, 'term': None})
+    data = utils.load_from_session(
+        request.session, {'group': None, 'term': None})
     group = models.Groups.objects.get(id=data['group'])
     quarter = data['term']
 
@@ -201,11 +205,21 @@ def teachers_diary(request):
         if hw_form.is_valid():
             hw_form.add_homework(group.id)
 
+    if request.method == 'POST' and 'plan_id' in request.POST:
+        plan = models.Lessons.objects.get(pk=request.POST.get('plan_id'))
+        plan.is_plan = False
+        plan.save()
+
+    plan_data = models.Lessons.objects.filter(
+        is_plan=True, group=group, quarter=quarter)
+
     context = {
         'form': form,
         'hw_form': hw_form,
-        'group_form': selectionForm
+        'group_form': selectionForm,
+        'plan_data': plan_data,
     }
+
     functions.update_context(context, group, quarter)
     return render(request, 'teacher.html', context)
 
@@ -239,7 +253,8 @@ def stats(request, pk, term):
             не преподают запрашиваемый предмет."})
     group = get_object_or_404(models.Groups, grade=grade, subject=subject)
     lessons = models.Lessons.objects.filter(group=group, quarter=term)
-    marks = student.marks_set.filter(lesson__group=group, lesson__quarter=term)
+    marks = student.marks_set.filter(
+        lesson__group=group, lesson__quarter=term, lesson__is_plan=False)
 
     # If student has no marks than send him a page with info.
     # Otherwise, student will get a page with statistics and his results.

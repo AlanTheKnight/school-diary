@@ -62,7 +62,7 @@ def create_table(group, quarter):
     lessons = {
         lesson.id: lesson for lesson in
         models.Lessons.objects.filter(
-            group=group, quarter=quarter).select_related("control").order_by(
+            group=group, quarter=quarter, is_plan=False).select_related("control").order_by(
             "date").all()
     }
     # Select all students which are related to group.
