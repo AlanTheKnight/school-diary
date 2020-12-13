@@ -1,135 +1,89 @@
-{% extends 'base/base.html' %}
-{% load static %}
-
-{% block title %}
+{% extends 'base/base.html' %} {% load static %} {% block title %}
 <title>Панель администратора</title>
-{% endblock %}
-
-{% block css %}
+{% endblock %} {% block css %}
 <style>
-    table a {
-        display: block;
-    }
+  table a {
+    display: block;
+  }
+  td:first-child {
+      width: 1%;
+  }
+  i {
+      color: black;
+  }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container my-5">
-    <h1>Панель администратора</h1>
+  <h1>Панель администратора</h1>
 
-    <table class="table my-5 table-borderless table-hover">
-        <tbody>
-            <tr class="bg-dark text-white">
-                <td colspan="2" class="text-center">
-                    Пользователи
-                </td>
-            </tr>
-            <tr>
-                <td style="width: 3%;">
-                    <i class="fas fa-user" style="color: black;"></i>
-                </td>
-                <td>
-                    <a href="{% url 'admins_dashboard' %}">Администраторы</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <i class="fas fa-user" style="color: black;"></i>
-                </td>
-                <td>
-                    <a href="{% url 'teachers_dashboard' %}">Учителя</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <i class="fas fa-user" style="color: black;"></i>
-                </td>
-                <td>
-                    <a href="{% url 'students_dashboard' %}">Ученики</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <i class="fas fa-comment" style="color: black;"></i>
-                </td>
-                <td>
-                    <a href="{% url 'messages_dashboard' %}">Сообщения от пользователей</a>
-                </td>
-            </tr>
-            <tr class="bg-dark text-white">
-                <td colspan="2" class="text-center">
-                    Расписание
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <i class="fas fa-clock" style="color: black;"></i>
-                </td>
-                <td>
-                    <a href="{% url 'timetable_dashboard' %}">Расписание</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <i class="fas fa-bell" style="color: black;"></i>
-                </td>
-                <td>
-                    <a href="{% url 'bells_dashboard' %}">Звонки</a>
-                </td>
-            </tr>
-            <tr class="bg-dark text-white">
-                <td colspan="2" class="text-center">
-                    Минимумы
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <i class="fas fa-file" style="color: black;"></i>
-                </td>
-                <td>
-                    <a href="{% url 'minimum_dashboard' %}">Минимумы</a>
-                </td>
-            </tr>
-            <tr class="bg-dark text-white">
-                <td colspan="2" class="text-center">
-                    Дневник
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <i class="fas fa-download" style="color: black;"></i>
-                </td>
-                <td>
-                    <a class="text-muted" href="#">Выгрузка оценок</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <i class="fas fa-users" style="color: black;"></i>
-                </td>
-                <td>
-                    <a href="{% url 'grades:dashboard' %}">Классы</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <i class="fas fa-table" style="color: black;"></i>
-                </td>
-                <td>
-                    <a href="#" class="text-muted">Оценки</a>
-                </td>
-            </tr>
-        </tbody>
-        
-    </table>
-    {% if request.user.account_type == 0 %}
-    <div class="alert alert-secondary">
-        <i class="fas fa-info px-3"></i>Как admin, вы можете перейти в <a href="/admin-extended">расширенную версию</a> панели
-    </div>
-    {% endif %}
-    <!-- <div class="alert alert-secondary">
+  <table class="table my-5 table-borderless table-hover">
+    <tbody>
+      <tr class="bg-dark text-white">
+        <td colspan="2" class="text-center">Пользователи</td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-user"></i></td>
+        <td><a href="{% url 'admins_dashboard' %}">Администраторы</a></td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-user"></i></td>
+        <td><a href="{% url 'teachers_dashboard' %}">Учителя</a></td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-user"></i></td>
+        <td><a href="{% url 'students_dashboard' %}">Ученики</a></td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-comment"></i></td>
+        <td><a href="{% url 'messages_dashboard' %}">Сообщения от пользователей</a></td>
+      </tr>
+      <!-- <tr>
+          <td><i class="fas fa-upload"></i></td>
+          <td>Загрузить список учеников из Excel-таблицы</td>
+      </tr> -->
+      <tr class="bg-dark text-white">
+        <td colspan="2" class="text-center">Расписание</td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-clock"></i></td>
+        <td><a href="{% url 'timetable_dashboard' %}">Расписание</a></td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-bell"></i></td>
+        <td><a href="{% url 'bells_dashboard' %}">Звонки</a></td>
+      </tr>
+      <tr class="bg-dark text-white">
+        <td colspan="2" class="text-center">Минимумы</td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-file"></i></td>
+        <td><a href="{% url 'minimum_dashboard' %}">Минимумы</a></td>
+      </tr>
+      <tr class="bg-dark text-white">
+        <td colspan="2" class="text-center">Дневник</td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-download"></i></td>
+        <td><a class="text-muted" href="#">Выгрузка оценок</a></td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-users"></i></td>
+        <td><a href="{% url 'grades:dashboard' %}">Классы</a></td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-table"></i></td>
+        <td><a href="#" class="text-muted">Оценки</a></td>
+      </tr>
+    </tbody>
+  </table>
+  {% if request.user.account_type == 0 %}
+  <div class="alert alert-secondary">
+    <i class="fas fa-info px-3"></i>Как admin, вы можете перейти в
+    <a href="/admin-extended">расширенную версию</a> панели
+  </div>
+  {% endif %}
+  <!-- <div class="alert alert-secondary">
         <i class="fas fa-question px-3"></i>Узнать как пользоваться панелью
     </div> -->
-
 </div>
 {% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base/base.html' %}
+
+
+{% block title %}
+<title>Загрузка списка учеников</title>
+{% endblock %}
+
+
+{% block content %}
+<div class="container my-5">
+    <h1>Загрузка списка учеников</h1>
+    <div class="my-4 card card-body">
+        Данная функция позволяет вам загрузить в дневник
+        аккаунты учеников из Excel-таблицы.
+        Подробнее о том, каким образом должна быть составлена
+        Excel-таблица можно прочитать в справочном руководстве.
+    </div>
+    {% if request.method == "POST" %}
+        {% if result %}
+        <div class="alert alert-primary">
+            {{ result }}
+        </div>
+        {% endif %}
+    {% endif %}
+    <div class="my-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-12 col-md-9">
+                    <div class="custom-file mb-3">
+                        {{ form.file }}
+                        <label class="custom-file-label" for="id_file">Выберите файл</label>
+                    </div>
+                </div>
+                <div class="col col-auto">
+                    <button type="submit" class="btn btn-outline-primary">Отправить</button>
+                </div>
+            </div>
+           
+        </form>
+    </div>
+</div>
+{% endblock %}
