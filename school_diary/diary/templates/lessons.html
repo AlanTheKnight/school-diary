@@ -6,13 +6,30 @@
 <style>
     input {
         border: none;
+        width: 100%;
     }
+
     select {
         border: none;
-        background-color: rgb(230, 230, 230);
+        width: 100%;
+        background-color: rgb(255, 255, 255);
         -webkit-appearance: none;
     }
+
+    tr td:last-child {
+        width: 5%;
+        white-space: nowrap;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    .plan-badge {
+        width: 100%;
+    }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 {% endblock %}
 
 
@@ -34,9 +51,9 @@
         <button type="button" class="btn btn-outline-primary my-1" data-toggle="modal">
             Добавить д/з
         </button>
-        <button type="button" class="btn btn-outline-primary my-1" data-toggle="modal">
+        <!-- <button type="button" class="btn btn-outline-primary my-1" data-toggle="modal">
             Утилиты
-        </button>
+        </button> -->
     </div>
 
     <input type="hidden" value="{{ request.session.group }}" id="group">
@@ -50,26 +67,33 @@
         </div>
         <div v-else-if="lessons.length != 0">
             <div class="table-responsive">
-                <table table class="table table-sm">
-                    <thead class="thead-dark">
+                <table table class="table table-bordered table-sm">
+                    <thead class="table-light">
+                        <th class="text-center">План</th>
                         <th>Дата</th>
                         <th>Тема урока</th>
                         <th>Вид работы</th>
+                        <th></th>
                     </thead>
                     <tbody>
-                        <tr
-                            tabindex="0" :id="lesson.id"
-                            v-for="lesson in lessons"
-                            oncontextmenu="showMenu(this); return false;"
-                            onfocusout="">
-                            <td><input type="date" :value="lesson.date"></td>
-                            <td><input type="text" :value="lesson.theme"></td>
+                        <tr :id="lesson.id"
+                            v-for="lesson in lessons">
+                            <td class="text-center" onclick="changePlanState(this)">
+                                <div v-if="lesson.is_plan" class="plan-badge">
+                                    <span class="badge badge-success">ПЛАН</span>
+                                </div>
+                            </td>
+                            <td><input type="date" :id="'date' + lesson.id" :value="lesson.date" v-on:change="editLessonInfo(lesson.id)"></td>
+                            <td><input type="text" :id="'theme' + lesson.id" :value="lesson.theme" v-on:change="editLessonInfo(lesson.id)"></td>
                             <td>
-                                <select name="" id="">
+                                <select name="" :id="'control' + lesson.id" v-on:change="editLessonInfo(lesson.id)">
                                     <template v-for="control in controls">
-                                        <option :selected="control.id == lesson.control" :value="control.name">[[ control.name ]]</option>
+                                        <option :selected="control.id == lesson.control" :value="control.id">[[ control.name ]]</option>
                                     </template>
                                 </select>
+                            </td>
+                            <td onclick="showMenu(this); return false;" class="text-center">
+                                <i class="fas fa-trash text-danger"></i>
                             </td>
                         </tr>
                     </tbody>
@@ -104,6 +128,20 @@
         </div>
     </div>
 
+    <div class="modal fade" id="plan-lesson" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-body">
+                Вы уверены, что хотите изменить поле "План"?
+                <div class="mt-3">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" v-on:click="changeLessonPlanState(id)">Да</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
     {% include 'teacher_page/create_lesson.html' %}
 
 </div>
@@ -112,17 +150,49 @@
 
 {% block js %}
 <script>
+    const csrf = Cookies.get("csrftoken")
+
     const app = new Vue({
         el: "#app",
         delimiters: ["[[", "]]"],
         data: {
             lessons: undefined,
             controls: undefined,
+        },
+        methods: {
+            editLessonInfo: function (pk) {
+                let date = $("#date" + pk).val()
+                let theme = $("#theme" + pk).val()
+                let control = Number($("#control" + pk).val())
+                $.ajax({
+                    headers: {
+                        "X-CSRFToken": csrf
+                    },
+                    data: {
+                        "date": date,
+                        "theme": theme,
+                        "control": control
+                    },
+                    url: "/api/inbuilt/edit-lesson/" + pk,
+                    method: "PATCH",
+                    success: function (data) {
+                        refresh()
+                    },
+                })
+            }
         }
     })
 
     const modalApp = new Vue({
         el: '#delete-lesson',
+        delimiters: ["[[", "]]"],
+        data: {
+            id: undefined
+        }
+    })
+
+    const planApp = new Vue({
+        el: '#plan-lesson',
         delimiters: ["[[", "]]"],
         data: {
             id: undefined
@@ -144,7 +214,7 @@
     }
 
     function showMenu(that) {
-        modalApp.id = that.id
+        modalApp.id = $(that).parent().attr("id")
         $("#delete-lesson").modal("toggle")
     }
 
@@ -161,8 +231,42 @@
     refresh()
     getControls()
 
+    function changeLessonPlanState(id) {
+        $.ajax({
+            url: "{% url 'api:inbuilt:change-is-plan' %}",
+            method: "POST",
+            data: {
+                "csrfmiddlewaretoken": csrf,
+                "lesson": Number(id)
+            },
+            success: function (data) {
+                refresh()
+                $("#plan-lesson").modal("hide")
+            }
+        })
+    }
+
     function deleteLesson(id) {
-        console.log(id)
+        $.ajax({
+            url: "/api/inbuilt/delete-lesson/" + id,
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": csrf
+            },
+            data: {
+                "lesson": Number(id)
+            },
+            success: function (data) {
+                refresh()
+                $("#delete-lesson").modal("hide")
+            }
+        })
+    }
+
+    function changePlanState(that) {
+        planApp.id = $(that).parent().attr("id")
+        console.log(planApp.id)
+        $("#plan-lesson").modal("toggle")
     }
 </script>
 {% endblock %}

@@ -6,86 +6,112 @@
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'pages/homepage.css' %}">
-{% endblock  %}
+<link rel="stylesheet" href="{% static 'pages/homepage.css' %}" />
+{% endblock %}
 
 {% block content %}
 <div class="container">
-    {% for m in messages %}
-    <div class="alert my-5 alert-info">
-        {{ m }}
-    </div>
-    {% endfor %}
 
-    {% if type == 3 and grade is None %}
-    <div class="alert alert-warning mt-5">
-        Вы не состоите в классе. Попросите вашего классного руководителя добавить вас в класс - 
-        до этого большая часть функционала будет недоступна.
+  {% for m in messages %}
+  <div class="alert my-5 alert-info">{{ m }}</div>
+  {% endfor %}
+  
+  {% if type == 3 and grade is None %}
+  <div class="alert alert-warning mt-5">
+    Вы не состоите в классе. Попросите вашего классного руководителя добавить
+    вас в класс - до этого большая часть функционала будет недоступна.
+  </div>
+  {% endif %}
+
+  <div class="row my-4">
+    {% if type == 0 or type == 1 %}
+    <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+      <div class="card h-100">
+        <a href="{% url 'admin_panel' %}">
+          <img src="{% static '/icons/panel.png' %}" id="admin-panel" class="card-img-top" alt="Панель администратора"/>
+        <div class="card-body">
+          <h5 class="card-title">Панель администратора</h5>
+          <p class="card-text text-muted">
+            Изменяйте данные системы электронного дневника
+          </p>
+        </div>
+        </a>
+      </div>
     </div>
+    {% elif type == 2 %}
+      {% include 'homepage/teachers.html' %}
+    {% elif type == 3 and grade is not None %}
+      {% include 'homepage/students.html' %}
     {% endif %}
 
-    <div class="row my-4">
-        {% if type == 0 or type == 1 %}
-        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
-            <div class="card h-100">
-                <a href="{% url 'admin_panel' %}"><img src="{% static '/admin_gui/admin_panel.png' %}" class="card-img-top" alt="Панель администратора"></a>
-                <div class="card-body">
-                    <h5 class="card-title">Панель администратора</h5>
-                    <p class="card-text text-muted">Изменяйте данные системы электронного дневника</p>
-                  </div>
-            </div>
-        </div>
-        {% elif type == 2 %}
-            {% include 'homepage/teachers.html' %}
-        {% elif type == 3 and grade is not None %}
-            {% include 'homepage/students.html' %}
-        {% endif %}
-
-        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
-            <div class="card h-100">
-                <a href="{% url 'timetable' %}"><img src="{% static 'timetable.png' %}" class="card-img-top" alt="Расписание"></a>
-                <div class="card-body">
-                    <h5 class="card-title">Расписание</h5>
-                    <p class="card-text text-muted">Школьное расписание с учетом последних изменений</p>
-                  </div>
-            </div>
-        </div>
-        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
-            <div class="card h-100">
-                <a href="{% url 'minimum' %}"><img src="{% static 'minimum.png' %}" class="card-img-top" alt="Минимум"></a>
-                <div class="card-body">
-                    <h5 class="card-title">Минимум</h5>
-                    <p class="card-text text-muted">Образовательный минимум по всем предметам</p>
-                  </div>
-            </div>
-        </div>
-        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
-            <div class="card h-100">
-                <a href="{% url 'news' %}"><img src="{% static 'news.png' %}" class="card-img-top" alt="Новости"></a>
-                <div class="card-body">
-                    <h5 class="card-title">Новости</h5>
-                    <p class="card-text text-muted">Новостной блок от администраторов дневника</p>
-                  </div>
-            </div>
-        </div>
-        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
-            <div class="card h-100">
-                <a href="{% url 'about' %}"><img src="{% static 'info.png' %}" class="card-img-top" alt="О проекте"></a>
-                <div class="card-body">
-                    <h5 class="card-title">О проекте</h5>
-                    <p class="card-text text-muted">Информация об этой версии электронного дневника</p>
-                  </div>
-            </div>
-        </div>
+    <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+      <div class="card h-100">
+        <a href="{% url 'timetable' %}">
+          <img
+            src="{% static 'timetable.png' %}"
+            class="card-img-top"
+            alt="Расписание"
+          />
+          <div class="card-body">
+            <h5 class="card-title">Расписание</h5>
+            <p class="card-text text-muted">
+              Школьное расписание с учетом последних изменений
+            </p>
+          </div>
+        </a>
+      </div>
     </div>
+    <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+      <div class="card h-100">
+        <a href="{% url 'minimum' %}">
+          <img
+            src="{% static 'minimum.png' %}"
+            class="card-img-top"
+            alt="Минимум"
+          />
+          <div class="card-body">
+            <h5 class="card-title">Минимум</h5>
+            <p class="card-text text-muted">
+              Образовательный минимум по всем предметам
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+      <div class="card h-100">
+        <a href="{% url 'news' %}">
+          <img
+            src="{% static 'news.png' %}"
+            class="card-img-top"
+            alt="Новости"
+          />
+          <div class="card-body">
+            <h5 class="card-title">Новости</h5>
+            <p class="card-text text-muted">
+              Новостной блок от администраторов дневника
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+      <div class="card h-100">
+        <a href="{% url 'about' %}"
+          ><img
+            src="{% static 'info.png' %}"
+            class="card-img-top"
+            alt="О проекте"
+          />
+          <div class="card-body">
+            <h5 class="card-title">О проекте</h5>
+            <p class="card-text text-muted">
+              Информация об этой версии электронного дневника
+            </p>
+          </div></a
+        >
+      </div>
+    </div>
+  </div>
 </div>
-<script>
-    if (!("join-us-jumbotron" in localStorage)) {
-        $('#join-us-jumbotron').css("display", "block");
-    }
-    $('#hide-jumbotron').on("click", function() {
-        $(this).parent().css("display", "none");
-        localStorage.setItem("join-us-jumbotron", "hide");
-    })
-</script>
 {% endblock %}

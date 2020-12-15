@@ -5,7 +5,7 @@ import utils
 
 
 bts4attr = {'class': 'form-control'}
-custom_select = {'class': 'custom-select'}
+custom_select = {'class': 'form-select selectFormInput'}
 bts4attr_file = {'class': 'custom-file-input'}
 QUARTERS = [(1, "I"), (2, "II"), (3, "III"), (4, "IV")]
 
@@ -21,7 +21,7 @@ class LessonCreationForm(forms.ModelForm):
     class Meta:
         model = models.Lessons
         fields = (
-            'date', 'theme', 'homework', 'h_file', 'control',
+            'date', 'theme', 'homework', 'h_file', 'control', 'is_plan'
         )
         widgets = {
             'h_file': forms.FileInput(attrs=bts4attr_file),
@@ -31,6 +31,7 @@ class LessonCreationForm(forms.ModelForm):
             'theme': forms.TextInput(attrs=bts4attr),
             'homework': forms.Textarea(attrs=bts4attr),
             'control': forms.Select(attrs=bts4attr),
+            'is_plan': forms.CheckboxInput(attrs={"class": "custom-control-input"})
         }
         labels = {
             'h_file': 'Файл с домашним заданием',

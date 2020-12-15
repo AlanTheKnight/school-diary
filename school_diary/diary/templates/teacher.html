@@ -22,11 +22,11 @@
 <input type="hidden" value="{% url 'api:inbuilt:add-comment' %}" name="add-comment-url">
 <input type="hidden" value="{% url 'api:inbuilt:get-comment' %}" name="get-comment-url">
 
-<div class="container-fluid my-5">
+<div class="container-fluid mt-5">
     {% include 'teacher_page/select_form.html' %}
 
     {% csrf_token %}
-    <div class="my-3">
+    <div class="mb-4">
         <button type="button" class="btn btn-outline-primary mt-2" data-toggle="modal" data-target="#lessonmodal">
             <i class="fas fa-plus mr-2"></i>Добавить урок
         </button>
@@ -34,7 +34,7 @@
             <i class="fas fa-book mr-2"></i>Добавить д/з
         </button>
         <a href="{% url 'visible-students' %}" class="btn btn-outline-primary mt-2"><i class="fas fa-tasks"></i> Настроить</a>
-        <!-- <a href="{% url 'lessons' %}" class="btn btn-outline-primary mt-2"><i class="far fa-list-alt pr-2"></i>Уроки</a> -->
+        <a href="{% url 'lessons' %}" class="btn btn-outline-primary mt-2"><i class="far fa-list-alt pr-2"></i>Уроки</a>
     </div>
 
     {% if lessons %}
@@ -53,7 +53,7 @@
                                 tabindex="0" class="lesson-link"
                                 oncontextmenu="$(this).popover({html: true}); $(this).popover('toggle'); return false;"
                                 onfocusout="$(this).popover('dispose')" title="{{ lesson.date|date:'j M, l' }}"
-                                data-content="
+                                data-bs-content="
                                     {{ lesson.control.name }}<br>
                                     {% if lesson.theme %}
                                     <b>Тема урока: </b>{{ lesson.theme }}
@@ -95,6 +95,8 @@
     {% include 'teacher_page/comment_modal.html' %}
 
     {% include 'teacher_page/homework_modal.html' %}
+
+    {% include 'teacher_page/lesson_from_plan.html' %}
 </div>
 <script src="{% static 'js/teacher.js' %}"></script>
 {% endblock %}

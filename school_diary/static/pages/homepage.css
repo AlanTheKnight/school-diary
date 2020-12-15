@@ -1,18 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600&display=swap');
-#join-us-jumbotron > *{
-    font-family: 'Nunito', sans-serif;
-    opacity: 0;
-    animation: show 3s ease-out 1s forwards;
+.card > a {
+    text-decoration: none;
+    color: inherit;
 }
-#join-us-jumbotron {
-    background-image: url('/static/Cover.png');
-    background-position: center top;
-    background-repeat: no-repeat;
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.13);
-    display: none;
+
+.card {
+    transition-property: box-shadow;
+    transition-duration: 0.5s;
 }
-@keyframes show {
-    from {opacity: 0;}
-    to {opacity: 100;}
+
+.card:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.295);
+}
+
+img#admin-panel {
+    display: block;
+    position: relative;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
 }

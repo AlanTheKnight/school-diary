@@ -1,59 +1,88 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed&display=swap&subset=cyrillic');
+@import url("https://fonts.googleapis.com/css?family=Roboto+Condensed&display=swap&subset=cyrillic");
 
 html {
-    position: relative;
-    min-height: 100%;
+  position: relative;
+  min-height: 100%;
 }
 
 * {
-    font-family: 'Roboto Condensed', sans-serif;
+  font-family: "Roboto Condensed", sans-serif;
 }
 
 body {
-    margin-bottom: 300px;
+  margin-bottom: 320px;
 }
 
-.footer{
-    line-height: 45px;
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
+.footer {
+  line-height: 40px;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
 }
 
-footer.footer a:visited{
-    color: white;
+footer.footer a:visited {
+  color: white;
 }
 
-footer.footer a:hover, footer.footer a:active, footer.footer a:focus {
-    color: white;
+footer.footer a:hover,
+footer.footer a:active,
+footer.footer a:focus {
+  color: white;
 }
 
 footer.footer a {
-    color: #ffffff9f;
+  color: #ffffff9f;
 }
 
 a:hover {
-    text-decoration: none;
+  text-decoration: none;
 }
 
-@media (min-width: 979px) {
-.dropdown:hover > .dropdown-menu {
+/* @media (min-width: 979px) {
+  .dropdown:hover > .dropdown-menu {
     display: block;
-}
-}
+  }
+} */
 
 h1 {
-    font-size: 30px;
+  font-size: 30px;
 }
 
 h2 {
-    font-size: 25px;
+  font-size: 25px;
 }
 
 h3 {
-    font-size: 23px;   
+  font-size: 23px;
 }
 
 h4 {
-    font-size: 20px;
+  font-size: 20px;
+}
+
+#main-navbar {
+  transition-property: box-shadow;
+  transition-duration: 0.5s;
+}
+
+#main-navbar:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.87);
+}
+
+#main-navbar a:hover {
+  color: rgba(255, 255, 255, 1) !important;
+}
+
+#authors-info {
+  background-color: #16191bc9;
+  height: 40px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.582);
+}
+
+#version-info {
+  background-color: #16191b88;
+  height: 40px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.582);
 }

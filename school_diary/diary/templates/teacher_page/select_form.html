@@ -1,28 +1,31 @@
-<div class="card card-50 my-5">
-    <div class="card-body">
-        <form method="POST">
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-6 col-sm-4">
-                    <div class="form-group">
-                        {{ group_form.subjects.label_tag }}
-                        {{ group_form.subjects }}
-                    </div>
-                </div>
-                <div class="col-6 col-sm-4">
-                    <div class="form-group">
-                        {{ group_form.classes.label_tag }}
-                        {{ group_form.classes }}
-                    </div>
-                </div>
-                <div class="col-6 col-sm-4">
-                    <div class="form-group">
-                        {{ group_form.quarters.label_tag }}
-                        {{ group_form.quarters }}
-                    </div>
+<div class="">
+    <form method="POST" id="mySelectForm">
+        {% csrf_token %}
+        <input type="hidden" name="getgrade">
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <div class="mb-3">
+                    {{ group_form.subjects.label_tag }}
+                    {{ group_form.subjects }}
                 </div>
             </div>
-            <button type="submit" class="btn btn-outline-primary" name="getgrade">Показать</button>
-        </form>
-    </div>
+            <div class="col-6 col-md-3">
+                <div class="mb-3">
+                    {{ group_form.classes.label_tag }}
+                    {{ group_form.classes }}
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="mb-3">
+                    {{ group_form.quarters.label_tag }}
+                    {{ group_form.quarters }}
+                </div>
+            </div>
+            <script>
+                $(".selectFormInput").on("change", function () {
+                    $("#mySelectForm").submit();
+                })
+            </script>
+        </div>
+    </form>
 </div>

@@ -1,46 +1,48 @@
 {% load static %}
 
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #24292e;">
+<nav class="navbar navbar-expand-lg navbar-dark" id="main-navbar" style="background-color: #24292e;">
         <div class="container">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarcontent" aria-controls="navbarcontent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <a class="navbar-brand" href="{% url 'homepage' %}" title="Главная страница">
-            <img src="{% static 'icons/book.png' %}" width="35" height="35" class="d-inline-block align-center" alt="" style="padding: 2px;">
+            <img src="{% static 'icons/christmas-book.png' %}" width="35" height="35" class="d-inline-block align-center" alt="" style="padding: 2px;">
             Diary56
         </a>
-        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'timetable' %}">Расписание</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'diary' %}">Дневник</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'minimum' %}">Минимум</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'news' %}">Новости</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'news_post_details' url='help' %}" tabindex="-1" aria-disabled="true">Помощь</a>
-            </li>
+        <div class="collapse navbar-collapse" id="navbarcontent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'timetable' %}">Расписание</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'diary' %}">Дневник</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'minimum' %}">Минимум</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'news' %}">Новости</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'news_post_details' url='help' %}" tabindex="-1" aria-disabled="true">Помощь</a>
+                </li>
             </ul>
             {% if user.is_authenticated %}
-            <div class="btn-group dropdown">
-                {% if request.user.account_type == 2 and request.user.teacher.avatar %}
-                <img class="dropdown-toggle" src="{{ request.user.teacher.avatar.url }}" alt="" width="45" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" title="Аккаунт" id="avatar"></button>
-                {% else %}
-                <img class="dropdown-toggle" src="{% static 'user.png' %}" alt="" height="45" width="45" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" title="Аккаунт"></button>
-                {% endif %}
-                <div class="dropdown-menu" style="margin-top: 0px;">
-                <a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Аккаунт</a>
-                <a class="dropdown-item" href="{% url 'logout' %}" onclick="clearstorage();"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+            <div class="d-flex">
+                <div class="dropdown">
+                    {% if request.user.account_type == 2 and request.user.teacher.avatar %}
+                    <img class="dropdown-toggle" role="button" src="{{ request.user.teacher.avatar.url }}" alt="" width="45" data-bs-toggle="dropdown" title="Аккаунт" id="navbarDropdown"/>
+                    {% else %}
+                    <img class="dropdown-toggle" role="button" src="{% static 'user.png' %}" alt="" height="45" width="45" data-bs-toggle="dropdown" title="Аккаунт" id="navbarDropdown"/>
+                    {% endif %}
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Аккаунт</a></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}" onclick="clearstorage();"><i class="fas fa-sign-out-alt"></i> Выйти</a></li>
+                    </ul>
                 </div>
             </div>
             {% else %}
-            <li class="nav-item">
+            <li class="d-flex">
                 <a href="{% url 'login' %}" class="btn btn-outline-success">Войти</a>
                 <a href="{% url 'register' %}" class="btn btn-success">Зарегистрироваться</a>
             </li>
@@ -53,7 +55,7 @@
 
 {% block css %}
 <style>
-#avatar {
+#navbarDropdown {
     width: 45px;
     height: 45px;
     object-fit: cover;

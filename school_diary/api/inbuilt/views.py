@@ -5,6 +5,7 @@ from rest_framework import authentication
 from rest_framework import generics
 from diary import models
 from diary.functions import get_marks_data
+from django.shortcuts import get_object_or_404
 from . import serializers
 from api import permissions
 
@@ -96,3 +97,37 @@ class ListControls(generics.ListAPIView):
     serializer_class = serializers.ControlSerializer
     permission_classes = (permissions.InBuiltAPIPermission,)
     queryset = models.Controls.objects.all()
+
+
+class ChangeLessonIsPlanned(APIView):
+    authentication_classes = (authentication.SessionAuthentication, )
+
+    def post(self, request):
+        if not (request.user.is_authenticated and request.user.account_type) == 2:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        serializer = serializers.ChangeLessonIsPlannedSerializer(
+            data=request.POST
+        )
+        serializer.is_valid(raise_exception=True)
+        lesson = get_object_or_404(
+            models.Lessons,
+            pk=serializer.validated_data['lesson']
+        )
+        lesson.is_plan = not lesson.is_plan
+        lesson.save()
+        return Response(status=status.HTTP_200_OK)
+
+
+class EditLesson(generics.UpdateAPIView):
+    queryset = models.Lessons.objects.all()
+    serializer_class = serializers.EditLessonSerializer
+    authentication_classes = (
+        authentication.SessionAuthentication,
+        authentication.BasicAuthentication)
+
+
+class DeleteLesson(generics.DestroyAPIView):
+    queryset = models.Lessons.objects.all()
+    authentication_classes = (
+        authentication.SessionAuthentication,
+        authentication.BasicAuthentication)
