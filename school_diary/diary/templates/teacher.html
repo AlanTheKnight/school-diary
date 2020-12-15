@@ -22,11 +22,11 @@
 <input type="hidden" value="{% url 'api:inbuilt:add-comment' %}" name="add-comment-url">
 <input type="hidden" value="{% url 'api:inbuilt:get-comment' %}" name="get-comment-url">
 
-<div class="container-fluid my-5">
+<div class="container-fluid mt-5">
     {% include 'teacher_page/select_form.html' %}
 
     {% csrf_token %}
-    <div class="my-3">
+    <div class="mb-4">
         <button type="button" class="btn btn-outline-primary mt-2" data-toggle="modal" data-target="#lessonmodal">
             <i class="fas fa-plus mr-2"></i>Добавить урок
         </button>
@@ -53,7 +53,7 @@
                                 tabindex="0" class="lesson-link"
                                 oncontextmenu="$(this).popover({html: true}); $(this).popover('toggle'); return false;"
                                 onfocusout="$(this).popover('dispose')" title="{{ lesson.date|date:'j M, l' }}"
-                                data-content="
+                                data-bs-content="
                                     {{ lesson.control.name }}<br>
                                     {% if lesson.theme %}
                                     <b>Тема урока: </b>{{ lesson.theme }}

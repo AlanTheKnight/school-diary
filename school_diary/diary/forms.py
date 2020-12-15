@@ -5,7 +5,7 @@ import utils
 
 
 bts4attr = {'class': 'form-control'}
-custom_select = {'class': 'custom-select'}
+custom_select = {'class': 'form-select selectFormInput'}
 bts4attr_file = {'class': 'custom-file-input'}
 QUARTERS = [(1, "I"), (2, "II"), (3, "III"), (4, "IV")]
 
