@@ -1,82 +1,56 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}
 <title>Войти в аккаунт</title>
 {% endblock %}
 
 {% block css %}
-<style>
-	.card {
-	margin: 0 auto;
-	float: none;
-	margin-bottom: 10px;
-	}
-</style>
-<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
 {% endblock %}
 
 
 {% block content %}
 <div class="container my-5">
-	<div class="card login card-50 my-3">
-		<div class="card-body">
-			<h2 class="card-title">Войти</h2>
-			{% if messages %}
-			<div class="alert alert-danger">
-			{% for message in messages %}
-				{{ message }}
-			{% endfor %}
-			</div>
-			{% endif %}
-			<form method="POST">
-				{% csrf_token %}
-				<div class="form-group">
-					{{ form.email.label_tag }}
-					{{ form.email }}
+	<div class="row justify-content-sm-center">
+		<div class="col col-md-9 col-lg-6">
+			<div class="card login my-3">
+				<div class="card-body">
+					<h2 class="card-title text-center">Вход в аккаунт</h2>
+					{% if messages %}
+					<div class="alert alert-danger">
+					{% for message in messages %}
+						{{ message }}
+					{% endfor %}
+					</div>
+					{% endif %}
+					<form method="POST">
+						{% csrf_token %}
+						<div class="mb-3">
+							<label for="id_email" class="form-label">{{ form.email.label }}</label> 
+							{{ form.email }}
+						</div>
+						<div class="mb-3">
+							<label for="id_password" class="form-label">{{ form.password.label }}</label> 
+							<div class="input-group" id="show_hide_password">
+							{{ form.password }}
+							<div class="input-group-append">
+								<span class="input-group-text">
+									<a href=""><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
+								</span>
+							</div>
+							</div>
+						</div>
+						<button type="submit" class="btn btn-outline-primary">Войти</button>
+						<a href="{% url 'register' %}" class="ms-2 btn btn-outline-secondary">Создать аккаунт</a>
+						<p class="text-end my-2"><a href="{% url 'reset_password' %}">Забыли пароль?</a></p>
+					</form>
 				</div>
-				<div class="form-group">
-                    {{ form.password.label_tag }}
-                    <div class="input-group" id="show_hide_password">
-                    {{ form.password }}
-                    <div class="input-group-append">
-                        <span class="input-group-text">
-                            <a href=""><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
-                        </span>
-                    </div>
-                    </div>
-                    <script>
-                        $(document).ready(function() {
-                            $("#show_hide_password a").on('click', function(event) {
-                                event.preventDefault();
-                                if($('#show_hide_password input').attr("type") == "text"){
-                                    $('#show_hide_password input').attr('type', 'password');
-                                    $('#show_hide_password i').addClass( "fa-eye-slash" );
-                                    $('#show_hide_password i').removeClass( "fa-eye" );
-                                }else if($('#show_hide_password input').attr("type") == "password"){
-                                    $('#show_hide_password input').attr('type', 'text');
-                                    $('#show_hide_password i').removeClass( "fa-eye-slash" );
-                                    $('#show_hide_password i').addClass( "fa-eye" );
-                                    }
-                                });
-                            });
-                    </script>
-                </div>
-				<button type="submit" class="btn btn-primary">Войти</button>
-				<p class="text-right"><a href="{% url 'reset_password' %}">Забыли пароль?</a></p>
-			</form>
+			</div>
 		</div>
 	</div>
-	<div class="card card-50 my-3">
-		<div class="card-body">
-			<h2 class="card-title">Нет аккаунта?</h2>
-			<p>
-				Зарегистрируйтесь в системе и получите
-				доступ к домашнему заданию и оценкам.
-			</p>
-			<a href="{% url 'register' %}" class="btn btn-primary">Создать аккаунт</a>
-		</div>
-	</div>
+	
 </div>
 <script>
 	localStorage.clear();

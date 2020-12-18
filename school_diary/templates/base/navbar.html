@@ -36,14 +36,18 @@
                     <img class="dropdown-toggle" role="button" src="{% static 'user.png' %}" alt="" height="45" width="45" data-bs-toggle="dropdown" title="Аккаунт" id="navbarDropdown"/>
                     {% endif %}
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Аккаунт</a></li>
-                        <li><a class="dropdown-item" href="{% url 'logout' %}" onclick="clearstorage();"><i class="fas fa-sign-out-alt"></i> Выйти</a></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Аккаунт</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'logout' %}" onclick="clearstorage();"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+                        </li>
                     </ul>
                 </div>
             </div>
             {% else %}
             <li class="d-flex">
-                <a href="{% url 'login' %}" class="btn btn-outline-success">Войти</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-success me-2">Войти</a>
                 <a href="{% url 'register' %}" class="btn btn-success">Зарегистрироваться</a>
             </li>
                 
@@ -52,15 +56,3 @@
     </div>
 </nav>
 
-
-{% block css %}
-<style>
-#navbarDropdown {
-    width: 45px;
-    height: 45px;
-    object-fit: cover;
-    object-position: center;
-    border-radius: 50%;
-}
-</style>
-{% endblock %}

@@ -12,10 +12,12 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.295);
 }
 
-img#admin-panel {
+.card img {
     display: block;
-    position: relative;
-    width: 50%;
+    /* position: relative; */
+    width: 40%;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 20%;
+    margin-bottom: 20%;
 }

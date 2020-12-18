@@ -1,8 +1,7 @@
-.card {
-    margin: 0 auto; /* Added */
-    float: none; /* Added */
-    margin-bottom: 10px; /* Added */
-    }
+.card:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.295);
+    transition-duration: 0.5s;
+}
     
 #message {
     display: none;

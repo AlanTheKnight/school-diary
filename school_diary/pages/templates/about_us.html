@@ -6,40 +6,50 @@
 {% endblock %}
 
 {% block css %}
+<style>
+    section#used-langs img:hover {
+        filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.473));
+        transition-duration: 0.5s;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container my-5">
     <h1>О проекте "Дневник 56"</h1>
     <hr>
-    
-    <div class="jumbotron">
+    <div class="bg-light p-2 rounded">
         <h2 class="text-center">Что это?</h2>
         <p class="text-center lead">
             Первый электронный дневник, сделанный учениками для
             учеников 56 Академической Гимназии
         </p>
     </div>
-    <h2 class="text-center">Команда</h2>
-    <p class="text-center">
-        Дневник сделан командой IdeaSoft для участия в <a href="https://itsolschool.ru">"Школе IT-решений"</a>, 
-        проходящей на базе ГФМЛ№30
-    </p>
-    <div class="row py-4">
-        <div class="col-12 col-sm-12 col-md-6 col-lg-4 text-center">
-            <img src="{% static 'pashs-ba.jpg' %}" alt="Павел Бардин" width="280px">
-            <p class="my-1">Павел Бардин, гимназия №56</p>
+
+    <section class="my-4">
+        <h2 class="text-center">Команда</h2>
+        <p class="text-center">
+            Дневник сделан командой IdeaSoft для участия в <a href="https://itsolschool.ru">"Школе IT-решений"</a>, 
+            проходящей на базе ГФМЛ№30
+        </p>
+        <div class="row py-4">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-4 text-center">
+                <img src="{% static 'pashs-ba.jpg' %}" alt="Павел Бардин" width="280px">
+                <p class="my-1">Павел Бардин, гимназия №56</p>
+            </div>
+            <div class="col-12 col-sm-12 col-md-6 col-lg-4 text-center">
+                <img src="{% static 'alantheknight.jpg' %}" alt="Максим Гусев" width="280px">
+                <p class="my-1">Максим Гусев, гимназия №56</p>
+            </div>
+            <div class="col-12 col-sm-12 col-md-6 col-lg-4 text-center">
+                <img src="{% static 'velutb.png' %}" alt="Марк Ефремов" width="280px">
+                <p class="my-1">Марк Ефремов, гимназия №610</p>
+            </div>
         </div>
-        <div class="col-12 col-sm-12 col-md-6 col-lg-4 text-center">
-            <img src="{% static 'alantheknight.jpg' %}" alt="Максим Гусев" width="280px">
-            <p class="my-1">Максим Гусев, гимназия №56</p>
-        </div>
-        <div class="col-12 col-sm-12 col-md-6 col-lg-4 text-center">
-            <img src="{% static 'velutb.png' %}" alt="Марк Ефремов" width="280px">
-            <p class="my-1">Марк Ефремов, гимназия №610</p>
-        </div>
-    </div>
-    <div class="jumbotron">
+    </section>
+
+
+    <section class="bg-light rounded py-2 px-4">
         <h2 class="text-center mb-5">Цели проекта</h2>
         <div class="row">
             <div class="col-lg-4 h-100 mb-4">
@@ -82,13 +92,14 @@
                 </p>
             </div>
         </div>
-    </div>
-    <section class="my-5">
+    </section>
+
+    <section class="my-4">
         <h2 class="text-center">Как начать использовать дневник?</h2>
         <div class="row">
             <div class="col-md-6 my-3">
                 <h3 class="text-center">Дневник и журнал</h3>
-                <p>
+                <p class="text-center">
                     Мы уже долго ожидаем разрешения администрации гимназии
                     на введение проекта своих учеников, но пока что 
                     функционал дневника закрыт к использованию
@@ -96,7 +107,7 @@
             </div>
             <div class="col-md-6 my-3">
                 <h3 class="text-center">Расписание и минимум</h3>
-                <p>
+                <p class="text-center">
                     Напишите
                     <a href="https://vk.com/alantheknight">временному администратору</a>
                     дневника с просьбой заполнить расписание для вашего класса или добавить
@@ -106,7 +117,7 @@
         </div>
     </section>
    
-    <section class="my-5">
+    <section class="my-4">
         <h2 class="text-center">Контакты разработчиков</h2>
         <div class="text-center">
             <a href="https://vk.com/ideasoft_spb" class="mx-4">
@@ -121,7 +132,7 @@
         </div>
     </section>
 
-    <section class="my-5">
+    <section class="my-4">
         <h2 class="text-center">Финансовая помощь разработке</h2>
         <div class="text-center">
             Мы будем признательны, если вы окажете нам помощь,
@@ -132,7 +143,7 @@
         </div>
     </section>
 
-    <section class="my-5">
+    <section class="my-5" id="used-langs">
         <h2 class="text-center">Использованные языки, инструменты и ресурсы</h2>
         <div class="row py-4">
             <div class="col-6 col-sm-4 col-lg-2 py-4 col-md-3">
@@ -194,6 +205,7 @@
                 <ul>
                     <li><a href="https://www.flaticon.com/authors/freepik">Freepik</a></li>
                     <li><a href="https://www.flaticon.com/authors/payungkead">Payungkead</a></li>
+                    <li><a href="https://www.flaticon.com/authors/nikita-golubev">Никита Голубев</a></li>
                 </ul>
             </li>
             <li>Горовикову Николаю за подсказки по дизайну версии 2.0</li>

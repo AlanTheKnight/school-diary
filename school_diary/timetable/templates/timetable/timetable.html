@@ -6,77 +6,86 @@
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
+<link rel="stylesheet" href="{% static 'css/timetable.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <div class="card my-4">
-        <div class="card-body">
-        <form class="my-2">
-            <div class="form-group">
-                {{ form.grade.label_tag }}
-                {{ form.grade }}
+    <div class="row justify-content-center">
+        <div class="col col-md-9 col-lg-6">
+            <div class="card card-body">
+                <form>
+                    <div class="mb-3">
+                        {% with field=form.grade %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
+                    </div>
+                    <div class="mb-3">
+                        {% with field=form.litera %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
+                    </div>
+                    <button id="timetable_btn" type="button" class="btn btn-outline-primary">Просмотреть расписание</button>
+                </form>
             </div>
-            <div class="form-group">
-                {{ form.litera.label_tag }}
-                {{ form.litera }}
-            </div>
-            <button id="timetable_btn" type="button" class="btn btn-primary">Просмотреть расписание</button>
-        </form>
         </div>
     </div>
 
-    <div id="timetable">
-    <div v-if="empty" class="alert alert-info">
-        Расписание на ваш класс ещё не заполнено.
-    </div>
-    <div v-else>
-        <div v-if="not_full" class="alert alert-info">
-            Расписание на ваш класс заполнено не полностью.
-        </div>
-        <div v-for="day in days">
-            <div class="card my-4" v-if="day.lessons.length != 0">
-                <div class="card-body">
-                    <div class="card-title text-center">
-                        <div v-if="day.weekday == 'tomorrow'">
-                            <h4>Расписание на завтра</h4>
-                        </div>
-                        <div v-else-if="day.weekday == 'today'">
-                            <h4>Расписание на сегодня</h4>
-                        </div>
-                        <div v-else>
-                            <h4>[[ day.weekday ]]</h4>
-                        </div>
+    <div id="timetable" class="my-4">
+        <div v-if="empty">
+            <div class="row justify-content-center">
+                <div class="col col-md-9 col-lg-6">
+                    <div class="alert alert-primary">
+                        Расписание на ваш класс ещё не заполнено.
                     </div>
-                    <div class="table-responsive-md">
-                        <table class="table-sm table">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>Номер</th>
-                                    <th>Предмет</th>
-                                    <th>Кабинет</th>
-                                    <th>Начало</th>
-                                    <th>Конец</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="lesson in day.lessons">
-                                    <td>[[ lesson.n ]]</td>
-                                    <td>[[ lesson.subject ]]</td>
-                                    <td>[[ lesson.classroom ]]</td>
-                                    <td>[[ lesson.start.substr(0, 5) ]]</td>
-                                    <td>[[ lesson.end.substr(0, 5) ]]</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                </div>
+            </div>
+        </div>
+        <div v-else>
+            <div class="row justify-content-center">
+                <div class="col col-md-9 col-lg-6">
+                    <div v-for="day in days">
+                        <div class="card my-4 card-body" v-if="day.lessons.length != 0">
+                            <div class="card-title text-center">
+                                <div v-if="day.weekday == 'tomorrow'">
+                                    <h4>Расписание на завтра</h4>
+                                </div>
+                                <div v-else-if="day.weekday == 'today'">
+                                    <h4>Расписание на сегодня</h4>
+                                </div>
+                                <div v-else>
+                                    <h4>[[ day.weekday ]]</h4>
+                                </div>
+                            </div>
+                            <div class="table-responsive-md">
+                                <table class="table-sm table">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Предмет</th>
+                                            <th>Кабинет</th>
+                                            <th>Начало</th>
+                                            <th>Конец</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="lesson in day.lessons">
+                                            <td>[[ lesson.n ]]</td>
+                                            <td>[[ lesson.subject ]]</td>
+                                            <td>[[ lesson.classroom ]]</td>
+                                            <td>[[ lesson.start.substr(0, 5) ]]</td>
+                                            <td>[[ lesson.end.substr(0, 5) ]]</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
-
+</div>
 
 </div>
 {% endblock %}
@@ -90,7 +99,6 @@
         el: '#timetable',
         data: {
             days: [],
-            not_full: false,
             empty: false,
         }
     })
@@ -127,7 +135,6 @@
                 // and check if every day has a full timetable.
                 switch (checkTimeTable(data)) {
                     case 2:
-                        tt.not_full = true;
                         tt.empty = false;
                         break;
                     case 1:
@@ -135,7 +142,6 @@
                         break;
                     case 0:
                         tt.empty = false;
-                        tt.not_full = false;
                         break;
                 }
 

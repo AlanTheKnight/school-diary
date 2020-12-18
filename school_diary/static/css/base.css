@@ -69,8 +69,8 @@ h4 {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.87);
 }
 
-#main-navbar a:hover {
-  color: rgba(255, 255, 255, 1) !important;
+#main-navbar a.nav-link:hover {
+  color: rgba(255, 255, 255, 1);
 }
 
 #authors-info {
@@ -85,4 +85,12 @@ h4 {
   height: 40px;
   text-align: center;
   color: rgba(255, 255, 255, 0.582);
+}
+
+#navbarDropdown {
+  width: 45px;
+  height: 45px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
 }

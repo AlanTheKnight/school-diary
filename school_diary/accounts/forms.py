@@ -13,7 +13,8 @@ bts4attr_file = {'class': 'custom-file-input'}
 class UsersLogin(forms.Form):
     email = forms.EmailField(
         label="Электронная почта", max_length=50, widget=forms.EmailInput(attrs=bts4attr))
-    password = forms.CharField(label="Пароль", widget=forms.PasswordInput(attrs=bts4attr))
+    password = forms.CharField(
+        label="Пароль", widget=forms.PasswordInput(attrs=bts4attr))
 
 
 class StudentSignUpForm(UserCreationForm):
@@ -22,29 +23,25 @@ class StudentSignUpForm(UserCreationForm):
     to 3 and add user to students group.
     """
     first_name = forms.CharField(
-        label="Имя", max_length=50, widget=forms.TextInput(attrs=bts4attr))
+        label="Имя", max_length=50)
     surname = forms.CharField(
-        label="Фамилия", max_length=100, widget=forms.TextInput(attrs=bts4attr))
+        label="Фамилия", max_length=100)
     second_name = forms.CharField(
-        label="Отчество", max_length=100, required=False, widget=forms.TextInput(attrs=bts4attr))
-    password1 = forms.CharField(
-        label="Пароль", widget=forms.PasswordInput(attrs={
-                'class': 'form-control', 'autocomplete': 'new-password',
-                'id': "password1", 'name': 'password1'
-            }))
-    password2 = forms.CharField(
-        label="Подтверждение пароля",
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control', 'autocomplete': 'new-password', "id": "password2"
-        }))
+        label="Отчество", max_length=100, required=False)
 
-    class Meta():
+    class Meta:
         model = models.Users
-        fields = ('email', 'first_name', 'surname', 'second_name', 'password1', 'password2')
+        fields = "__all__"
         widgets = {
             'email': forms.EmailInput(attrs={
-                'class': 'form-control', 'placeholder': 'myemail@example.com', "id": "email"
-                }),
+                'placeholder': 'myemail@example.com'
+            }),
+            'password1': forms.PasswordInput(attrs={
+                'autocomplete': 'new-password',
+            }),
+            'password2': forms.PasswordInput(attrs={
+                'autocomplete': 'new-password'
+            })
         }
 
     @transaction.atomic
@@ -79,20 +76,21 @@ class AdminSignUpForm(UserCreationForm):
         label="Отчество", max_length=100, required=False, widget=forms.TextInput(attrs=bts4attr))
     password1 = forms.CharField(
         label="Пароль", widget=forms.PasswordInput(attrs={
-                'class': 'form-control', 'autocomplete': 'new-password',
-                'id': "password1", 'name': 'password1'
-            }))
+            'class': 'form-control', 'autocomplete': 'new-password',
+            'id': "password1", 'name': 'password1'
+        }))
     password2 = forms.CharField(
         label="Подтверждение пароля", widget=forms.PasswordInput(attrs={
             'class': 'form-control', 'autocomplete': 'new-password', "id": "password2"}))
 
     class Meta():
         model = models.Users
-        fields = ('email', 'first_name', 'surname', 'second_name', 'password1', 'password2')
+        fields = ('email', 'first_name', 'surname',
+                  'second_name', 'password1', 'password2')
         widgets = {
             'email': forms.EmailInput(attrs={
-                    'class': 'form-control', 'placeholder': 'myemail@example.com', "id": "email"
-                }),
+                'class': 'form-control', 'placeholder': 'myemail@example.com', "id": "email"
+            }),
         }
 
     @transaction.atomic
@@ -124,13 +122,13 @@ class TeacherSignUpForm(UserCreationForm):
         queryset=models.Subjects.objects.all(), widget=forms.SelectMultiple(attrs=bts4attr))
     password1 = forms.CharField(
         label="Пароль", widget=forms.PasswordInput(attrs={
-                'class': 'form-control', 'autocomplete': 'new-password',
-                'id': "password1", 'name': 'password1'
-            }))
+            'class': 'form-control', 'autocomplete': 'new-password',
+            'id': "password1", 'name': 'password1'
+        }))
     password2 = forms.CharField(
         label="Подтверждение пароля", widget=forms.PasswordInput(attrs={
-                'class': 'form-control', 'autocomplete': 'new-password', "id": "password2"
-            }))
+            'class': 'form-control', 'autocomplete': 'new-password', "id": "password2"
+        }))
 
     class Meta():
         model = models.Users
@@ -139,8 +137,8 @@ class TeacherSignUpForm(UserCreationForm):
             'second_name', 'subjects', 'password1', 'password2')
         widgets = {
             'email': forms.EmailInput(attrs={
-                    'class': 'form-control', 'placeholder': 'myemail@example.com'
-                }),
+                'class': 'form-control', 'placeholder': 'myemail@example.com'
+            }),
         }
 
     @transaction.atomic

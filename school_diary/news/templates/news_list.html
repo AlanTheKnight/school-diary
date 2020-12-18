@@ -7,18 +7,17 @@
     .post-image{
         object-fit: cover;
     }
+
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container my-5">
 
-    <form method="GET">
+    <form method="GET" id="searchForm">
         <div class="input-group mb-3">
             <input type="text" class="form-control" name="search" value="{{ search_text }}">
-            <div class="input-group-append">
-              <button class="btn btn-outline-primary" type="submit">Поиск</button>
-            </div>
+            <button class="btn btn-outline-primary" type="submit">Поиск</button>
           </div>
     </form>
 
