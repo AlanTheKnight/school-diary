@@ -28,8 +28,9 @@
 					<form method="POST">
 						{% csrf_token %}
 						<div class="mb-3">
-							<label for="id_email" class="form-label">{{ form.email.label }}</label> 
-							{{ form.email }}
+							{% with field=form.email %}
+								{% include "field_template.html" %}
+							{% endwith %}
 						</div>
 						<div class="mb-3">
 							<label for="id_password" class="form-label">{{ form.password.label }}</label> 

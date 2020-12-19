@@ -7,8 +7,6 @@
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
-<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
 <style>
     td {
         position: relative;
@@ -31,14 +29,12 @@
             <form method="GET">
                 <div class="input-group mb-3">
                     {{ termform.quarter }}
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-outline-primary">Выбрать</button>
-                    </div>
+                    <button type="submit" class="btn btn-outline-primary">Выбрать</button>
                 </div>
             </form>
         </div>
         <div class="col-auto">
-            <button class="btn btn-outline-primary" data-toggle="modal" data-target="#homeworkmodal"><i class="fas fa-plus mr-2"></i>Добавить д/з</button>
+            <button class="btn btn-outline-primary" data-toggle="modal" data-target="#homeworkmodal"><i class="fas fa-plus me-2"></i>Добавить д/з</button>
         </div>
     </div>
     
@@ -49,7 +45,7 @@
     {% else %}
     <div class="table-responsive my-2">
         <table class="table text-center">
-            <thead class="thead thead-dark">
+            <thead class="table-dark">
                 <th>Дата</th>
                 <th>Предмет</th>
                 <th>Удалить</th>

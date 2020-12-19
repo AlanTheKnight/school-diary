@@ -20,18 +20,14 @@
         {% endfor %}
         {% endif %}
     {% else %}
-        {% if not isFile %}
+        {% if not hide_errors %}
             {% render_field field class="form-control is-valid" %}
         {% else %}
-            {% render_field field class="custom-file-input is-valid" %}
+            {% render_field field class="form-control" %}
         {% endif %}
     {% endif %}
 {% else %}
-    {% if not isFile %}
-        {% render_field field class="form-control" %}
-    {% else %}
-        {% render_field field class="custom-file-input" %}
-    {% endif %}
+    {% render_field field class="form-control" %}
 {% endif %}
 
 {% if field.help_text and showhelp %}

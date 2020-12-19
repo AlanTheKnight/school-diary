@@ -6,48 +6,40 @@
 <title>Домашнее задание</title>
 {% endblock %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
-<link rel="stylesheet" href="{% static 'css/card_align.css' %}">
-{% endblock %}
-
 
 {% block content %}
 <div class="container my-5">
 
     <form method="GET">
     <div class="row my-3" id="search-wrapper">
-
         <div class="col-12 col-md-6">
-            <div class="input-group my-1">
-                {{ form.date }}
-                <div class="input-group-append">
-                    <button type="submit" class="btn btn-outline-primary">Найти</button>
-                </div>
+            <div class="input-group mb-1">
+                {% with field=form.date hide_label=True hide_errors=True %}
+                    {% include "field_template.html" %}
+                {% endwith %}
+                <button type="submit" class="btn btn-outline-primary">Найти</button>
             </div>
         </div>
-        <div class="col-12 col-sm-auto my-1">
+        <div class="col-12 col-sm-auto mb-1">
             <a href="{% url 'homework' %}" class="btn btn-outline-primary">Д/з на неделю</a>
+        </div>
+        <div class="col-auto mb-1">
+            <a href="{% url 'homework-stats' %}" class="btn btn-outline-primary"><i class="fas fa-chart-pie"></i></a>
         </div>
     </div>
     </form>
 
-    <div class="row my-3">
+    <div class="row my-2">
         {% if request.user.student.special %}
         <div class="col-auto my-1">
-            <a href="{% url 'homework-list' %}" class="btn btn-outline-danger"><i class="fas fa-list mr-2"></i>Список д/з</a>
+            <a href="{% url 'homework-list' %}" class="btn btn-outline-danger"><i class="fas fa-list me-2"></i>Список д/з</a>
         </div>
         {% endif %}
-        <div class="col-auto my-1">
-            <a href="{% url 'homework-stats' %}" class="btn btn-outline-primary"><i class="fas fa-chart-pie"></i></a>
-        </div>
     </div>
 
     <div class="card card-body my-4">
-        <div id="homework-wrapper">
             {% if "date" in request.GET %}
-                <h2 class="card-title">Домашнее задание на {{ date|date:"d.m, D" }}</h2>
-                <hr>
+                <h2 class="card-title text-center">Домашнее задание на {{ date|date:"d.m, D" }}</h2>
                 {% if lessons %}
                     {% for lesson in lessons %}
                         <h5>{{ lesson.subject }}</h5>
@@ -69,8 +61,7 @@
                     </div>
                 {% endif %}
             {% else %}
-                <h2 class="card-title">Домашнее задание на неделю:</h2>
-                <hr>
+                <h2 class="card-title text-center">Домашнее задание на неделю:</h2>
                 {% if lessons %}
                     {% for lesson in lessons %}
                         <h5><span class="badge badge-secondary" style="display: inline;">{{ lesson.date|date:"d.m, D" }}</span> {{ lesson.subject }}</h5>
@@ -84,12 +75,11 @@
                     {% endfor %}
                 {% else %}
                     <div class="text-center my-3">
-                        <img src="{% static 'book.svg' %}" alt="" width="100">
+                        <img src="{% static 'icons/relaxing.png' %}" alt="" width="100">
                         <p>Домашнее задание не задано.</p>
                     </div>
                 {% endif %}
             {% endif %}
-        </div>
     </div>
 </div>
 {% endblock %}
