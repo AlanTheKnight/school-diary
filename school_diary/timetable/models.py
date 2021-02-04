@@ -1,5 +1,4 @@
 from django.db import models
-from diary import models as diary_models
 
 
 DAYS = [
@@ -62,16 +61,16 @@ class BellsTimeTable(models.Model):
 
 
 class Lessons(models.Model):
-    connection = models.ForeignKey(
-        "Grades", default=None, on_delete=models.CASCADE, null=True,
-        related_name="t_grade", verbose_name="Класс")
+    klass = models.ForeignKey(
+        "Klasses", default=None, on_delete=models.CASCADE, null=True,
+        related_name="lessons", verbose_name="Класс")
     day = models.CharField(max_length=11, choices=DAYS, verbose_name="День недели", blank=False)
     number = models.ForeignKey(BellsTimeTable, on_delete=models.CASCADE, verbose_name="Номер урока")
     subject = models.CharField(max_length=50, verbose_name="Предмет")
     classroom = models.CharField(max_length=50, verbose_name="Кабинет")
 
     class Meta:
-        ordering = ['connection', 'day', 'number']
+        ordering = ['klass', 'day', 'number']
         verbose_name = "Урок"
         verbose_name_plural = "Уроки"
 
@@ -82,7 +81,7 @@ class Lessons(models.Model):
             return str(self.number.n) + "й урок во " + self.day.lower() + " у " + str(self.connection)
 
 
-class Grades(models.Model):
+class Klasses(models.Model):
     """
     Model that represents a grade in a timetable.
 

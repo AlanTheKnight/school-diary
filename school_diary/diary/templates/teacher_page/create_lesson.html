@@ -1,60 +1,56 @@
-<div class="modal fade" id="lessonmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="lessonmodalLabel" aria-hidden="true">
+<div class="modal fade" id="lessonmodal" data-bs-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="lessonmodalLabel">Создать новый урок</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title" id="lessonmodalLabel">Добавление урока</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-                    {{ form.date.label_tag }}
+                    <label for="{{ form.date.auto_id }}" class="form-label">{{ form.date.label }}</label> 
                     <div class="input-group mb-3">
-                        {{ form.date }}
-                        <div class="input-group-append">
-                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                        </div>
-                        <div class="invalid-feedback">
-                            Урок не может быть на каникулах
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        {{ form.theme.label_tag }}
-                        {{ form.theme }}
+                        {% with field=form.date hide_label=True %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
+                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                     </div>
 
-                    <div class="form-group">
-                        {{ form.control.label_tag }}
-                        {{ form.control }}
+                    <div class="mb-3">
+                        {% with field=form.theme %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
                     </div>
 
-                    <div class="custom-control custom-checkbox">
-                        {{ form.is_plan }}
-                        <label for="id_is_plan" class="custom-control-label">Отметить урок как запланированный</label>
+                    <div class="mb-3">
+                        {% with field=form.control %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
                     </div>
+
+                    {% with field=form.is_planned %}
+                        {% include 'field_template.html' %}
+                    {% endwith %}
 
                     <div class="my-3">
-                        <a href="#collapse-hw" data-toggle="collapse" class="my-5" id="hwbutton" onclick="changeBtnText();">Домашнее задание</a>
+                        <a href="#collapse-hw" data-bs-toggle="collapse" class="my-5" id="hwbutton" onclick="changeBtnText();">Домашнее задание</a>
                     </div>
 
                     <div id="collapse-hw" class="collapse">
-                        <div class="form-group">
-                            <label for="id_homework">Домашнее задание <i>на этот урок</i></label>
-                            {{ form.homework }}
+                        <div class="mb-3">
+                            {% with field=form.homework %}
+                                {% include 'field_template.html' %}
+                            {% endwith %}
                         </div>
-                        <div class="form-group">
-                            <div class="custom-file">
-                                {{ form.h_file }}
-                                <label for="id_h_file" class="custom-file-label">Файл с заданием</label>
-                            </div>
+                        <div class="mb-3">
+                            {% with field=form.h_file%}
+                                {% include 'field_template.html' %}
+                            {% endwith %}
                         </div>
                     </div>
-
-                    <a href="#" data-dismiss="modal" class="btn btn-secondary">Отменить</a>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#lessonplan" aria-hidden="true" data-dismiss="modal">Добавить из плана</button>
-                    <button type="submit" class="btn btn-primary" name="createlesson">Добавить</button>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-outline-primary" name="createlesson">Добавить</button>
+                    </div>
                 </form>
             </div>
             </div>
@@ -63,13 +59,13 @@
 </div>
 
 <script>
-    let value = false;
+    let lessonModalValue = false;
     function changeBtnText() {
-        if (!value)
-            $("#hwbutton").text("Скрыть")
+        if (!lessonModalValue)
+            $("#hwbutton").text("Скрыть");
         else
-            $("#hwbutton").text("Домашнее задание")
-        value = !value
+            $("#hwbutton").text("Домашнее задание");
+        lessonModalValue = !lessonModalValue;
     }
 </script>
 

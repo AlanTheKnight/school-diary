@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-<title>Электронный дневник diary56 - домашняя страница</title>
+<title>Электронный дневник diary56</title>
 {% endblock %}
 
 {% block css %}
@@ -16,7 +16,7 @@
   <div class="alert my-5 alert-info">{{ m }}</div>
   {% endfor %}
   
-  {% if type == 3 and grade is None %}
+  {% if user.account_type == 3 and user.student.klass is None %}
   <div class="alert alert-warning mt-5">
     Вы не состоите в классе. Попросите вашего классного руководителя добавить
     вас в класс - до этого большая часть функционала будет недоступна.
@@ -24,7 +24,7 @@
   {% endif %}
 
   <div class="row my-4">
-    {% if type == 0 or type == 1 %}
+    {% if user.account_type < 2 %}
     <div class="col-md-4 col-sm-6 col-lg-3 my-3">
       <div class="card h-100">
         <a href="{% url 'admin_panel' %}">
@@ -38,9 +38,9 @@
         </a>
       </div>
     </div>
-    {% elif type == 2 %}
+    {% elif user.account_type == 2 %}
       {% include 'homepage/teachers.html' %}
-    {% elif type == 3 and grade is not None %}
+    {% elif user.account_type == 3 and user.student.klass is not None %}
       {% include 'homepage/students.html' %}
     {% endif %}
 
@@ -61,6 +61,7 @@
         </a>
       </div>
     </div>
+
     <div class="col-md-4 col-sm-6 col-lg-3 my-3">
       <div class="card h-100">
         <a href="{% url 'minimum' %}">
@@ -78,6 +79,7 @@
         </a>
       </div>
     </div>
+
     <div class="col-md-4 col-sm-6 col-lg-3 my-3">
       <div class="card h-100">
         <a href="{% url 'news' %}">
@@ -95,21 +97,21 @@
         </a>
       </div>
     </div>
+
     <div class="col-md-4 col-sm-6 col-lg-3 my-3">
       <div class="card h-100">
-        <a href="{% url 'about' %}"
-          ><img
+        <a href="{% url 'about' %}">
+          <img
             src="{% static 'icons/team.png' %}"
             class="card-img-top"
-            alt="О проекте"
-          />
+            alt="О проекте"/>
           <div class="card-body">
             <h5 class="card-title">О проекте</h5>
             <p class="card-text text-muted">
               Информация об этой версии электронного дневника
             </p>
-          </div></a
-        >
+          </div>
+        </a>
       </div>
     </div>
   </div>

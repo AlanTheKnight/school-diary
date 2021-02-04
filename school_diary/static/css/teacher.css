@@ -1,38 +1,75 @@
-.inp_table{
-    border: 0px;
-    -webkit-appearance: none;
-    height: 100%;
-    width: 80%;
-    background-color: white;
+.inp-table {
+  border: 0px;
+  height: 100%;
+  width: 100%;
+  background-color: white;
 }
 
-.inp_table:focus{
-    outline:none;
+.inp-table:focus {
+  outline: none;
 }
 
-.inp_table::-webkit-inner-spin-button {
+.inp-table::-webkit-inner-spin-button {
   display: none;
 }
 
-.edit {
-  display: inline-block;
+.student-name {
+  width: fit-content;
 }
 
-.quater-mark{
-  background-color: #e9ecef;
-}
-.year-mark{
-  background-color: rgb(233,236,239);
-}
-.quater-mark-select{
-  border: none;
-  background-color: #e9ecef;
-}
-.year-mark-select{
-  border: none;
-  background-color: rgb(233,236,239);
+.grade-2 {
+  color: red;
 }
 
-.important-mark {
-  background-color: red;
+.grade-3 {
+  color: orangered;
 }
+
+.grade-4 {
+  color: rgb(4, 0, 255);
+}
+
+.grade-5 {
+  color: green;
+}
+
+.inp-table option {
+  color: black;
+}
+
+.grade-changed:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  display: block;
+  border-left: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-top: 15px solid rgba(186, 82, 255, 0.603);
+}
+
+.grade-changed {
+  position: relative;
+}
+
+.plan-badge {
+  width: 100%;
+}
+
+.lesson-control-select {
+  border: none;
+  width: 100%;
+  background-color: white;
+}
+
+.lesson-input {
+  border: none;
+  width: 100%;
+}
+
+.lesson-link {
+  display: block;
+}
+

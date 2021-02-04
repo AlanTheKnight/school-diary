@@ -2,11 +2,11 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark" id="main-navbar" style="background-color: #24292e;">
         <div class="container">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarcontent" aria-controls="navbarcontent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarcontent">
             <span class="navbar-toggler-icon"></span>
         </button>
         <a class="navbar-brand" href="{% url 'homepage' %}" title="Главная страница">
-            <img src="{% static 'icons/christmas-book.png' %}" width="35" height="35" class="d-inline-block align-center" alt="" style="padding: 2px;">
+            <img src="{% static 'icons/book.png' %}" width="35" height="35" class="d-inline-block align-center" alt="" style="padding: 2px;">
             Diary56
         </a>
         <div class="collapse navbar-collapse" id="navbarcontent">
@@ -24,7 +24,7 @@
                     <a class="nav-link" href="{% url 'news' %}">Новости</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'news_post_details' url='help' %}" tabindex="-1" aria-disabled="true">Помощь</a>
+                    <a class="nav-link" href="{% url 'news_post_details' url='help' %}" tabindex="-1">Помощь</a>
                 </li>
             </ul>
             {% if user.is_authenticated %}

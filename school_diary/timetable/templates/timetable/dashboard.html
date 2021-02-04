@@ -7,7 +7,6 @@
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/card_width.css' %}">
 <style>
     .field-input {
         border: none;
@@ -23,10 +22,10 @@
             <form method="POST">
                 {% csrf_token %}
                 <div class="form-row">
-                    <div class="form-group col-sm-3 col-12">
+                    <div class="mb-3 col-sm-3 col-12">
                         {{ form.grade }}
                     </div>
-                    <div class="form-group col-sm-3 col-12">
+                    <div class="mb-3 col-sm-3 col-12">
                         {{ form.litera }}
                     </div>
                     <div class="col-3">

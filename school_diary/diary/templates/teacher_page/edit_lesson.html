@@ -1,0 +1,78 @@
+<div class="modal fade" id="editLessonModal" data-bs-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Изменение урока</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" id="id_edit-id" name="id">
+                    <label for="{{ lessonEditForm.date.auto_id }}" class="form-label">{{ lessonEditForm.date.label }}</label>
+                    <div class="input-group mb-3">
+                        {% with field=lessonEditForm.date hide_label=True %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
+                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                    </div>
+
+                    <div class="mb-3">
+                        {% with field=lessonEditForm.theme %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
+                    </div>
+
+                    <div class="mb-3">
+                        {% with field=lessonEditForm.control %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
+                    </div>
+
+                    <div class="mb-3">
+                        {% with field=lessonEditForm.is_planned %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
+                    </div>
+
+                    <div class="mb-3">
+                        {% with field=lessonEditForm.homework %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
+                    </div>
+
+                    <div id="editLessonApp">
+                        <div v-if="lesson !== undefined && lesson.h_file">
+                            <div class="mb-3">
+                                К домашнему заданию был приложен <a :href="lesson.h_file">файл</a>
+                                <div class="form-check mt-2">
+                                    <input type="checkbox" id="id_edit-deleteFile" class="form-check-input" name="edit-deleteFile">
+                                    <label for="id_edit-deleteFile" class="form-check-label">Удалить файл</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {% with field=lessonEditForm.h_file %}
+                            {% include 'field_template.html' %}
+                        {% endwith %}
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-outline-primary" name="editLesson">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if form.errors %}
+    <script>
+        $(window).load(function () {
+            $("#editLessonModal").modal("show")
+        })
+    </script>
+{% endif %}

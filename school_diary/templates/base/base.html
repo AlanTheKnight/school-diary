@@ -11,13 +11,12 @@
     {% block title %}{% endblock %}
     <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script> <!--JQuery-->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script> <!--Bootstrap JS-->
-    <script src="{% static 'js/savy.min.js' %}"></script> <!--Savy.js-->
     <script src="{% static 'js/charts.min.js' %}"></script> <!--Charts.js-->
+    <script src="{% static 'js/js.cookie.min.js' %}"></script> <!-- Cookie.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/0.6.5/datepicker.min.js" integrity="sha256-/7FLTdzP6CfC1VBAj/rsp3Rinuuu9leMRGd354hvk0k=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="{% static 'js/vue@2.6.12.js' %}"></script> <!-- Vue.js -->
     <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet"> <!--FontAwesome-->
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
-    <script src="{% static 'js/snowfall.jquery.min.js' %}"></script>
 </head>
 
 <body>
@@ -29,13 +28,4 @@
 
 {% include 'base/footer.html' %}
 
-<script>
-  $('.auto-save').savy('load');
-  function clearstorage(){
-    localStorage.clear();
-  };
-
-  $("footer").snowfall({flakeCount : 50, round: true, minSize: 5, maxSpeed: 2});
-  $("#main-navbar").snowfall({flakeCount : 30, round: true, minSize: 5, maxSpeed: 2});
-</script>
 </html>

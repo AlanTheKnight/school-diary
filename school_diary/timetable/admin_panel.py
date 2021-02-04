@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from diary.decorators import admin_only
+from core.access import admin_only
 from timetable import forms
 from timetable import models
 from timetable import utils
@@ -27,13 +27,13 @@ def dashboard(request):
     })
 
     form = forms.GetTimeTableForm(initial=chosen)
-    my_grade = models.Grades.objects.get_or_create(number=chosen['grade'], letter=chosen['litera'])[0]
-    lessons = models.Lessons.objects.filter(connection=my_grade).order_by('day', 'number')
+    my_klass = models.Klasses.objects.get_or_create(number=chosen['grade'], letter=chosen['litera'])[0]
+    lessons = models.Lessons.objects.filter(klass=my_klass).order_by('day', 'number')
     context = {
         'form': form,
         'lessons': lessons,
         'number': chosen['grade'],
         'letter': chosen['litera'],
-        'grade': my_grade,
+        'klass': my_klass,
     }
     return render(request, 'timetable/dashboard.html', context)

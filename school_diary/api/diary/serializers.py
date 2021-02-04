@@ -1,14 +1,14 @@
 from rest_framework import serializers
-from diary import models
+from core import models
 
 
 class GradeListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Grades
+        model = models.Klasses
         exclude = ('teachers', 'subjects')
 
 
 class GradeDetailsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Grades
+        model = models.Klasses
         fields = '__all__'

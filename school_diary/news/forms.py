@@ -9,11 +9,10 @@ class ArticleCreationForm(forms.ModelForm):
     """Form for creating a new post in news section."""
     class Meta:
         model = models.Publications
-        fields = ('title', 'author', 'content', 'image', 'slug')
-        widgets = {
-            'title': forms.TextInput(attrs=bts4attr),
-            'author': forms.TextInput(attrs=bts4attr),
-            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 10}),
-            'image': forms.FileInput(attrs={'class': 'custom-file-input'}),
-            'slug': forms.TextInput(attrs=bts4attr),
+        fields = "__all__"
+        help_texts = {
+            "slug": "Уникальная ссылка на написанную статью (может состоять только " +
+            "из букв латинского алфавита, дефисов и цифр)",
+            "author": "Отображаемый автор статьи",
+            "content": "Текст статьи, может использовать разметку MarkDown, а также CSS & HTML"
         }

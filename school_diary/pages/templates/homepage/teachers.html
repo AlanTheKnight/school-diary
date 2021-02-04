@@ -1,16 +1,17 @@
 {% load static %}
 <div class="col-md-4 col-sm-6 col-lg-3 my-3">
     <div class="card h-100">
-        <a href="{% url 'my_grade' %}"><img src="{% static 'grade.png' %}" class="card-img-top" alt="Мой класс">
+        <a href="{% url 'klasses:my-klass' %}"><img src="{% static 'icons/class.png' %}" class="card-img-top" alt="Мой класс">
         <div class="card-body">
             <h5 class="card-title">Мой класс</h5>
             <p class="card-text text-muted">Просмотр оценок учеников в вашем классе</p>
           </div></a>
     </div>
 </div>
+
 <div class="col-md-4 col-sm-6 col-lg-3 my-3">
     <div class="card h-100">
-        <a href="{% url 'diary' %}"><img src="{% static 'diary.png' %}" class="card-img-top" alt="Дневник">
+        <a href="{% url 'diary' %}"><img src="{% static 'icons/open-book.png' %}" class="card-img-top" alt="Дневник">
         <div class="card-body">
             <h5 class="card-title">Дневник</h5>
             <p class="card-text text-muted">Выставление оценок и добавление домашнего задания</p>

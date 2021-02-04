@@ -4,8 +4,8 @@ from .models import Lessons, BellsTimeTable
 
 @admin.register(Lessons)
 class LessonsAdmin(admin.ModelAdmin):
-    list_display = ('connection', 'day', 'subject')
-    list_filter = ('connection', 'day', 'subject', 'number')
+    list_display = ('klass', 'day', 'subject')
+    list_filter = ('klass', 'day', 'subject', 'number')
 
 
 admin.site.register(BellsTimeTable)

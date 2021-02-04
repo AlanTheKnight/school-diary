@@ -1,0 +1,59 @@
+<div class="modal fade" id="homeworkmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="homeworkmodalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="homeworkmodalLabel">Добавить домашнее задание</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        <form method="POST" enctype="multipart/form-data">
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              {% for code, error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+          {% csrf_token %}
+          <div class="mb-3">
+            {% with field=form.subject %}
+              {% include 'field_template.html' %}
+            {% endwith %}
+          </div>
+          
+          <div class="mb-3">
+            {% with field=form.date %}
+              {% include 'field_template.html' %}
+            {% endwith %}
+          </div>
+          <div class="mb-3">
+            
+            {% with field=form.homework %}
+              {% include 'field_template.html' %}
+            {% endwith %}
+          </div>
+          <div class="mb-3">
+            <div class="custom-file">
+              {% with field=form.h_file %}
+                {% include 'field_template.html' %}
+              {% endwith %}
+              
+            </div>
+          </div>  
+
+          <a href="#" data-dismiss="modal" class="btn btn-secondary">Отменить</a>
+          <button type="submit" class="btn btn-primary" name="addhomework">Добавить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% if 'addhomework' in request.POST and form.errors %}
+<script>
+  $('#homeworkmodal').modal("show");
+</script>
+{% endif %}

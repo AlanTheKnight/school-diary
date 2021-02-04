@@ -4,31 +4,35 @@
 
 {% block title %}
 <title>Минимум</title>
+<style>
+    .card:hover {
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.233);
+        transition-duration: 0.5s;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <div class="card">
-        <div class="card-body">
-        <form method="POST" class="px-5">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ form.subject.label_tag }}
-                {{ form.subject }}
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card card-body">
+                <h2 class="text-center card-title">Минимум</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for f in form %}
+                        <div class="mb-3">
+                            {% with field=f %}
+                                {% include 'field_template.html' %}
+                            {% endwith %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-outline-primary">Скачать</button>
+                </div>
             </div>
-            <div class="form-group">
-                {{ form.grade.label_tag }}
-                {{ form.grade }}
-            </div>
-            <div class="form-group">
-                {{ form.term.label_tag }}
-                {{ form.term }}
-            </div>
-            <button type="submit" class="btn btn-outline-primary">Скачать</button>
-        </form>
         </div>
     </div>
-
 
 </div>
 {% endblock %}

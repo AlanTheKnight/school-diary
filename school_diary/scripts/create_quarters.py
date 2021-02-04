@@ -1,4 +1,4 @@
-from diary.models import Quarters
+from core.models import Quarters
 from datetime import date
 
 

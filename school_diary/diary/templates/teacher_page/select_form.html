@@ -1,31 +1,32 @@
-<div class="">
-    <form method="POST" id="mySelectForm">
-        {% csrf_token %}
-        <input type="hidden" name="getgrade">
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <div class="mb-3">
-                    {{ group_form.subjects.label_tag }}
-                    {{ group_form.subjects }}
-                </div>
+<form method="POST" id="mySelectForm">
+    {% csrf_token %}
+    <input type="hidden" name="getgrade">
+    <div class="row justify-content-center">
+        <div class="col-6 col-md-3">
+            <div class="mb-3">
+                {% with field=group_form.subjects hide_errors=True hide_label=True %}
+                    {% include 'field_template.html' %}
+                {% endwith %}
             </div>
-            <div class="col-6 col-md-3">
-                <div class="mb-3">
-                    {{ group_form.classes.label_tag }}
-                    {{ group_form.classes }}
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="mb-3">
-                    {{ group_form.quarters.label_tag }}
-                    {{ group_form.quarters }}
-                </div>
-            </div>
-            <script>
-                $(".selectFormInput").on("change", function () {
-                    $("#mySelectForm").submit();
-                })
-            </script>
         </div>
-    </form>
-</div>
+        <div class="col-6 col-md-3">
+            <div class="mb-3">
+                {% with field=group_form.classes hide_errors=True hide_label=True %}
+                    {% include 'field_template.html' %}
+                {% endwith %}
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="mb-3">
+                {% with field=group_form.quarters hide_errors=True hide_label=True %}
+                    {% include 'field_template.html' %}
+                {% endwith %}
+            </div>
+        </div>
+        <script>
+            $("#mySelectForm select").on("change", function() {
+                refreshSelection()
+            })
+        </script>
+    </div>
+</form>

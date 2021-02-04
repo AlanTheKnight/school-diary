@@ -1,13 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.shortcuts import render, redirect, get_object_or_404
-from . import forms
-from .decorators import teacher_only, student_only
-from . import models
+from django.shortcuts import render, redirect, get_object_or_404, Http404
+from core import forms, models
+from core.access import teacher_only, student_only, in_klass
 from . import functions
-from . import homework
 import utils
-import datetime
 
 # Tuple of keys needed to be in request.session
 # when teachers work with diary.
@@ -17,24 +14,6 @@ NO_GRADE_CONTEXT = {
     "message": ("Вы не состоите в классе. Попросите Вашего"
                 "классного руководителя добавить Вас в класс.")
 }
-
-
-@teacher_only
-@login_required(login_url="/login/")
-def visible_students(request):
-    if not utils.session_ok(request.session):
-        return redirect('diary')
-    data = utils.load_from_session(
-        request.session, {'group': None, 'term': None})
-    group = models.Groups.objects.get(id=data['group'])
-
-    form = forms.VisibleStudentsForm(instance=group)
-    if request.method == "POST":
-        form = forms.VisibleStudentsForm(request.POST, instance=group)
-        if form.is_valid():
-            form.save()
-            return redirect("diary")
-    return render(request, "visible_students.html", context={"form": form})
 
 
 @teacher_only
@@ -69,6 +48,34 @@ def lesson_page(request, pk):
     return render(request, 'lesson_page.html', context)
 
 
+def get_data(request):
+    if "group_id" in request.COOKIES and "quarter" in request.COOKIES:
+        group_id = int(request.COOKIES["group_id"])
+        quarter = int(request.COOKIES["quarter"])
+        try:
+            group = models.Groups.objects.get(id=group_id)
+            return group, quarter
+        except models.Groups.DoesNotExist:
+            pass
+    return None
+
+
+def get_teacher_page_data(request, subjects, klasses):
+    group = models.Groups.create_group(
+        klasses[0].id, subjects[0].id
+    )
+    quarter = models.Quarters.get_default_quarter().number
+
+    if "group_id" in request.COOKIES and "quarter" in request.COOKIES:
+        group_id = int(request.COOKIES["group_id"])
+        quarter = int(request.COOKIES["quarter"])
+        try:
+            group = models.Groups.objects.get(id=group_id)
+        except models.Groups.DoesNotExist:
+            pass
+    return group, quarter
+
+
 @login_required(login_url='/login/')
 @teacher_only
 def delete_lesson(request, pk):
@@ -86,43 +93,23 @@ def delete_lesson(request, pk):
     return render(request, 'lesson_delete.html', {'item': lesson})
 
 
+@student_only
+@in_klass
 def students_diary(request):
-    student = request.user.student
-    grade = student.grade
-    if grade is None:
-        return render(request, 'access_denied.html', {'message': "Вы не состоите в классе.\
-        Попросите Вашего классного руководителя добавить Вас в класс."})
-    if request.method == "POST" and 'all' in request.POST:
-        chosen_quarter = int(request.POST.get('term'))
-        groups = models.Groups.objects.filter(students=student, grade=grade)
-        all_marks = student.marks_set.filter(
-            lesson__quarter=chosen_quarter, lesson__is_plan=False)
-        if not all_marks:
-            return render(request, 'no_marks.html')
-
-        d = {}
-        max_length, total_missed = 0, 0
-        for group in groups:
-            marks = all_marks.filter(
-                lesson__group=group, lesson__is_plan=False).order_by("lesson__date")
-            if len(marks) > max_length:
-                max_length = len(marks)
-            data = functions.get_marks_data(marks)
-            d[group] = [data[1], data[0], marks]
-            total_missed += data[5]
-
-        for group in d:
-            d[group].append(range(max_length - len(d[group][2])))
-
-        context = {
-            'student': student,
-            'd': d,
-            'max_length': max_length,
-            'total_missed': total_missed,
-            'term': chosen_quarter,
-        }
-        return render(request, 'marklist.html', context)
-    return render(request, 'diary_student.html')
+    student: models.Students = request.user.student
+    chosen_quarter = models.Quarters.get_default_quarter().number
+    if 'quarter' in request.GET:
+        chosen_quarter = int(request.GET.get('quarter'))
+    form = forms.QuarterSelectionForm(initial={"quarter": chosen_quarter})
+    response = student.get_grades(chosen_quarter)
+    context = {
+        'student': student,
+        'term': chosen_quarter,
+        'form': form,
+    }
+    if response is not None:
+        context.update(response)
+    return render(request, 'student/grades.html', context)
 
 
 def teachers_diary(request):
@@ -133,94 +120,69 @@ def teachers_diary(request):
         Otherwise it returns "teacher.html" rendered page.
     """
 
-    # Current teacher and it's available subjects & grades
     teacher = request.user.teacher
-    available_subjects, available_grades \
+    available_subjects, available_klasses \
         = utils.grades_and_subjects(teacher)
 
-    # If teacher doesn't have available classes or subjects,
-    # user is redirected to Access Denied page.
-    if not (available_grades and available_subjects):
+    if not (available_klasses and available_subjects):
         return render(request, 'access_denied.html', {
             'message': "Пока что вы не указаны как учитель ни в одном классе."
         })
 
-    # If teacher has just chosen grade, subject & quarter, update these
-    # values in current session.
-    if request.method == 'POST' and 'getgrade' in request.POST:
-        selectionForm = forms.GroupSelectionForm(request.POST)
-        if selectionForm.is_valid():
-            utils.load_into_session(
-                request.session,
-                {
-                    'term': selectionForm.cleaned_data['quarters'],
-                    'group': selectionForm.get_group().id
-                }
-            )
-            # We got data from form, saved it into the session,
-            # now we teacher is redirected back to this page.
-        return redirect('diary')
+    group, quarter = get_teacher_page_data(
+        request, available_subjects, available_klasses)
 
-    # Assume that teacher hasn't selected any class/subject yet.
-    # If current session doesn't have values we need (group & quarter),
-    # we load defaults.
-    utils.set_default_session(
-        request.session, available_subjects, available_grades)
-    # Now we can redirect teacher back to diary page.
-    # After the redirect, we will get all needed session data.
-
-    # Finally, grade, subject & term chosen by teacher
-    data = utils.load_from_session(
-        request.session, {'group': None, 'term': None})
-    group = models.Groups.objects.get(id=data['group'])
-    quarter = data['term']
-
-    # Initialising a form for selecting classes and subjects
-    # and filling it with initial values (available subjects & classes)
     selectionForm = forms.GroupSelectionForm(
-        classes=available_grades,
+        classes=available_klasses,
         subjects=available_subjects,
         initial={
-            'classes': group.grade,
+            'classes': group.klass,
             'subjects': group.subject,
             'quarters': quarter
         }
     )
 
-    if group.subject not in group.grade.subjects.all():
+    if group.subject not in group.klass.subjects.all():
         return render(request, 'access_denied.html', {
-            'message': "Предмет \"{}\" не изучается в {} классе".format(group.subject, group.grade)
+            'message': "Предмет \"{}\" не изучается в {} классе".format(group.subject, group.klass)
         })
 
-    # New lesson creation
     form = forms.LessonCreationForm()
     if request.method == "POST" and 'createlesson' in request.POST:
         form = forms.LessonCreationForm(request.POST, request.FILES)
         if form.is_valid():
             form.save(group=group)
+            form = forms.LessonCreationForm()
 
-    hw_form = forms.HomeworkForm()
+    hw_form = forms.HomeworkForm(prefix="homework")
     if request.method == "POST" and 'addhomework' in request.POST:
-        hw_form = forms.HomeworkForm(request.POST, request.FILES)
+        hw_form = forms.HomeworkForm(request.POST, request.FILES, prefix="homework")
         if hw_form.is_valid():
-            hw_form.add_homework(group.id)
+            hw_form.add_homework(group)
+            hw_form = forms.HomeworkForm(prefix="homework")
 
-    if request.method == 'POST' and 'plan_id' in request.POST:
-        plan = models.Lessons.objects.get(pk=request.POST.get('plan_id'))
-        plan.is_plan = False
-        plan.save()
+    lesson_edit_form = forms.LessonCreationForm(prefix="edit")
+    if request.method == "POST" and "editLesson" in request.POST:
+        lesson = models.Lessons.objects.get(pk=int(request.POST.get("id")))
+        lesson_edit_form = forms.LessonCreationForm(request.POST, request.FILES, prefix="edit", instance=lesson)
+        if lesson_edit_form.is_valid():
+            lesson_edit_form.save(group=group)
+            lesson_edit_form = forms.LessonCreationForm(prefix="edit")
 
-    plan_data = models.Lessons.objects.filter(
-        is_plan=True, group=group, quarter=quarter)
+    students_form = forms.VisibleStudentsForm(instance=group)
+    if request.method == "POST" and 'visibleStudents' in request.POST:
+        students_form = forms.VisibleStudentsForm(request.POST, instance=group)
+        if students_form.is_valid():
+            students_form.save()
 
     context = {
         'form': form,
         'hw_form': hw_form,
         'group_form': selectionForm,
-        'plan_data': plan_data,
+        'visibleStudentsForm': students_form,
+        'lessonEditForm': lesson_edit_form
     }
 
-    functions.update_context(context, group, quarter)
     return render(request, 'teacher.html', context)
 
 
@@ -240,45 +202,29 @@ def diary(request):
 
 @login_required(login_url="login")
 @student_only
-def stats(request, pk, term):
+@in_klass
+def stats(request, pk, quarter: int):
     """Return a page with results for one specified subject."""
-    student = request.user.student
-    grade = student.grade
-    if grade is None:
-        return render(request, 'access_denied.html', {'message': "Вы не состоите в классе.\
-            Попросите Вашего классного руководителя добавить Вас в класс."})
+    student: models.Students = request.user.student
+    klass = student.klass
     subject = get_object_or_404(models.Subjects, pk=pk)
-    if subject not in student.grade.subjects.all():
+    if subject not in student.klass.subjects.all():
         return render(request, 'access_denied.html', {'message': "В вашем классе\
             не преподают запрашиваемый предмет."})
-    group = get_object_or_404(models.Groups, grade=grade, subject=subject)
-    lessons = models.Lessons.objects.filter(group=group, quarter=term)
-    marks = student.marks_set.filter(
-        lesson__group=group, lesson__quarter=term, lesson__is_plan=False)
+    try:
+        group = models.Groups.objects.get(klass=klass, subject=subject)
+    except models.Groups.DoesNotExist:
+        raise Http404
+    context = student.get_grades_by_group(quarter, group)
 
     # If student has no marks than send him a page with info.
     # Otherwise, student will get a page with statistics and his results.
-    if marks:
-        sm_avg, avg, quantity, amounts, needed, missed = functions.get_marks_data(
-            marks)
-
-        data = []
-        for i in range(5, 1, -1):
-            data.append(amounts.count(i))
-        data.append(missed)
-        teachers = grade.teachers.filter(subjects=subject)
-        context = {
-            'term': term,
-            'lessons': lessons,
-            'marks': marks,
-            'subject': subject,
-            'data': data,
-            'avg': avg,
-            'smartavg': sm_avg,
-            'quantity': quantity,
-            'needed': needed,
-            'missed': missed,
-            'teachers': teachers
-        }
-        return render(request, 'results.html', context)
+    if context is not None:
+        teachers = student.klass.teachers.filter(subjects=subject)
+        context.update({
+            "teachers": teachers,
+            "quarter": quarter,
+            "subject": subject
+        })
+        return render(request, 'student/results.html', context)
     return render(request, 'no_marks.html')

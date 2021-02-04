@@ -1,11 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from diary.decorators import admin_only, unauthenticated_user, allowed_users
+from core import models
+from core.users import forms
+from core.access import unauthenticated_user, admin_only, student_only, allowed_users
 from django.contrib import messages
-from . import forms
-from diary import models
-from diary.decorators import student_only
 
 
 @unauthenticated_user

@@ -1,34 +1,6 @@
 import datetime
 from typing import Union
-from diary import models
-
-
-def get_current_quarter() -> int:
-    """
-    Return current quarter, 0 if now is holidays' time.
-    """
-    today = datetime.date.today()
-    for q in models.Quarters.objects.all():
-        if q.begin <= today <= q.end:
-            return q.number
-    return 0
-
-
-def get_quarter_by_date(date: Union[str, datetime.date]) -> int:
-    """
-    Return a number of quarter by a date
-    stamp string or date object.
-    If quarter does not exist, return 0 instead.
-
-    Args:
-        date: datestring or datetime.date instance
-    """
-    if isinstance(date, str):
-        date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-    for q in models.Quarters.objects.all():
-        if q.begin <= date <= q.end:
-            return q.number
-    return 0
+from core import models
 
 
 def load_from_session(session, values: dict) -> dict:
@@ -58,13 +30,6 @@ def load_into_session(session, values: dict) -> None:
         session[key] = values[key]
 
 
-def get_default_quarter():
-    def_term = get_current_quarter()
-    if def_term == 0:
-        def_term = 1
-    return def_term
-
-
 def each_contains(d: dict, values: list):
     for i in values:
         if i not in d:
@@ -78,19 +43,19 @@ def grades_and_subjects(teacher: models.Teachers) -> tuple:
     teacher.
     """
     available_subjects = teacher.subjects.all().order_by('name')
-    available_grades = models.Grades.objects.filter(
+    available_grades = models.Klasses.objects.filter(
         teachers=teacher).order_by('number', 'letter')
     return available_subjects, available_grades
 
 
-def get_group(subject, grade) -> models.Groups:
+def get_group(subject, klass) -> models.Groups:
     """
     Return group from given subject and class.
     If group hasn't been created yet, set
     default students for new group and return it.
     """
     group, created = models.Groups.objects.get_or_create(
-        grade=grade,
+        klass=klass,
         subject=subject
     )
     if created:
@@ -108,13 +73,11 @@ def set_default_session(session, subjects, grades) -> None:
     if not subjects:
         raise ValueError("Subjects length needs to be > 0.")
     if not each_contains(session, ("term", "group")):
-        current_quarter = get_current_quarter()
-        if not current_quarter:
-            current_quarter = 1
+        current_quarter = models.Quarters.get_default_quarter()
         group = get_group(subjects[0], grades[0])
         load_into_session(session, {
             'group': group.id,
-            'term': current_quarter,
+            'term': current_quarter.id,
         })
 
 

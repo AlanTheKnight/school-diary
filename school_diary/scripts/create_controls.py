@@ -1,4 +1,4 @@
-from diary.models import Controls
+from core.models import Controls
 from django.db.models.deletion import ProtectedError
 
 

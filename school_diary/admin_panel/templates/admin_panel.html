@@ -19,23 +19,11 @@
   <table class="table my-5 table-borderless table-hover">
     <tbody>
       <tr class="bg-dark text-white">
-        <td colspan="2" class="text-center">Пользователи</td>
+        <td colspan="2" class="text-center">Основное</td>
       </tr>
       <tr>
-        <td><i class="fas fa-user"></i></td>
-        <td><a href="{% url 'admins_dashboard' %}">Администраторы</a></td>
-      </tr>
-      <tr>
-        <td><i class="fas fa-user"></i></td>
-        <td><a href="{% url 'teachers_dashboard' %}">Учителя</a></td>
-      </tr>
-      <tr>
-        <td><i class="fas fa-user"></i></td>
-        <td><a href="{% url 'students_dashboard' %}">Ученики</a></td>
-      </tr>
-      <tr>
-        <td><i class="fas fa-comment"></i></td>
-        <td><a href="{% url 'messages_dashboard' %}">Сообщения от пользователей</a></td>
+        <td><i class="fas fa-users"></i></td>
+        <td><a href="{% url 'users:users' %}">Пользователи</a></td>
       </tr>
       <!-- <tr>
           <td><i class="fas fa-upload"></i></td>

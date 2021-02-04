@@ -3,11 +3,7 @@
 {% with teacher=request.user.teacher %}
     <div class="profile">
         <div class="text-center">
-            {% if teacher.avatar %}
-            <img src="{{ teacher.avatar.url }}" alt="Учитель" height=100 width=100 style="object-fit: cover;" class="avatar">
-            {% else %}
-            <img src="{% static 'user_types/teachers.png' %}" alt="Учитель" height=100 width=100 style="object-fit: cover;" class="avatar">
-            {% endif %}
+
             <p class="text-muted">Учитель</p>
         </div>
     
@@ -31,24 +27,7 @@
                 
             </div>
             <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-                <h4><i class="fas fa-user"></i> Изменить аватар</h4>
-                {% if teacher.avatar.url != '/media/teachers/teachers.png' %}
-                <form method="POST">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-sm" name='image-delete'>Удалить аватар</button>
-                </form>
-                {% else %}
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <div class="custom-file">
-                            <input class="custom-file-input" name='avatar' type="file" accept="image/*" id="avatar-upload">
-                            <label class="custom-file-label avatar-upload" for="avatar-upload">Загрузите аватар</label>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary btn-sm" name='image-upload'>Изменить</button>
-                </form>
-                {% endif %}
+
                 <hr>
                 <h4><i class="fas fa-key"></i> Сбросить пароль</h4>
                 <p>Перейдите по ссылке для сброса пароля:</p>

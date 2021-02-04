@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from diary.decorators import admin_only
+from core.access import admin_only
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from news import forms

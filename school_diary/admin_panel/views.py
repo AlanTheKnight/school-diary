@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from diary.decorators import admin_only
+from core.access import admin_only
 from django.contrib.auth.decorators import login_required
 
 

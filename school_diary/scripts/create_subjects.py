@@ -1,4 +1,4 @@
-from diary import models
+from core import models
 
 
 def run():

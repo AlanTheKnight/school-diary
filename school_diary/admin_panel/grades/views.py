@@ -3,8 +3,8 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 from django.db.models import ProtectedError
 
-from diary.decorators import admin_only
-from diary import models
+from core.access import admin_only
+from core import models
 
 from . import forms
 

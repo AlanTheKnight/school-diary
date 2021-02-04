@@ -55,7 +55,7 @@
                             {% endwith %}
                         </div>
                         <div class="mb-3">
-                            {% with field=form.password1 hide_label=True hide_errors=True %}
+                            {% with field=form.password1 hide_label=True hide_errors=True hidehelp=True %}
                             <label for="{{ field.auto_id }}" class="form-label">{{ field.label }}</label>
                             <div class="input-group" id="show_hide_password">
                                 {% include 'field_template.html' %}

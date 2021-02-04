@@ -36,7 +36,6 @@ fi
 
 if [[ -n "$migrate" ]]; then
     python manage.py makemigrations
-    python manage.py migrate diary
     python manage.py migrate
     exit
 fi

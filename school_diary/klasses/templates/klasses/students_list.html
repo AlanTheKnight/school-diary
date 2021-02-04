@@ -1,0 +1,36 @@
+{% load static %}
+<div class="my-4">
+        <h2 class="card-title text-center">Ученики в классе</h2>
+        {% if students %}
+        <div class="table-responsive">
+            <table class="table my-3 text-center table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Почта</th>
+                        <th>Имя</th>
+                        <th>Фамилия</th>
+                        <th>Удаление</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr>
+                        <td>{{ s.account.email }}</td>
+                        <td>{{ s.account.first_name }}</td>
+                        <td>{{ s.account.surname }}</td>
+                        <td><a href="{% url 'klasses:delete-student' s.account_id %}" class="text-danger"><i class="fas fa-trash-alt"></i></a></td>
+                        {% comment %}
+                        <td><a href="{% url 'view_marks' s.account_id %}" class="btn btn-primary btn-sm text-white" style="display:inline-block;"><i><i class="fas fa-eye"></i></a></td>
+                        {% endcomment %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% else %}
+        <div class="my-4 text-center">
+            <img src="{% static 'icons/cactus.svg' %}" alt="" height="70" class="my-1">
+            <p>В классе еще нет учеников. Добавьте их с помощью формы ниже.</p>
+        </div>
+        {% endif %}
+</div>

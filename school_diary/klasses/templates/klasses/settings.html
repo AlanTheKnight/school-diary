@@ -1,0 +1,50 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Настройки класса</title>
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'klasses:my-klass' %}">Класс</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Настройки</li>
+            </ol>
+        </nav>
+
+        <div class="card card-body">
+            <p>
+                <i class="fas fa-exclamation-circle text-danger me-2"></i>
+                Будьте осторожны с изменением этих настроек, так как учителя могут
+                потерять доступ к Вашему классу.
+                Чтобы удалить класс, передать его другому классному руководителю или изменить
+                номер или букву класса, обратитесь к администрутору дневника.
+            </p>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                {% with field=form.subjects %}
+                    {% include "field_template.html" %}
+                {% endwith %}
+            </div>
+            <div class="mb-3">
+                {% with field=form.teachers %}
+                    {% include "field_template.html" %}
+                {% endwith %}
+            </div>
+            <div class="mb-3">
+                <i>
+                    Для того, чтобы выбрать несколько элементов в этих полях, зажмите клавишу CTRL
+                    и кликните на элемент.
+                </i>
+            </div>
+            <button type="submit" class="btn btn-success">Сохранить изменения</button>
+        </form>
+        </div>
+</div>
+{% endblock %}

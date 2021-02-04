@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="{% static 'css/card_align.css' %}">
 <style>
     .post-image{
-        object-fit: scale-down;
+        object-fit:cover;
     }
 </style>
 {% endblock %}
@@ -24,8 +24,8 @@
 
     {% if request.user.account_type < 3 %}
         <div class="mb-3">
-            <a href="{% url 'news_update' pk=post.id %}" class="btn btn-outline-primary"><i class="fas fa-edit mr-2"></i>Редактировать</a>
-            <a href="{% url 'news_delete' pk=post.id %}" class="btn btn-outline-danger"><i class="fas fa-trash mr-2"></i>Удалить</a>
+            <a href="{% url 'news_update' pk=post.id %}" class="btn btn-outline-primary"><i class="fas fa-edit me-2"></i>Редактировать</a>
+            <a href="{% url 'news_delete' pk=post.id %}" class="btn btn-outline-danger"><i class="fas fa-trash me-2"></i>Удалить</a>
         </div>
     {% endif %}
 
@@ -33,11 +33,11 @@
         {% if post.image %}
         <img class="card-img-top post-image" src="{{ post.image.url }}" alt="Изображение" height="200">
         {% endif %}
-        <div class="card-body text-center">
+        <div class="card-body">
             <div class="card-title">
-                <h1 class="dispay-4 my-0 px-5">{{ post.title }}</h1>
-                <p class="my-0">{{ post.author }}</p>
-                <p class="text-muted">{{ post.date }}</p>
+                <h2 class="dispay-4 my-0 px-5 text-center">{{ post.title }}</h2>
+                <p class="my-0 text-center">{{ post.author }}</p>
+                <p class="text-muted text-center">{{ post.date }}</p>
                 <div class="text-left">
                     <p>{{ post.content|markdown |safe }}</p>
                 </div>

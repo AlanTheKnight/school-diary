@@ -3,7 +3,7 @@ from rest_framework import filters as rf_filters
 from news import models
 from api.news import serializers
 from api.news import filters
-from api import permissions
+from core.api import permissions
 
 
 class PostDetails(generics.RetrieveUpdateDestroyAPIView):

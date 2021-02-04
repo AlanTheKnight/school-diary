@@ -1,102 +1,84 @@
 {% extends 'base/base.html' %}
 {% load static %}
-{% load templateLibs %}
 
 {% block title %}
 <title>Оценки</title>
 {% endblock %}
 
 {% block css %}
-<link href="{% static 'css/teacher.css' %}" rel="stylesheet">
-<link href="{% static 'css/card_width.css' %}" rel="stylesheet">
+<link href="{% static 'css/teacher.css' %}" rel="stylesheet" />
+<link href="{% static 'css/card_width.css' %}" rel="stylesheet" />
 
-<style>
-    .lesson-link {
-        display: block;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
-<input type="hidden" value="{% url 'api:inbuilt:save-mark' %}" name="save-mark-url">
-<input type="hidden" value="{% url 'api:inbuilt:add-comment' %}" name="add-comment-url">
-<input type="hidden" value="{% url 'api:inbuilt:get-comment' %}" name="get-comment-url">
 
-<div class="container-fluid mt-5">
-    {% include 'teacher_page/select_form.html' %}
+<div class="container mt-5">
+  {% include 'teacher_page/select_form.html' %} {% csrf_token %}
 
-    {% csrf_token %}
+  <div class="text-center">
     <div class="mb-4">
-        <button type="button" class="btn btn-outline-primary mt-2" data-toggle="modal" data-target="#lessonmodal">
-            <i class="fas fa-plus mr-2"></i>Добавить урок
-        </button>
-        <button type="button" class="btn btn-outline-primary mt-2" data-toggle="modal" data-target="#homeworkmodal">
-            <i class="fas fa-book mr-2"></i>Добавить д/з
-        </button>
-        <a href="{% url 'visible-students' %}" class="btn btn-outline-primary mt-2"><i class="fas fa-tasks"></i> Настроить</a>
-        <a href="{% url 'lessons' %}" class="btn btn-outline-primary mt-2"><i class="far fa-list-alt pr-2"></i>Уроки</a>
+      <button
+        type="button"
+        class="btn btn-outline-primary mt-2"
+        data-bs-toggle="modal"
+        data-bs-target="#lessonmodal"
+      >
+        <i class="fas fa-plus me-2"></i>Добавить урок
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-primary mt-2"
+        data-bs-toggle="modal"
+        data-bs-target="#homeworkModal">
+        <i class="fas fa-book me-2"></i>Добавить д/з
+      </button>
+      <button
+        data-bs-toggle="modal" data-bs-target="#visibleStudentsModal"
+        class="btn btn-outline-primary mt-2"
+        ><i class="fas fa-tasks me-2"></i> Настроить</button>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a
+        class="nav-link active"
+        id="grades-tab"
+        data-bs-toggle="pill"
+        href="#tab-grades-content"
+        role="tab"
+        ><i class="fas fa-table me-2"></i>Оценки</a
+      >
+    </li>
+    <li class="nav-item" role="presentation">
+      <a
+        class="nav-link"
+        id="lessons-tab"
+        data-bs-toggle="pill"
+        href="#tab-lessons-content"
+        role="tab"
+        ><i class="far fa-list-alt me-2"></i>Уроки</a
+      >
+    </li>
+  </ul>
+
+  <div class="tab-content" id="header-tab-content">
+    <div class="tab-pane fade show active" id="tab-grades-content" role="tabpanel">
+      {% include 'teacher_page/grades_tab.html' %}
     </div>
 
-    {% if lessons %}
-        <div class="table-responsive">
-            <table class="table table-bordered table-sm ">
-                <thead class="thead-light">
-                    <tr>
-                        <th scope="col">Ученики</th>
-                        <th title="Среднее арифметическое" style="width:4%;">AVG</th>
-                        <th title="Взвешенный средний балл" style="width:5%;">SM.AVG</th>
-                        {% for k, lesson in lessons.items %}
+    <div class="tab-pane fade" id="tab-lessons-content" role="tabpanel">
+      {% include 'teacher_page/lessons_tab.html' %}
+    </div>
+  </div>
 
-                            <th scope="col">
-                                <a
-                                href="{% url 'lesson-page' lesson.pk %}"
-                                tabindex="0" class="lesson-link"
-                                oncontextmenu="$(this).popover({html: true}); $(this).popover('toggle'); return false;"
-                                onfocusout="$(this).popover('dispose')" title="{{ lesson.date|date:'j M, l' }}"
-                                data-bs-content="
-                                    {{ lesson.control.name }}<br>
-                                    {% if lesson.theme %}
-                                    <b>Тема урока: </b>{{ lesson.theme }}
-                                    {% endif %}">
-                                    {{ lesson.date|date:'d M' }}
-                                </a>
-                            </th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                {% for student, small_scope in scope %}
-                    <tr>
-                        <td scope="row" style="width: 20%;">{{ student.surname }} {{ student.first_name }}</td>
-                        <td id="{{ student.pk }}">
-                            {{ small_scope|lookup:"avg"|lookup:0 }}
-                        </td>
-                        <td id = "s_{{ student.pk }}">
-                            {{ small_scope|lookup:"avg"|lookup:1 }}
-                        </td>
-                        {% for lk, lesson in lessons.items %}
-                            {% with mark=small_scope|lookup:lesson %}
-                                {% include "teacher_page/mark_td.html" %}
-                            {% endwith %}
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-                </table>
-        </div>
-    {% else %}
-        <div class="alert alert-info mt-5">
-            Уроки еще не были добавлены.
-        </div>
-    {% endif %}
+  {% include 'teacher_page/create_lesson.html' %}
+  {% include 'teacher_page/comment_modal.html' %}
+  {% include 'teacher_page/homework_modal.html' %}
+  {% include 'teacher_page/students_modal.html' %}
+  {% include 'teacher_page/edit_lesson.html' %}
 
-    {% include 'teacher_page/create_lesson.html' %}
-
-    {% include 'teacher_page/comment_modal.html' %}
-
-    {% include 'teacher_page/homework_modal.html' %}
-
-    {% include 'teacher_page/lesson_from_plan.html' %}
 </div>
 <script src="{% static 'js/teacher.js' %}"></script>
 {% endblock %}

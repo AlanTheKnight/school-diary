@@ -1,0 +1,140 @@
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4">
+  <input type="hidden" value="{{ request.session.group }}" id="group" />
+  <input type="hidden" value="{{ request.session.term }}" id="term" />
+
+  <div id="app">
+    <div v-if="lessons === undefined" class="text-center mt-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <div v-else-if="lessons.length == 0">
+      <div class="mt-4 alert alert-primary">
+        Ни один урок ещё не был добавлен. Добавьте новые уроки или перенесите уроки из запланнированных.
+      </div>
+    </div>
+    <div v-else>
+      <div class="table-responsive">
+        <table table class="table table-bordered table-sm">
+          <thead class="table-light">
+            <th class="text-center">План</th>
+            <th>Дата</th>
+            <th>Тема урока</th>
+            <th>Вид работы</th>
+            <th></th>
+          </thead>
+          <tbody>
+            <tr :id="lesson.id" v-for="lesson in lessons" class="lesson-table-row">
+              <td class="text-center" onclick="changePlanState(this)">
+                <div v-if="lesson.is_planned" class="plan-badge">
+                  <span class="badge bg-success">ПЛАН</span>
+                </div>
+              </td>
+              <td>
+                <input
+                  type="date" class="lesson-input"
+                  :id="'date' + lesson.id"
+                  :value="lesson.date"
+                  v-on:change="editLessonInfo(lesson.id)"
+                />
+              </td>
+              <td>
+                <input
+                  type="text" class="lesson-input"
+                  :id="'theme' + lesson.id"
+                  :value="lesson.theme"
+                  v-on:change="editLessonInfo(lesson.id)"
+                />
+              </td>
+              <td>
+                <select
+                  name=""
+                  :id="'control' + lesson.id" class="lesson-control-select"
+                  v-on:change="editLessonInfo(lesson.id)"
+                >
+                  <template v-for="control in controls">
+                    <option
+                      :selected="control.id == lesson.control"
+                      :value="control.id"
+                    >
+                      [[ control.name ]]
+                    </option>
+                  </template>
+                </select>
+              </td>
+              <td onclick="showMenu(this); return false;" class="text-center">
+                <i class="fas fa-trash text-danger"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="delete-lesson"
+    data-backdrop="static"
+    data-keyboard="false"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Удаление урока</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
+        </div>
+        <div class="modal-body">Вы уверены, что хотите удалить этот урок?</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Отмена
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            v-on:click="deleteLesson(id)"
+          >
+            Да
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="plan-lesson"
+    data-bs-backdrop="static"
+    data-keyboard="false"
+    tabindex="-1"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          Вы уверены, что хотите изменить поле "План"?
+          <div class="mt-3">
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              v-on:click="changeLessonPlanState(id)"
+            >
+              Да
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

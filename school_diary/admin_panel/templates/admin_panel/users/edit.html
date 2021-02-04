@@ -1,0 +1,63 @@
+{% extends 'base/base.html' %}
+
+
+{% block content %}
+
+<div class="container my-5">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'admin_panel' %}">Панель</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:users' %}">Пользователи</a></li>
+            <li class="breadcrumb-item active">Редактрование</li>
+        </ol>
+    </nav>
+
+    <h1 class="text-center mb-3">Редактрование пользователя</h1>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8">
+            <div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {% with field=form.email %}
+                            {% include "field_template.html" %}
+                        {% endwith %}
+                    </div>
+                    <div class="mb-3">
+                        {% with field=form.surname %}
+                            {% include "field_template.html" %}
+                        {% endwith %}
+                    </div>
+                    <div class="mb-3">
+                        {% with field=form.first_name %}
+                            {% include "field_template.html" %}
+                        {% endwith %}
+                    </div>
+                    <div class="mb-3">
+                        {% with field=form.second_name %}
+                            {% include "field_template.html" %}
+                        {% endwith %}
+                    </div>
+                    {% if form.klass %}
+                        <div class="mb-3">
+                            {% with field=form.klass %}
+                                {% include "field_template.html" %}
+                            {% endwith %}
+                        </div>
+                    {% endif %}
+                    {% if form.subjects %}
+                        <div class="mb-3">
+                            {% with field=form.subjects %}
+                                {% include "field_template.html" %}
+                            {% endwith %}
+                        </div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-outline-primary">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

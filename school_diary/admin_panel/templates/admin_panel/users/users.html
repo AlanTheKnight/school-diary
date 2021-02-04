@@ -1,0 +1,107 @@
+{% extends 'base/base.html' %}
+
+
+{% block title %}
+    <title>Пользователи</title>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container my-5">
+
+    <nav class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'admin_panel' %}">Панель</a></li>
+            <li class="breadcrumb-item active">Пользователи</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-3">
+        <div class="col-lg-9">
+            {% if users %}
+            <div class="table-responsive mb-4">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Почта</th>
+                            <th>Фамилия</th>
+                            <th>Имя</th>
+                            <th>Посл. вход</th>
+                            {% if t == 3 %}
+                                <th>Класс</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                            <tr onclick="editUser(this)" id="{{ u.id }}" account_type="{{ u.account_type }}">
+                                <a href="#">
+                                    <td>{{ u.email }}</td>
+                                    <td>{{ u.surname }}</td>
+                                    <td>{{ u.first_name }}</td>
+                                    <td>{{ u.last_login|date:"d/m/y" }}</td>
+                                    {% if t == 3 %}
+                                        {% if u.student.klass is not None %}
+                                            <td>{{ u.student.klass }}</td>
+                                        {% else %}
+                                            <td>-</td>
+                                        {% endif %}
+                                    {% endif %}
+                                </a>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% else %}
+                <div class="alert alert-primary">
+                    Не найдено ни одного пользователя по запросу.
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-lg-3 order-first order-lg-last">
+            {% if messages %}
+            <div class="mb-4"><i class="fas fa-bell me-3"></i>Есть непрочитанные сообщения от пользователей. <a href="{% url 'users:messages' %}">Просмотреть</a></div>
+            {% endif %}
+            <div class="mb-4">
+                <a href="#" class="btn btn-outline-success mb-1"><i class="fas fa-plus me-2"></i>Учитель</a>
+                <a href="#" class="btn btn-outline-success mb-1"><i class="fas fa-plus me-2"></i>Администратор</a>
+            </div>
+            <div class="mb-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="my-3">
+                        {% with field=form.usertype hide_errors=True %}
+                            {% include "field_template.html" %}
+                        {% endwith %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="justify-content-center">
+        
+    </div>
+</div>
+
+<script>
+    $("select").on("change", function () {
+        $("form").submit();
+    });
+
+    function editUser(that) {
+        if (Number($(that).attr("account_type")) != 0) {
+            let id = $(that).attr("id");
+            document.location = `/admin/users/edit/${id}`;
+        }
+    }
+
+    $(document).ready(function () {
+        $("tr[account_type=0]").addClass("table-danger");
+    });
+</script>
+
+{% endblock %}

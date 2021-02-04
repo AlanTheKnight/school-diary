@@ -1,5 +1,5 @@
 from django.db import models
-from diary.models import Users
+from core.models import Users
 
 
 class AllowedToUseAPIList(models.Model):

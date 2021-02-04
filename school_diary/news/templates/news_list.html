@@ -7,7 +7,6 @@
     .post-image{
         object-fit: cover;
     }
-
 </style>
 {% endblock %}
 
@@ -21,15 +20,15 @@
           </div>
     </form>
 
-    {% if request.user.account_type == 0 or request.user.account_type == 1 %}
-    <div class="mb-3">
-            <a href="{% url 'news_create' %}" class="btn btn-outline-primary"><i class="fas fa-edit mr-2"></i>Новая новость</a>
-    </div>
-    {% endif %}
-
     {% if search %}
     <div class="mb-3">
         <a href="{% url 'news' %}">Отменить поиск</a>
+    </div>
+    {% endif %}
+
+    {% if request.user.account_type == 0 or request.user.account_type == 1 %}
+    <div class="mb-3">
+        <a href="{% url 'news_create' %}" class="btn btn-outline-primary"><i class="fas fa-edit me-2"></i>Новая новость</a>
     </div>
     {% endif %}
     
@@ -39,14 +38,17 @@
         <div class="card-body">
             <ul class="list-unstyled">
                 {% for post in news %}
-                <li class="media my-2">
-                    <div class="media-body">
+                <li class="row mt-2">
+                    <div class="col">
                     <a href="{% url 'news_post_details' post.slug %}"><h5 class="mt-0">{{ post.title }}</h5></a>
                     <p class="my-0">От {{ post.author }}</p>
-                    <p class="text-muted my-0">{{ post.publication_date }}</p>
+                    <p class="text-muted my-0">{{ post.date }}</p>
                     </div>
+
                     {% if post.image %}
-                    <img src="{{ post.image.url }}" class="align-self-center mr-3 post-image" alt="" height="70" width="70">
+                    <div class="col-auto">
+                        <img src="{{ post.image.url }}" class="align-self-center mr-3 post-image" alt="" height="70" width="70">
+                    </div>
                     {% endif %}
                 </li>
                 {% ifnotequal forloop.counter news|length %}
@@ -59,7 +61,7 @@
     
     {% else %}
         {% if not search %}
-        <div class="text-center">
+        <div class="text-center my-5">
             <img src="{% static 'icons/cactus.svg' %}" alt="" height="60">
             <p class="my-2">Кажется, тут нет новостей.</p>
         </div>

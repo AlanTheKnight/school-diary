@@ -3,10 +3,10 @@ import datetime
 import os
 from shutil import rmtree
 from django.shortcuts import render, redirect
-from diary.decorators import admin_only
+from core.access import admin_only
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-import diary.models as models
+from core import models
 
 
 # TODO(ideasoft-spb@yandex.com): move generated tables to MEDIA folder!!!

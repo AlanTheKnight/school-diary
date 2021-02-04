@@ -1,4 +1,4 @@
-from diary import models
+from core import models
 from django.shortcuts import render
 import openpyxl
 from . import forms

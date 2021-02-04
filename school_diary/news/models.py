@@ -7,7 +7,7 @@ class Publications(models.Model):
     author = models.CharField(max_length=50, verbose_name="Автор")
     content = models.TextField(verbose_name="Текст", blank=True)
     image = models.ImageField(upload_to='news/', verbose_name="Изображение", blank=True)
-    slug = models.SlugField(max_length=100, verbose_name="Имя ссылки", unique=True)
+    slug = models.SlugField(max_length=100, verbose_name="Ссылка", unique=True)
 
     class Meta:
         ordering = ['-date']

@@ -1,15 +1,18 @@
 {% load widget_tweaks %}
 
-{% if not hide_label %}
+{% if not hide_label and field.field.widget.input_type != "checkbox" %}
     <label for="{{ field.auto_id }}" class="form-label">{{ field.label }}</label>
 {% endif %}
 
 {% if form.is_bound %}
     {% if field.errors %}
-        {% if not isFile %}
-            {% render_field field class="form-control is-invalid" %}
+        
+        {% if field.field.widget.input_type == "checkbox" %}
+            {% render_field field class="form-check-input is-invalid" %}
+        {% elif field.field.widget.input_type == "select" %}
+            {% render_field field class="form-select is-invalid" %}
         {% else %}
-            {% render_field field class="custom-file-input is-invalid" %}
+            {% render_field field class="form-control is-invalid" %}
         {% endif %}
 
         {% if not hide_errors %}
@@ -21,15 +24,37 @@
         {% endif %}
     {% else %}
         {% if not hide_errors %}
-            {% render_field field class="form-control is-valid" %}
+            {% if field.field.widget.input_type == "checkbox" %}
+                {% render_field field class="form-check-input is-valid" %}
+            {% elif field.field.widget.input_type == "select" %}
+                {% render_field field class="form-select is-valid" %}
+            {% else %}
+                {% render_field field class="form-control is-valid" %}
+            {% endif %}
         {% else %}
-            {% render_field field class="form-control" %}
+            {% if field.field.widget.input_type == "checkbox" %}
+                {% render_field field class="form-check-input" %}
+            {% elif field.field.widget.input_type == "select" %}
+                {% render_field field class="form-select" %}
+            {% else %}
+                {% render_field field class="form-control" %}
+            {% endif %}
         {% endif %}
     {% endif %}
 {% else %}
-    {% render_field field class="form-control" %}
+    {% if field.field.widget.input_type == "checkbox" %}
+        {% render_field field class="form-check-input" %}
+    {% elif field.field.widget.input_type == "select" %}
+        {% render_field field class="form-select" %}
+    {% else %}
+        {% render_field field class="form-control" %}
+    {% endif %}
 {% endif %}
 
-{% if field.help_text and showhelp %}
+{% if field.field.widget.input_type == "checkbox" and not hide_label %}
+    <label for="{{ field.auto_id }}" class="form-check-label">{{ field.label }}</label>
+{% endif %}
+
+{% if field.help_text and not hidehelp %}
     <small class="form-text text-muted">{{ field.help_text }}</small>
 {% endif %}
