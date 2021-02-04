@@ -1,48 +1,58 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from core import models
+from django.shortcuts import render, redirect
+
+from core.access import unauthenticated_user, allowed_users
 from core.users import forms
-from core.access import unauthenticated_user, admin_only, student_only, allowed_users
-from django.contrib import messages
 
 
 @unauthenticated_user
-def user_register(request):
+def student_registration(request):
     """
-    New student registration.
+    Page with a registration form for students.
+    Available only to unauthenticated users.
+
+    Return `registration.html` if form wasn't submitted or isn't valid.
+    Otherwise, redirect to `login`.
     """
+    form = forms.StudentSignUpForm()
     if request.method == 'POST':
         form = forms.StudentSignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Учётная запись была создана успешно.")
             return redirect('login')
-    if request.method != 'POST':
-        form = forms.StudentSignUpForm()
-    return render(request, 'registration.html', {'form': form})
+    return render(request, 'accounts/registration.html', {'form': form})
 
 
 @unauthenticated_user
 def user_login(request):
+    """
+    Page where user can log in to his account.
+    Available only to unauthenticated users.
+
+    Redirect to `homepage` if login was successful.
+    Otherwise, return `login.html`.
+    """
     form = forms.UsersLogin()
     if request.method == 'POST':
-        form = forms.UsersLogin(data=request.POST)
+        form = forms.UsersLogin(request.POST)
         if form.is_valid():
-            email = form.cleaned_data.get('email')
-            password = form.cleaned_data.get('password')
+            email: str = form.cleaned_data.get('email')
+            password: str = form.cleaned_data.get('password')
             user = authenticate(request, email=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect("/")
-            else:
-                messages.info(
-                    request, 'Проверьте, что вы ввели правильный логин и пароль.')
+                return redirect("homepage")
+            messages.info(request, 'Проверьте, что вы ввели правильный логин и пароль.')
     context = {'form': form}
-    return render(request, 'login.html', context)
+    return render(request, 'accounts/login.html', context)
 
 
 def user_logout(request):
+    """
+    Logout user from a current session and redirect to `login`.
+    """
     logout(request)
     return redirect('login')
 
@@ -50,75 +60,23 @@ def user_logout(request):
 @login_required(login_url="/login/")
 def user_profile(request):
     """
-    User profile page (diary56.ru/profile/)
+    User profile page. Return 'profile.html`
     """
-    if request.user.account_type == 2:
-        if request.method == "POST":
-            if 'image-upload' in request.POST:
-                request.user.teacher.avatar = request.FILES.get('avatar')
-                request.user.teacher.save()
-            elif 'image-delete' in request.POST:
-                request.user.teacher.avatar.delete()
-    return render(request, 'profile.html')
+    return render(request, 'accounts/profile.html')
 
 
-@login_required(login_url="/login/")
-@admin_only
-def admin_register(request):
-    if request.method == 'POST':
-        form = forms.AdminSignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(
-                request, "Новый аккаунт администратора был создан успешно.")
-            return redirect('login')
-    if request.POST:
-        form = forms.AdminSignUpForm(request.POST)
-    else:
-        form = forms.AdminSignUpForm()
-    context = {'form': form, 'error': 0}
-    return render(request, 'registration_admin.html', context)
-
-
-@login_required(login_url="/login/")
-@admin_only
-def teacher_register(request):
-    if request.method == 'POST':
-        form = forms.TeacherSignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(
-                request, "Новый аккаунт учителя был создан успешно.")
-            return redirect('login')
-    if request.POST:
-        form = forms.TeacherSignUpForm(request.POST)
-    else:
-        form = forms.TeacherSignUpForm()
-    context = {'form': form, 'error': 0}
-    return render(request, 'registration_teacher.html', context)
-
-
-@allowed_users(
-    allowed_roles=['teachers', 'students'],
-    message="Администраторы не имеют доступ к этой странице.")
+@allowed_users(allowed_types=(2, 3))
 @login_required(login_url="login")
-def admin_message(request):
+def message_to_admin(request):
     """
-    Send a message to an admin.
+    A page where student/teacher can send a message to admin.
+    Redirect to 'profile' if message was sent successfully.
+    Otherwise, return 'message_to_admin.html'
     """
+    form = forms.MessageToAdminForm()
     if request.method == "POST":
-        form = forms.AdminMessageCreationForm(request.POST)
+        form = forms.MessageToAdminForm(request.POST)
         if form.is_valid():
-            m = form.save()
-            m.sender = request.user
-            m.save()
+            form.save(sender=request.user)
             return redirect('profile')
-    form = forms.AdminMessageCreationForm()
-    return render(request, 'admin_messages.html', {'form': form})
-
-
-@student_only
-def teacher_page(request, pk: int):
-    t = get_object_or_404(models.Teachers, account_id=pk)
-    context = {'teacher': t}
-    return render(request, "teacher_page.html", context)
+    return render(request, 'accounts/message_to_admin.html', {'form': form})

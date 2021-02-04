@@ -1,9 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import Group
 from django.db import transaction
-from core import models
 
+from core import models
 
 form_fields = (
     "first_name", "second_name", "surname",
@@ -44,7 +43,7 @@ class StudentSignUpForm(UserCreationForm):
 
 
 class AdminSignUpForm(UserCreationForm):
-    class Meta():
+    class Meta:
         model = models.Users
         fields = form_fields
         widgets = {
@@ -137,3 +136,17 @@ class TeacherEditForm(UserEditForm):
         super().__init__(*args, **kwargs)
         if self.instance:
             self.fields['subjects'].initial = self.instance.teacher.subjects.all()
+
+
+class MessageToAdminForm(forms.ModelForm):
+    class Meta:
+        model = models.AdminMessages
+        fields = ('subject', 'content')
+
+    def save(self, commit=True, sender=None):
+        if sender is None:
+            raise ValueError("Message sender must be specified.")
+        message = super(MessageToAdminForm, self).save(commit=False)
+        message.sender = sender
+        message.save()
+        return message

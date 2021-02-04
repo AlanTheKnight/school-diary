@@ -1,9 +1,9 @@
+from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase, Client
 from django.urls import reverse, resolve
-from django.contrib.auth.models import AnonymousUser
+
 from accounts import views
 from core import models
-
 
 # Email & password for test user
 EMAIL = "vasya@pupkin.com"
@@ -62,7 +62,7 @@ class TestStudentsRegistration(TestCase):
         with right view function.
         """
         self.assertEqual(reverse('register'), '/register/')
-        self.assertEqual(resolve('/register/').func, views.user_register)
+        self.assertEqual(resolve('/register/').func, views.student_registration)
 
     def test_passwords_not_match(self):
         """

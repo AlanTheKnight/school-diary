@@ -1,5 +1,7 @@
-from django.shortcuts import redirect, render
+from functools import wraps
+from typing import Tuple
 
+from django.shortcuts import redirect, render
 
 MESSAGES = {
     'NO_GRADE': {
@@ -13,6 +15,7 @@ MESSAGES = {
 
 
 def unauthenticated_user(view_func):
+    @wraps(view_func)
     def wrapper_func(request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('homepage')
@@ -21,18 +24,15 @@ def unauthenticated_user(view_func):
     return wrapper_func
 
 
-def allowed_users(allowed_roles=None, message=""):
-    if allowed_roles is None:
-        allowed_roles = []
-
+def allowed_users(allowed_types: Tuple[int, ...]):
     def decorator(view_func):
+        @wraps(view_func)
         def wrapper_func(request, *args, **kwargs):
-            group = None
-            if request.user.groups.exists():
-                group = request.user.groups.all()[0].name
-            if group in allowed_roles:
+            if request.user.account_type in allowed_types:
                 return view_func(request, *args, **kwargs)
-            context = {'message': message}
+            context = {
+                'message': "Вам недоступна данная страница."
+            }
             return render(request, 'access_denied.html', context)
         return wrapper_func
     return decorator
@@ -66,6 +66,8 @@ def admin_only(view_func):
 
 
 def is_president(function):
+    """Check `request.user.student` has a president status."""
+    @wraps(function)
     def wrapper(request, *args, **kwargs):
         if request.user.student.president:
             return function(request, *args, **kwargs)
@@ -74,17 +76,19 @@ def is_president(function):
 
 
 def in_klass(function):
+    """Check `request.user.student` is in class."""
+    @wraps(function)
     def wrapper(request, *args, **kwargs):
-        if request.user.student.klass is not None:
+        if request.user.student.in_klass:
             return function(request, *args, **kwargs)
         return render(request, 'access_denied.html', MESSAGES['NO_GRADE'])
     return wrapper
 
 
 def has_klass(function):
-    """Check that `request.user` is main teacher."""
+    """Check that `request.user` is a main teacher."""
     def wrapper(request, *args, **kwargs):
         if request.user.teacher.klass:
             return function(request, *args, **kwargs)
-        return render('klasses/no_klass.html')
+        return render(request, 'klasses/no_klass.html')
     return wrapper

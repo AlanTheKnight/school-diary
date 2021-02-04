@@ -3,7 +3,7 @@
 // regexes
 
 let email = $("#id_email");
-let emailregex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+let emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 let letter = $("#letter");
 let number = $("#number");
 let length = $("#length");
@@ -60,7 +60,7 @@ function setInValid(el) {
 
 function passwordMatchCheck() {
   if (
-    password1.val() == password2.val() &&
+    password1.val() === password2.val() &&
     password1.val().length > 0 &&
     password2.val().length > 0
   ) {
@@ -79,27 +79,27 @@ function passwordCheck() {
 }
 
 function emailCheck() {
-  if (email.val().match(emailregex)) {
+  if (email.val().match(emailRegex)) {
     setValid(email);
   } else {
     setInValid(email);
   }
 }
 
-function finalpasswordMatchCheck() {
+function finalPasswordMatchCheck() {
   return (
-    password1.val() == password2.val() &&
+    password1.val() === password2.val() &&
     password1.val().length > 0 &&
     password2.val().length > 0
   );
 }
 
-function finalpasswordCheck() {
+function finalPasswordCheck() {
   return password1.val().match(/^(?=.*[0-9])[A-ZА-ЯЁ0-9!@#$%^&*_\-]{8,}$/i);
 }
 
-function finalemailCheck() {
-  return email.val().match(emailregex);
+function finalEmailCheck() {
+  return email.val().match(emailRegex);
 }
 
 password2.on("input", passwordMatchCheck);
@@ -108,20 +108,22 @@ password1.on("input", passwordCheck);
 email.on("input", emailCheck);
 
 function validateMyForm() {
-  return finalemailCheck() && finalpasswordCheck && finalpasswordMatchCheck();
+  return finalEmailCheck() && finalPasswordCheck && finalPasswordMatchCheck();
 }
 
 $(document).ready(function () {
   $("#show_hide_password a").on("click", function (event) {
     event.preventDefault();
-    if ($("#show_hide_password input").attr("type") == "text") {
-      $("#show_hide_password input").attr("type", "password");
-      $("#show_hide_password i").addClass("fa-eye-slash");
-      $("#show_hide_password i").removeClass("fa-eye");
-    } else if ($("#show_hide_password input").attr("type") == "password") {
-      $("#show_hide_password input").attr("type", "text");
-      $("#show_hide_password i").removeClass("fa-eye-slash");
-      $("#show_hide_password i").addClass("fa-eye");
+    let passwordField = $("#id_password");
+    let hideBtnIcon = $("#show_hide_password i");
+    if (passwordField.attr("type") === "text") {
+      passwordField.attr("type", "password");
+      hideBtnIcon.addClass("fa-eye-slash");
+      hideBtnIcon.removeClass("fa-eye");
+    } else {
+      passwordField.attr("type", "text");
+      hideBtnIcon.removeClass("fa-eye-slash");
+      hideBtnIcon.addClass("fa-eye");
     }
   });
 });

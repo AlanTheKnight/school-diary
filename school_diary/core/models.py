@@ -410,17 +410,10 @@ class Users(AbstractBaseUser, PermissionsMixin):
         return self.get_username()
 
 
-def teacher_avatar_upload(instance, filename):
-    return 'teachers/{}/{}'.format(instance.pk, filename)
-
-
 class Teachers(models.Model):
     account = models.OneToOneField(
         Users, on_delete=models.CASCADE, related_name='teacher',
         verbose_name="Пользователь", primary_key=True)
-    avatar = models.FileField(
-        verbose_name="Аватар", null=True, default=None, blank=True,
-        upload_to=teacher_avatar_upload)
     subjects = models.ManyToManyField("Subjects", verbose_name="Предметы")
 
     class Meta:
@@ -506,6 +499,9 @@ class Students(models.Model):
             }
         }
         return data
+
+    def in_klass(self):
+        return self.klass is not None and self.klass.head_teacher is not None
 
 
 class Admins(models.Model):

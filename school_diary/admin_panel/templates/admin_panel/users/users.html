@@ -66,15 +66,15 @@
             <div class="mb-4"><i class="fas fa-bell me-3"></i>Есть непрочитанные сообщения от пользователей. <a href="{% url 'users:messages' %}">Просмотреть</a></div>
             {% endif %}
             <div class="mb-4">
-                <a href="#" class="btn btn-outline-success mb-1"><i class="fas fa-plus me-2"></i>Учитель</a>
-                <a href="#" class="btn btn-outline-success mb-1"><i class="fas fa-plus me-2"></i>Администратор</a>
+                <a href="{% url 'users:register_teacher' %}" class="btn btn-outline-success mb-1"><i class="fas fa-plus me-2"></i>Учитель</a>
+                <a href="{% url 'users:register_admin' %}" class="btn btn-outline-success mb-1"><i class="fas fa-plus me-2"></i>Администратор</a>
             </div>
             <div class="mb-4">
                 <form method="POST">
                     {% csrf_token %}
                     <div class="my-3">
                         {% with field=form.usertype hide_errors=True %}
-                            {% include "field_template.html" %}
+                            {% include "field.html" %}
                         {% endwith %}
                     </div>
                 </form>
@@ -93,7 +93,7 @@
     });
 
     function editUser(that) {
-        if (Number($(that).attr("account_type")) != 0) {
+        if (Number($(that).attr("account_type")) !== 0) {
             let id = $(that).attr("id");
             document.location = `/admin/users/edit/${id}`;
         }

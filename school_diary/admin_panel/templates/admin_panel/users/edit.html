@@ -21,35 +21,35 @@
                     {% csrf_token %}
                     <div class="mb-3">
                         {% with field=form.email %}
-                            {% include "field_template.html" %}
+                            {% include "field.html" %}
                         {% endwith %}
                     </div>
                     <div class="mb-3">
                         {% with field=form.surname %}
-                            {% include "field_template.html" %}
+                            {% include "field.html" %}
                         {% endwith %}
                     </div>
                     <div class="mb-3">
                         {% with field=form.first_name %}
-                            {% include "field_template.html" %}
+                            {% include "field.html" %}
                         {% endwith %}
                     </div>
                     <div class="mb-3">
                         {% with field=form.second_name %}
-                            {% include "field_template.html" %}
+                            {% include "field.html" %}
                         {% endwith %}
                     </div>
                     {% if form.klass %}
                         <div class="mb-3">
                             {% with field=form.klass %}
-                                {% include "field_template.html" %}
+                                {% include "field.html" %}
                             {% endwith %}
                         </div>
                     {% endif %}
                     {% if form.subjects %}
                         <div class="mb-3">
                             {% with field=form.subjects %}
-                                {% include "field_template.html" %}
+                                {% include "field.html" %}
                             {% endwith %}
                         </div>
                     {% endif %}

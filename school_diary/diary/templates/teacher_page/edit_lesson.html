@@ -12,32 +12,32 @@
                     <label for="{{ lessonEditForm.date.auto_id }}" class="form-label">{{ lessonEditForm.date.label }}</label>
                     <div class="input-group mb-3">
                         {% with field=lessonEditForm.date hide_label=True %}
-                            {% include 'field_template.html' %}
+                            {% include 'field.html' %}
                         {% endwith %}
                         <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                     </div>
 
                     <div class="mb-3">
                         {% with field=lessonEditForm.theme %}
-                            {% include 'field_template.html' %}
+                            {% include 'field.html' %}
                         {% endwith %}
                     </div>
 
                     <div class="mb-3">
                         {% with field=lessonEditForm.control %}
-                            {% include 'field_template.html' %}
+                            {% include 'field.html' %}
                         {% endwith %}
                     </div>
 
                     <div class="mb-3">
                         {% with field=lessonEditForm.is_planned %}
-                            {% include 'field_template.html' %}
+                            {% include 'field.html' %}
                         {% endwith %}
                     </div>
 
                     <div class="mb-3">
                         {% with field=lessonEditForm.homework %}
-                            {% include 'field_template.html' %}
+                            {% include 'field.html' %}
                         {% endwith %}
                     </div>
 
@@ -55,7 +55,7 @@
 
                     <div class="mb-3">
                         {% with field=lessonEditForm.h_file %}
-                            {% include 'field_template.html' %}
+                            {% include 'field.html' %}
                         {% endwith %}
                     </div>
 

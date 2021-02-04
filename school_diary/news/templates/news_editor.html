@@ -18,22 +18,22 @@
                     {% csrf_token %}
                     <div class="mb-3">
                         {% with field=form.title %}
-                            {% include "field_template.html" %}
+                            {% include "field.html" %}
                         {% endwith %}
                     </div>
                     <div class="mb-3">
                         {% with field=form.author %}
-                            {% include "field_template.html" %}
+                            {% include "field.html" %}
                         {% endwith %}
                     </div>
                     <div class="mb-3">
                         {% with field=form.content %}
-                            {% include "field_template.html" %}
+                            {% include "field.html" %}
                         {% endwith %}
                     </div>
                     <div class="mb-3">
                         {% with field=form.image %}
-                            {% include "field_template.html" %}
+                            {% include "field.html" %}
                         {% endwith %}
                     </div>
                     <button class="btn btn-danger btn-sm mb-4" id="imagedeletebutton" onclick="delete_image()" style="display: none;" type="button">Очистить это поле</button>
@@ -46,7 +46,7 @@
                     {% endif %}
                     <div class="mb-3">
                         {% with field=form.slug %}
-                            {% include "field_template.html" %}
+                            {% include "field.html" %}
                         {% endwith %}
                     </div>
                     <button type="submit" class="btn btn-outline-primary">Сохранить</button>

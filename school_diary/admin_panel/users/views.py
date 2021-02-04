@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
-from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from core.access import admin_only
+from django.core.paginator import Paginator
+from django.shortcuts import render, redirect, get_object_or_404
+
 from core import models
+from core.access import admin_only
+from core.users import forms
 from .forms import FilterForm
 
 
@@ -52,7 +54,35 @@ def messages(request, page=1):
 
 @login_required(login_url="/login/")
 @admin_only
-def message(request, pk: int):
-    m = models.AdminMessages.objects.get(pk=pk)
-    context = {"m": m}
+def message_details(request, pk: int):
+    message = get_object_or_404(models.AdminMessages, pk=pk)
+    context = {"m": message}
     return render(request, "admin_panel/users/message.html", context)
+
+
+@login_required(login_url="/login/")
+@admin_only
+def register_admin(request):
+    form = forms.AdminSignUpForm()
+    if request.method == 'POST':
+        form = forms.AdminSignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, "Новый аккаунт администратора был создан успешно.")
+            return redirect('login')
+    return render(request, 'admin_panel/users/register_admin.html', {'form': form})
+
+
+@login_required(login_url="/login/")
+@admin_only
+def register_teacher(request):
+    form = forms.TeacherSignUpForm()
+    if request.method == 'POST':
+        form = forms.TeacherSignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, "Новый аккаунт учителя был создан успешно.")
+            return redirect('login')
+    return render(request, 'admin_panel/users/register_teacher.html', {'form': form})

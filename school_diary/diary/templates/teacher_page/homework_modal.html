@@ -14,18 +14,18 @@
                     <label for="id_date" class="form-label">Дата, на которую вы задаете д/з</label>
                     <div class="input-group mb-3">
                         {% with field=hw_form.date hide_label=True %}
-                            {% include 'field_template.html' %}
+                            {% include 'field.html' %}
                         {% endwith %}
                         <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                     </div>
                     <div class="mb-3">
                         {% with field=hw_form.homework %}
-                            {% include 'field_template.html' %}
+                            {% include 'field.html' %}
                         {% endwith %}
                     </div>
                     <div class="mb-3">
                         {% with field=hw_form.h_file %}
-                            {% include 'field_template.html' %}
+                            {% include 'field.html' %}
                         {% endwith %}
                     </div>
 

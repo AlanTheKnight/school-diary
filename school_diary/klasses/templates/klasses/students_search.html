@@ -4,17 +4,17 @@
         <form method="GET" autocomplete="off">
             <div class="mb-3">
                 {% with field=form.email %}
-                    {% include "field_template.html" %}
+                    {% include "field.html" %}
                 {% endwith %}
             </div>
             <div class="mb-3">
                 {% with field=form.first_name %}
-                    {% include "field_template.html" %}
+                    {% include "field.html" %}
                 {% endwith %}
             </div>
             <div class="mb-3">
                 {% with field=form.surname %}
-                    {% include "field_template.html" %}
+                    {% include "field.html" %}
                 {% endwith %}
             </div>
             <button class="btn btn-outline-primary" type="submit" name="search">Найти</button>

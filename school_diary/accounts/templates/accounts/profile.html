@@ -49,44 +49,24 @@
                 <div class="mb-1"><b>Дата регистрации: </b>{{ user.registration_date }}</div>
 
                 {% if user.is_student %}
-                    {% if user.student.klass == None %}
-                        <p class="text-muted">Ваш класс еще не указан. Попросите Вашего классного руководителя добавить Вас.</p>
+                    {% if user.student.in_klass %}
+                        <div class="mb-1"><b>Класс: </b>{{ user.student.klass }}</div>
                     {% else %}
-                        <p>Класс: {{ user.student.klass }}</p>
+                        <div class="text-muted mb-1">
+                            Вы еще не были добавлены в класс. Для того, чтобы в полной мере<br>
+                            пользоваться функционалом дневника, попросите сделать это вашего классного руководителя.
+                        </div>
                     {% endif %}
                 {% endif %}
             </div>
         </div>
         <div class="tab-pane fade" id="settings" role="tabpanel">
-
             <div class="mb-3">
-            <a href="{% url 'reset_password' %}"><i class="fas fa-key me-2"></i>Сбросить пароль</a>
+                <a href="{% url 'reset_password' %}"><i class="fas fa-key me-2"></i>Сбросить пароль</a>
             </div>
             <div class="mb-3">
                 <a href="{% url 'message_to_admin' %}"><i class="fas fa-edit me-2"></i>Изменить данные аккаунта</a>
             </div>
-
-{#            TODO: Fix form displaying, add uploaded image size limit #}
-{#            {% if user.is_teacher %}#}
-{#                <h4><i class="fas fa-user"></i> Изменить аватар</h4>#}
-{#                {% if user.teacher.avatar.url != '/media/teachers/teachers.png' %}#}
-{#                    <form method="POST">#}
-{#                        {% csrf_token %}#}
-{#                        <button type="submit" class="btn btn-danger btn-sm" name='image-delete'>Удалить аватар</button>#}
-{#                    </form>#}
-{#                {% else %}#}
-{#                    <form method="POST" enctype="multipart/form-data">#}
-{#                        {% csrf_token %}#}
-{#                        <div class="form-group">#}
-{#                            <div class="custom-file">#}
-{#                                <input class="custom-file-input" name='avatar' type="file" accept="image/*" id="avatar-upload">#}
-{#                                <label class="custom-file-label avatar-upload" for="avatar-upload">Загрузите аватар</label>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                        <button class="btn btn-primary btn-sm" name='image-upload'>Изменить</button>#}
-{#                    </form>#}
-{#                {% endif %}#}
-{#            {% endif %}#}
         </div>
     </div>
 

@@ -1,0 +1,75 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Войти в аккаунт</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="container my-5">
+	<div class="row justify-content-sm-center">
+		<div class="col col-md-9 col-lg-6">
+			<div class="card card-body login my-3">
+                <h2 class="card-title text-center">Вход в аккаунт</h2>
+                {% if messages %}
+                    <div class="alert alert-danger my-3">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                    </div>
+                {% endif %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {% with field=form.email %}
+                            {% include "field.html" %}
+                        {% endwith %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">{{ form.password.label }}</label>
+                        <div class="input-group" id="show_hide_password">
+                            {% with field=form.password hide_label=True %}
+                                {% include "field.html" %}
+                            {% endwith %}
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <a id="hideBtn" href="#"><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
+                            </span>
+                        </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary">Войти</button>
+                    <a href="{% url 'register' %}" class="ms-2 btn btn-outline-secondary">Создать аккаунт</a>
+                    <p class="text-end my-2"><a href="{% url 'reset_password' %}">Забыли пароль?</a></p>
+                </form>
+			</div>
+		</div>
+	</div>
+	
+</div>
+<script>
+	localStorage.clear();
+
+	$(document).ready(function () {
+	$("#hideBtn").on("click", function (event) {
+		event.preventDefault();
+		let hideBtnIcon = $("#hideBtn i");
+		let passwordField = $("#id_password");
+		if (passwordField.attr("type") === "text") {
+			passwordField.attr("type", "password");
+			hideBtnIcon.addClass("fa-eye-slash");
+			hideBtnIcon.removeClass("fa-eye");
+		} else {
+			passwordField.attr("type", "text");
+			hideBtnIcon.removeClass("fa-eye-slash");
+			hideBtnIcon.addClass("fa-eye");
+		}
+	});
+	});
+</script>
+{% endblock %}

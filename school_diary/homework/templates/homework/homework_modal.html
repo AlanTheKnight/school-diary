@@ -19,25 +19,25 @@
           {% csrf_token %}
           <div class="mb-3">
             {% with field=form.subject %}
-              {% include 'field_template.html' %}
+              {% include 'field.html' %}
             {% endwith %}
           </div>
           
           <div class="mb-3">
             {% with field=form.date %}
-              {% include 'field_template.html' %}
+              {% include 'field.html' %}
             {% endwith %}
           </div>
           <div class="mb-3">
             
             {% with field=form.homework %}
-              {% include 'field_template.html' %}
+              {% include 'field.html' %}
             {% endwith %}
           </div>
           <div class="mb-3">
             <div class="custom-file">
               {% with field=form.h_file %}
-                {% include 'field_template.html' %}
+                {% include 'field.html' %}
               {% endwith %}
               
             </div>
