@@ -1,6 +1,5 @@
 {% extends 'base/base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
 
 {% block title %}
 <title>Сброс пароля</title>
@@ -19,7 +18,7 @@
             <p>Введите новый пароль для своего аккаунта.</p>
             <form method="post">
                 {% csrf_token %}
-                {{ form|crispy }}
+                {{ form }}
                 <button type="submit" class="btn btn-primary">Обновить пароль</button>
             </form>
         </div>

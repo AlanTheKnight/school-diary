@@ -22,13 +22,13 @@
 
     {% if search %}
     <div class="mb-3">
-        <a href="{% url 'news' %}">Отменить поиск</a>
+        <a href="{% url 'news' page=1 %}">Отменить поиск</a>
     </div>
     {% endif %}
 
     {% if request.user.account_type == 0 or request.user.account_type == 1 %}
     <div class="mb-3">
-        <a href="{% url 'news_create' %}" class="btn btn-outline-primary"><i class="fas fa-edit me-2"></i>Новая новость</a>
+        <a href="{% url 'news_create' %}" class="btn btn-outline-primary"><i class="fas fa-edit me-2"></i>Новая статья</a>
     </div>
     {% endif %}
     

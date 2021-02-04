@@ -12,19 +12,34 @@
 {% block content %}
 <div class="container">
 
-  {% for m in messages %}
-  <div class="alert my-5 alert-info">{{ m }}</div>
-  {% endfor %}
+    {% for m in messages %}
+    <div class="alert my-5 alert-info">{{ m }}</div>
+    {% endfor %}
+
+    <div id="update-info" class="mt-5">
+        <div class="card text-light">
+            <div class="card-header">
+                <a class="text-light" id="hide-update-info"><i class="fas fa-times"></i></a>
+            </div>
+            <div class="card-body text-center">
+                <h1>Diary56 2.0 🥳</h1>
+                <div>
+                    Встречайте ещё больше интересных функций 🔥
+                </div>
+            </div>
+        </div>
+    </div>
   
-  {% if user.account_type == 3 and user.student.klass is None %}
-  <div class="alert alert-warning mt-5">
-    Вы не состоите в классе. Попросите вашего классного руководителя добавить
-    вас в класс - до этого большая часть функционала будет недоступна.
-  </div>
-  {% endif %}
+    {% if user.is_student and not user.student.in_klass %}
+        <div class="alert alert-warning mt-5">
+        Вы не состоите в классе. Попросите вашего классного руководителя добавить
+        вас в класс - до этого большая часть функционала будет недоступна.
+        </div>
+    {% endif %}
+
 
   <div class="row my-4">
-    {% if user.account_type < 2 %}
+    {% if user.is_admin %}
     <div class="col-md-4 col-sm-6 col-lg-3 my-3">
       <div class="card h-100">
         <a href="{% url 'admin_panel' %}">
@@ -38,10 +53,39 @@
         </a>
       </div>
     </div>
-    {% elif user.account_type == 2 %}
+    {% elif user.is_teacher %}
       {% include 'homepage/teachers.html' %}
-    {% elif user.account_type == 3 and user.student.klass is not None %}
-      {% include 'homepage/students.html' %}
+    {% elif user.is_student and user.student.in_klass %}
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+            <div class="card h-100">
+                <a href="{% url 'homework' %}"><img src="{% static 'icons/studying.png' %}" class="card-img-top" alt="Мой класс">
+                <div class="card-body">
+                    <h5 class="card-title">Домашнее задание</h5>
+                    <p class="card-text text-muted">Домашнее задание, добавленное учителями</p>
+                </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+            <div class="card h-100">
+                <a href="{% url 'diary' %}"><img src="{% static 'icons/score.png' %}" class="card-img-top" alt="Дневник">
+                <div class="card-body">
+                    <h5 class="card-title">Дневник</h5>
+                    <p class="card-text text-muted">Просмотр своих оценок и успеваемости</p>
+                </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+            <div class="card h-100">
+                <a href="#"><img src="{% static 'icons/pencil.png' %}" class="card-img-top" alt="">
+                <div class="card-body">
+                    <h5 class="card-title">Конспекты</h5>
+                    <p class="card-text text-muted">Выкладывайте конспект по различным предметам</p>
+                </div>
+                </a>
+            </div>
+        </div>
     {% endif %}
 
     <div class="col-md-4 col-sm-6 col-lg-3 my-3">
@@ -82,7 +126,7 @@
 
     <div class="col-md-4 col-sm-6 col-lg-3 my-3">
       <div class="card h-100">
-        <a href="{% url 'news' %}">
+        <a href="{% url 'news' 1 %}">
           <img
             src="{% static 'icons/newspaper.png' %}"
             class="card-img-top"
@@ -116,4 +160,15 @@
     </div>
   </div>
 </div>
+
+<script>
+    if (localStorage.hasOwnProperty("hide_update_info")) {
+        $("#update-info").hide();
+    } else {
+        $("#hide-update-info").on("click", () => {
+            localStorage.setItem("hide_update_info", "True");
+            $("#update-info").hide();
+        })
+    }
+</script>
 {% endblock %}

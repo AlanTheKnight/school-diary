@@ -10,7 +10,7 @@ html {
 }
 
 * {
-  font-family: "Montserrat";
+  font-family: "Montserrat", sans-serif;
 }
 
 body {
@@ -20,8 +20,8 @@ body {
 .footer {
   line-height: 40px;
   position: absolute;
-  left: 0px;
-  bottom: 0px;
+  left: 0;
+  bottom: 0;
 }
 
 footer.footer a:visited {
@@ -97,4 +97,10 @@ h4 {
   object-fit: cover;
   object-position: center;
   border-radius: 50%;
+}
+
+.card-shadow:hover {
+  transition-property: box-shadow;
+  transition-duration: 0.5s;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
