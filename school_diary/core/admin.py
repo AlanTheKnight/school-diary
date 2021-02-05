@@ -1,6 +1,6 @@
 from django.contrib import admin
-from . import models
 
+from . import models
 
 admin.site.site_header = "Электронный дневник"
 admin.site.index_title = "Панель администратора"
@@ -49,3 +49,4 @@ admin.site.register(models.Controls)
 admin.site.register(models.Subjects)
 admin.site.register(models.Quarters)
 admin.site.register(models.Groups)
+admin.site.register(models.Homework)

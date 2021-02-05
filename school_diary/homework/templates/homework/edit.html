@@ -33,7 +33,7 @@
     
             <div class="mb-3">
                 <label class="form-label" for="id_homework">Домашнее задание</label>
-                {% with field=form.homework hide_label=True %}
+                {% with field=form.content hide_label=True %}
                     {% include 'field.html' %}
                 {% endwith %}
             </div>

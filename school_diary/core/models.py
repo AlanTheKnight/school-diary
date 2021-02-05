@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import Union
 
@@ -6,6 +8,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Group
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models import Q, UniqueConstraint
 
 from . import utils
 from .users import manager
@@ -15,6 +18,7 @@ class Subjects(models.Model):
     name = models.CharField(
         max_length=100, verbose_name="Название",
         unique=True)
+    icon = models.ImageField("Иконка", upload_to='subject_icons/', blank=True)
 
     class Meta:
         ordering = ['name']
@@ -54,28 +58,109 @@ class Klasses(models.Model):
             group.students.add(student)
         student.save()
 
+    def get_homework(self, quarter: Union[None, int] = None,
+                     start_date: Union[None, datetime.date] = None,
+                     end_date: Union[None, datetime.date] = None,
+                     reverse: bool = False):
+        """
+        Get homework for a specified class.
+
+        :param quarter: Specify if you want to get homework by quarter.
+        :param start_date: Specify if you want to get homework for a
+        specific day or a time range.
+        :param end_date: If not omitted, get homework in range (start_date, end_date).
+        :param reverse: Order homework queryset by date in descending order.
+        :return: A queryset of Homework objects.
+        """
+        if not quarter and not (start_date or end_date):
+            return TypeError(
+                "At least one argument: quarter, start_date or end_date is expected.")
+        args = [Q(content__iregex=r'\S+') | Q(h_file__iregex=r'\S+')]
+        kwargs = {
+            "lesson__group__klass": self
+        }
+        if quarter:
+            kwargs["lesson__quarter__number"] = quarter
+        if end_date is not None:
+            kwargs["lesson__date__range"] = (start_date, end_date)
+        elif start_date is not None:
+            kwargs["lesson__date"] = start_date
+        queryset = Homework.objects.filter(*args, **kwargs)
+        queryset = queryset.order_by('-lesson__date') if reverse else queryset.order_by('lesson__date')
+        return queryset
+
 
 class Controls(models.Model):
-    name = models.CharField(max_length=120, verbose_name='Вид работы')
-    weight = models.FloatField(verbose_name='Коэффицент', default=1)
+    name = models.CharField("Вид работы", max_length=150)
+    weight = models.FloatField("Коэффицент", default=1)
+    notify = models.BooleanField("Оповещать учеников", default=False)
+    default = models.BooleanField("Вид работы по умолчанию", default=False)
 
     class Meta:
         verbose_name = "Вид работы"
         verbose_name_plural = "Виды работ"
+        constraints = [
+            UniqueConstraint(fields=['default'], condition=Q(default=True), name="unique_default_control")
+        ]
 
     def __str__(self):
         return "{} ({})".format(self.name, self.weight)
 
+    @classmethod
+    def get_default_control(cls) -> Union[Controls, None]:
+        try:
+            return cls.objects.get(default=True)
+        except cls.DoesNotExist:
+            return None
 
-def lesson_upload(instance, filename):
-    return 'homework/{}_{}'.format(str(instance.pk), filename)
+
+def homework_upload(instance: Homework, filename: str):
+    return 'homework/{}_{}'.format(instance.id, filename)
+
+
+class Homework(models.Model):
+    lesson = models.ForeignKey("Lessons", verbose_name="Урок", on_delete=models.CASCADE)
+    content = models.TextField("Задание", blank=True)
+    h_file = models.FileField("Файл", null=True, default=None, upload_to=homework_upload, blank=True)
+
+    class Meta:
+        verbose_name = "Домашнее задание"
+        verbose_name_plural = "Домашние задания"
+
+    def __str__(self):
+        return f"Урок {self.lesson}"
+
+    @property
+    def file_attached(self) -> bool:
+        return bool(self.h_file)
+
+    @property
+    def subject(self) -> Subjects:
+        return self.lesson.group.subject
+
+    @property
+    def date(self) -> datetime.date:
+        return self.lesson.date
+
+    @classmethod
+    def add_homework(cls, date: datetime.date, group: Groups,
+                     content: Union[None, str] = None, h_file=None) -> Homework:
+        if not content and not h_file:
+            raise ValueError("Either content or h_file must be specified.")
+        control = Controls.get_default_control()
+        if control is None:
+            raise Exception("Default control is not defined.")
+        quarter = Quarters.get_quarter_by_date(date)
+        if quarter is None:
+            raise Exception("Lesson's date can't be on holiday.")
+        lesson = Lessons.objects.get_or_create(date=date, control=control, group=group, quarter=quarter)[0]
+        return cls.objects.create(lesson=lesson, content=content, h_file=h_file)
 
 
 class Lessons(models.Model):
     date = models.DateField(verbose_name='Дата')
     quarter = models.ForeignKey(
         "Quarters", on_delete=models.PROTECT, verbose_name="Четверть")
-    homework = models.TextField(blank=True, verbose_name='Д/з')
     theme = models.CharField(max_length=120, verbose_name='Тема', blank=True)
     group = models.ForeignKey(
         "Groups", on_delete=models.PROTECT,
@@ -83,9 +168,6 @@ class Lessons(models.Model):
     )
     control = models.ForeignKey(
         Controls, on_delete=models.PROTECT, verbose_name='Контроль')
-    h_file = models.FileField(
-        null=True, default=None, blank=True,
-        verbose_name="Файл", upload_to=lesson_upload)
     is_planned = models.BooleanField(
         verbose_name='Запланирован', default=False)
 

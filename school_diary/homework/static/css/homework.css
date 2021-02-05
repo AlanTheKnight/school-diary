@@ -1,0 +1,15 @@
+.subject-icon {
+    width: 40px;
+    display: block;
+    margin: 10px auto;
+}
+
+.subject-icon-parent {
+    height: 100%;
+}
+
+.attachment-icon {
+    width: 40px;
+    display: block;
+    margin: 10px auto;
+}

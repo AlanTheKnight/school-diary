@@ -1,7 +1,7 @@
 from django import forms
+
 from . import models
 from .homework import HomeworkForm
-
 
 __all__ = [
     "HomeworkForm", "DatePickForm", "LessonCreationForm",
@@ -24,7 +24,7 @@ class LessonCreationForm(forms.ModelForm):
     class Meta:
         model = models.Lessons
         fields = (
-            'date', 'theme', 'homework', 'h_file', 'control', 'is_planned', 'deleteFile'
+            'date', 'theme', 'control', 'is_planned', 'deleteFile'
         )
         widgets = {
             'date': forms.DateInput(format=('%Y-%m-%d'), attrs={

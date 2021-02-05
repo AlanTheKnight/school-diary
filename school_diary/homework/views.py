@@ -1,9 +1,11 @@
 import datetime
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+
 from django import http
-from core.access import student_only, in_klass, is_president
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+
 from core import forms, models, homework
+from core.access import student_only, in_klass, is_president
 
 
 @login_required(login_url="login")
@@ -19,14 +21,14 @@ def show_homework(request):
         form = forms.DatePickForm(request.GET)
         if form.is_valid():
             date = form.cleaned_data['date']
-            lessons = homework.get_homework(klass, start_date=date)
-            context = {'form': form, 'lessons': lessons, 'date': date}
+            tasks = klass.get_homework(start_date=date)
+            context = {'form': form, 'homework': tasks, 'date': date}
             return render(request, 'homework/homework.html', context)
     start_date = datetime.date.today() + datetime.timedelta(days=1)
     end_date = start_date + datetime.timedelta(days=7)
-    lessons = homework.get_homework(klass, start_date=start_date, end_date=end_date)
+    tasks = klass.get_homework(start_date=start_date, end_date=end_date)
     form = forms.DatePickForm()
-    return render(request, 'homework/homework.html', {'form': form, 'lessons': lessons})
+    return render(request, 'homework/homework.html', {'form': form, 'homework': tasks})
 
 
 @student_only
@@ -49,7 +51,7 @@ def homework_list(request, quarter=None):
         if hw_form.is_valid():
             hw_form.add_homework(request.user.student.klass)
             hw_form = homework.PresidentHomeworkForm(subjects)
-    lessons = homework.get_homework(request.user.student.klass, quarter=quarter, reverse=True)
+    lessons = request.user.student.klass.get_homework(quarter=quarter, reverse=True)
     return render(request, 'homework/list.html', {
         'quarter_form': quarter_form, 'lessons': lessons, 'form': hw_form
     })
@@ -59,11 +61,11 @@ def homework_list(request, quarter=None):
 @is_president
 @in_klass
 def homework_delete(request, pk: int):
-    lesson = models.Lessons.objects.get(id=pk)
+    task = get_object_or_404(models.Homework, pk=pk)
     if request.method == "POST":
-        lesson.delete()
+        task.delete()
         return redirect('homework-list')
-    return render(request, 'homework/delete.html', {'lesson': lesson})
+    return render(request, 'homework/delete.html', {'lesson': task})
 
 
 @student_only
@@ -71,7 +73,7 @@ def homework_delete(request, pk: int):
 @in_klass
 def homework_edit(request, pk: int):
     subjects = request.user.student.klass.subjects.all()
-    lesson = models.Lessons.objects.get(id=pk)
+    lesson = models.Homework.objects.get(pk=pk)
     form = homework.PresidentHomeworkForm(subjects, instance=lesson)
     if request.method == "POST":
         form = homework.PresidentHomeworkForm(subjects, request.POST, request.FILES, instance=lesson)
