@@ -89,6 +89,13 @@ class Klasses(models.Model):
         queryset = queryset.order_by('-lesson__date') if reverse else queryset.order_by('lesson__date')
         return queryset
 
+    def get_exams(self, start_date: datetime.date, delta: int = 7):
+        end_date = start_date + datetime.timedelta(days=delta)
+        return Lessons.objects.filter(
+            control__notify=True, theme__iregex=r'\S+',
+            date__range=(start_date, end_date)).order_by('date')
+
+
 
 class Controls(models.Model):
     name = models.CharField("Вид работы", max_length=150)

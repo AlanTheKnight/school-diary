@@ -42,15 +42,42 @@
             {% endif %}
         </div>
 
+        {% if exams %}
+        <div id="carouselExampleIndicators" class="carousel slide my-4" data-bs-ride="carousel">
+            <div class="carousel-inner text-center">
+                {% for exam in exams %}
+                    <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %}">
+                        <h1>{{ exam.group.subject }}</h1>
+                        <div>
+                            <b>{{ exam.control.name }}</b><br>
+                            "{{ exam.theme }}"
+                        </div>
+                        <div>
+                            {{ exam.date|date:"j E" }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </a>
+        </div>
+        {% endif %}
+
         <div class="card card-body my-4">
             {% if "date" in request.GET %}
-                <h2 class="card-title text-center">Домашнее задание на {{ date|date:"d.m, D" }}</h2>
+                <h2 class="card-title text-center mb-4">Домашнее задание на {{ date|date:"d.m, D" }}</h2>
                 {% if homework %}
                     {% for task in homework %}
 
                         <div class="row h-100">
                             <div class="col-2 col-lg-1 col-md-2 col-sm-2 subject-icon-parent h-100">
-                                {% if task.subject.icon  %}
+                                {% if task.subject.icon %}
                                     <img src="{{ task.subject.icon.url }}" class="subject-icon" alt="">
                                 {% endif %}
                             </div>
@@ -60,7 +87,8 @@
                                     <div>{{ task.content|linebreaks }}</div>
                                 {% endif %}
                                 {% if task.file_attached %}
-                                    <a href="{{ task.file.url }}" download><i class="fas fa-file me-2"></i>Скачать приложенный файл</a>
+                                    <a href="{{ task.file.url }}" download><i class="fas fa-file me-2"></i>Скачать
+                                        приложенный файл</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -76,24 +104,25 @@
                     </div>
                 {% endif %}
             {% else %}
-                <h2 class="card-title text-center">Домашнее задание на неделю:</h2>
+                <h2 class="card-title text-center mb-4">Домашнее задание на неделю:</h2>
                 {% if homework %}
                     {% for task in homework %}
                         <div class="row h-100">
                             <div class="col-2 col-lg-1 col-md-2 col-sm-2 subject-icon-parent h-100">
-                                {% if task.subject.icon  %}
+                                {% if task.subject.icon %}
                                     <img src="{{ task.subject.icon.url }}" class="subject-icon" alt="">
                                 {% endif %}
                             </div>
                             <div class="col-10 col-lg-10 col-md-8 col-sm-8">
                                 <h5><span
-                                    class="badge bg-primary me-2">{{ task.lesson.date|date:"d.m, D" }}</span>{{ task.subject }}
+                                        class="badge bg-primary me-2">{{ task.lesson.date|date:"d.m, D" }}</span>{{ task.subject }}
                                 </h5>
                                 {% if task.content %}
                                     <div>{{ task.content|linebreaks }}</div>
                                 {% endif %}
                                 {% if task.file_attached %}
-                                    <a href="{{ task.file.url }}" download><i class="fas fa-file me-2"></i>Скачать приложенный файл</a>
+                                    <a href="{{ task.file.url }}" download><i class="fas fa-file me-2"></i>Скачать
+                                        приложенный файл</a>
                                 {% endif %}
                             </div>
                         </div>
