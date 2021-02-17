@@ -48,7 +48,7 @@ class Klasses(models.Model):
         unique_together = ('number', 'letter')
 
     def __str__(self):
-        return '{} {}'.format(self.number, self.letter)
+        return '{} "{}"'.format(self.number, self.letter)
 
     def add_new_student(self, student_id: int):
         student = Students.objects.get(pk=student_id)

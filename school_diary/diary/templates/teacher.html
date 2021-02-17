@@ -2,83 +2,84 @@
 {% load static %}
 
 {% block title %}
-<title>Оценки</title>
+    <title>Оценки</title>
 {% endblock %}
 
 {% block css %}
-<link href="{% static 'css/teacher.css' %}" rel="stylesheet" />
-<link href="{% static 'css/card_width.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/teacher.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/card_width.css' %}" rel="stylesheet"/>
 
 {% endblock %}
 
 {% block content %}
 
-<div class="container mt-5">
-  {% include 'teacher_page/select_form.html' %} {% csrf_token %}
+    <div class="container mt-5">
+        {% include 'teacher_page/select_form.html' %} {% csrf_token %}
 
-  <div class="text-center">
-    <div class="mb-4">
-      <button
-        type="button"
-        class="btn btn-outline-primary mt-2"
-        data-bs-toggle="modal"
-        data-bs-target="#lessonmodal"
-      >
-        <i class="fas fa-plus me-2"></i>Добавить урок
-      </button>
-      <button
-        type="button"
-        class="btn btn-outline-primary mt-2"
-        data-bs-toggle="modal"
-        data-bs-target="#homeworkModal">
-        <i class="fas fa-book me-2"></i>Добавить д/з
-      </button>
-      <button
-        data-bs-toggle="modal" data-bs-target="#visibleStudentsModal"
-        class="btn btn-outline-primary mt-2"
-        ><i class="fas fa-tasks me-2"></i> Настроить</button>
+        <div class="text-center">
+            <div class="mb-4">
+                <button
+                        type="button"
+                        class="btn btn-outline-primary mt-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#lessonmodal"
+                >
+                    <i class="fas fa-plus me-2"></i>Добавить урок
+                </button>
+                <button
+                        type="button"
+                        class="btn btn-outline-primary mt-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#homeworkModal">
+                    <i class="fas fa-book me-2"></i>Добавить д/з
+                </button>
+                <button
+                        data-bs-toggle="modal" data-bs-target="#visibleStudentsModal"
+                        class="btn btn-outline-primary mt-2"
+                ><i class="fas fa-tasks me-2"></i> Настроить
+                </button>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a
+                        class="nav-link active"
+                        id="grades-tab"
+                        data-bs-toggle="pill"
+                        href="#tab-grades-content"
+                        role="tab"
+                ><i class="fas fa-table me-2"></i>Оценки</a
+                >
+            </li>
+            <li class="nav-item" role="presentation">
+                <a
+                        class="nav-link"
+                        id="lessons-tab"
+                        data-bs-toggle="pill"
+                        href="#tab-lessons-content"
+                        role="tab"
+                ><i class="far fa-list-alt me-2"></i>Уроки</a
+                >
+            </li>
+        </ul>
+
+        <div class="tab-content" id="header-tab-content">
+            <div class="tab-pane fade show active" id="tab-grades-content" role="tabpanel">
+                {% include 'teacher_page/grades_tab.html' %}
+            </div>
+
+            <div class="tab-pane fade" id="tab-lessons-content" role="tabpanel">
+                {% include 'teacher_page/lessons_tab.html' %}
+            </div>
+        </div>
+
+        {% include 'teacher_page/create_lesson.html' %}
+        {% include 'teacher_page/comment_modal.html' %}
+        {% include 'teacher_page/homework_modal.html' %}
+        {% include 'teacher_page/students_modal.html' %}
+        {% include 'teacher_page/edit_lesson.html' %}
+
     </div>
-  </div>
-
-  <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
-    <li class="nav-item" role="presentation">
-      <a
-        class="nav-link active"
-        id="grades-tab"
-        data-bs-toggle="pill"
-        href="#tab-grades-content"
-        role="tab"
-        ><i class="fas fa-table me-2"></i>Оценки</a
-      >
-    </li>
-    <li class="nav-item" role="presentation">
-      <a
-        class="nav-link"
-        id="lessons-tab"
-        data-bs-toggle="pill"
-        href="#tab-lessons-content"
-        role="tab"
-        ><i class="far fa-list-alt me-2"></i>Уроки</a
-      >
-    </li>
-  </ul>
-
-  <div class="tab-content" id="header-tab-content">
-    <div class="tab-pane fade show active" id="tab-grades-content" role="tabpanel">
-      {% include 'teacher_page/grades_tab.html' %}
-    </div>
-
-    <div class="tab-pane fade" id="tab-lessons-content" role="tabpanel">
-      {% include 'teacher_page/lessons_tab.html' %}
-    </div>
-  </div>
-
-  {% include 'teacher_page/create_lesson.html' %}
-  {% include 'teacher_page/comment_modal.html' %}
-  {% include 'teacher_page/homework_modal.html' %}
-  {% include 'teacher_page/students_modal.html' %}
-  {% include 'teacher_page/edit_lesson.html' %}
-
-</div>
-<script src="{% static 'js/teacher.js' %}"></script>
+    <script src="{% static 'js/teacher.js' %}"></script>
 {% endblock %}

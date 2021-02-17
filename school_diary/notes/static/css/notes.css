@@ -1,0 +1,58 @@
+.notes-group-row img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+#dragFileBox {
+    font-size: 1.25rem; /* 20 */
+    background-color: #f1f1f1;
+    position: relative;
+    outline: var(--bs-primary) dashed 2px;
+    outline-offset: -10px;
+
+    -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    transition: outline-offset .15s ease-in-out, background-color .15s linear;
+}
+
+#dragFileBox.is-dragover {
+    outline-offset: -20px;
+    outline-color: #a1baff;
+    background-color: #ffffff;
+}
+
+
+.box__file {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.box__file + label {
+    max-width: 80%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.box__file + label:hover strong,
+.box__file:focus + label strong,
+.box__file.has-focus + label strong {
+    color: var(--bs-primary);
+}
+
+.box__file:focus + label,
+.box__file.has-focus + label {
+    outline: 1px dotted #000000;
+}
+
+.delete-note {
+    display: none;
+}
+
+

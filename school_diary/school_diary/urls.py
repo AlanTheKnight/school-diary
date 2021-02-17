@@ -15,7 +15,8 @@ urlpatterns = [
     path('klasses/', include('klasses.urls', namespace="klasses")),
     path('news/', include('news.urls')),
     path('api/', include('api.urls', namespace="api")),
-    path('', include('homework.urls'))
+    path('', include('homework.urls')),
+    path('notes/', include('notes.urls', namespace="notes"))
 ]
 
 

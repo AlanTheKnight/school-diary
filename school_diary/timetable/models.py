@@ -76,9 +76,9 @@ class Lessons(models.Model):
 
     def __str__(self):
         if self.day != "Вторник":
-            return str(self.number.n) + "й урок в " + self.day.lower() + " у " + str(self.connection)
+            return str(self.number.n) + "й урок в " + self.day.lower() + " у " + str(self.klass)
         else:
-            return str(self.number.n) + "й урок во " + self.day.lower() + " у " + str(self.connection)
+            return str(self.number.n) + "й урок во " + self.day.lower() + " у " + str(self.klass)
 
 
 class Klasses(models.Model):

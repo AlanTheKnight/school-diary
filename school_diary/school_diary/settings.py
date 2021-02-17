@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'accounts',
     'api',
     'core',
+    'notes',
     # Third party
     'rest_framework',  # Working with API
     'rest_framework.authtoken',  # Token authentication for REST API

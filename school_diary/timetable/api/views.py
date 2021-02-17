@@ -1,12 +1,11 @@
-from rest_framework import generics
-from rest_framework import views
-from timetable import models
-from . import serializers
 import time
+
 from django.shortcuts import get_object_or_404
-from . import utils
+from rest_framework import generics, views, authentication
 from rest_framework.response import Response
 
+from timetable import models
+from . import serializers, utils
 
 DAYWEEK_NAMES = {
     1: "Понедельник",
@@ -57,9 +56,12 @@ class TimeTableList(generics.ListAPIView):
 class ListBells(generics.ListAPIView):
     serializer_class = serializers.LessonNumberSerializer
     queryset = models.BellsTimeTable.objects.all()
+    authentication_classes = [authentication.SessionAuthentication]
 
 
 class CreateLesson(views.APIView):
+    authentication_classes = [authentication.SessionAuthentication]
+
     def post(self, request):
         serializer = serializers.LessonCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

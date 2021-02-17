@@ -228,3 +228,4 @@ def stats(request, pk, quarter: int):
         })
         return render(request, 'student/results.html', context)
     return render(request, 'no_marks.html')
+
