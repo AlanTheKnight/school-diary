@@ -96,10 +96,10 @@ def stats(request, quarter=None):
         return redirect('homework-stats', int(request.GET.get("quarter")))
     klass = request.user.student.klass
     groups = klass.groups_set.all()
-    hw = homework.get_homework(klass=klass, quarter=quarter, convert=False)
+    hw = klass.get_homework(quarter=quarter)
     subjects, data = [], []
     for group in groups:
         subjects.append(group.subject.name)
-        data.append(hw.filter(group=group).count())
+        data.append(hw.filter(lesson__group=group).count())
     context = {'subjects': subjects, 'data': data, 'no_hw': len(hw) == 0}
     return render(request, 'homework/hw_stats.html', context)
