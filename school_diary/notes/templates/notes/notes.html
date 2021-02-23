@@ -163,8 +163,14 @@
                             </div>
                         </div>
 
+                        <div v-if="error415alert" v-on:click="error415alert = false"
+                             class="alert alert-danger mt-3 text-center">
+                            Отправленный формат фото не поддерживается. Попробуйте отправить JPG/JPEG/PNG.
+                        </div>
 
-                        <form id="dragFileForm" class="mt-4" method="post" ref="dragFileForm" enctype="multipart/form-data" multiple novalidate>
+
+                        <form id="dragFileForm" class="mt-4" method="post" ref="dragFileForm"
+                              enctype="multipart/form-data" multiple novalidate>
                             {% csrf_token %}
                             <div class="px-5 py-5 mb-3" id="dragFileBox">
                                 <div class="text-center">

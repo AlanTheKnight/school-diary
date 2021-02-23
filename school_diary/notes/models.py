@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from io import BytesIO
+
+from PIL import Image, ImageEnhance, ImageOps, UnidentifiedImageError
 from django.core.files.base import ContentFile
 from django.db import models
-from core.models import Users
 
-from PIL import Image, ImageEnhance, ImageOps
-from io import BytesIO
+from core.models import Users
 
 
 class Category(models.Model):
@@ -70,7 +71,13 @@ class Note(models.Model):
         verbose_name_plural = "Страницы"
 
     def save(self, *args, enhance_image=False, **kwargs):
-        img = Image.open(self.image)
+        try:
+            img = Image.open(self.image)
+        except UnidentifiedImageError:
+            return False
+
+        fmt = self.image.name.split(".")[-1]
+        fmt = "JPEG" if fmt in ("jpg", "jpeg") else "PNG"
 
         # Resizes image and makes it's width maximum of 2000px
         max_width = 2000
@@ -88,7 +95,7 @@ class Note(models.Model):
             img = ImageEnhance.Color(img).enhance(0.7)
 
         img_io = BytesIO()
-        img.save(img_io, format="JPEG", dpi=(400, 400))
+        img.save(img_io, format=fmt, dpi=(400, 400))
 
         temp_name = self.image.name
         self.image.delete(save=False)
@@ -99,3 +106,4 @@ class Note(models.Model):
             save=False
         )
         super(Note, self).save(*args, **kwargs)
+        return True

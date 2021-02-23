@@ -1,5 +1,4 @@
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from rest_framework import generics, authentication, views, response, parsers
 
 from . import models, serializers
@@ -49,7 +48,9 @@ class UploadNoteView(views.APIView):
 
         for file in files:
             instance = models.Note(group_id=group, image=file)
-            instance.save(enhance_image=enhance_photo)
+            if not instance.save(enhance_image=enhance_photo):
+                return response.Response(status=415)
+
         return response.Response()
 
 

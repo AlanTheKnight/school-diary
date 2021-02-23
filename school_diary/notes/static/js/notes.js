@@ -69,6 +69,7 @@ const notesGroupEditApp = new Vue({
         notesGroup: undefined,
         notes: undefined,
         droppedFiles: undefined,
+        error415alert: false
     },
     methods: {
         refreshGroup: function (initForm = false) {
@@ -136,6 +137,11 @@ const notesGroupEditApp = new Vue({
                             app2.getNotesList();
                             app1.getNotesList();
                         },
+                        error: function (r) {
+                            if (r.status === 415) {
+                                vm.error415alert = true;
+                            }
+                        }
                     });
                 })
             });
@@ -170,7 +176,7 @@ const notesGroupEditApp = new Vue({
             let photoDiv = $(event.target).parent();
             photoDiv.find('.delete-note').css("display", "block");
             return false;
-        }
+        },
     },
 })
 
