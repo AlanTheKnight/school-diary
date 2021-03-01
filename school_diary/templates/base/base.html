@@ -30,12 +30,10 @@
 {% include 'base/footer.html' %}
 
 <script>
-  $('.auto-save').savy('load');
-  function clearstorage(){
-    localStorage.clear();
-  };
+    $('.auto-save').savy('load');
 
-  $("footer").snowfall({flakeCount : 50, round: true, minSize: 5, maxSpeed: 2});
-  $("#main-navbar").snowfall({flakeCount : 30, round: true, minSize: 5, maxSpeed: 2});
+    function clearstorage() {
+        localStorage.clear();
+    }
 </script>
 </html>
