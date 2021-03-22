@@ -13,6 +13,6 @@ def main(request):
             noteGroup.save()
             return redirect("notes:notes")
 
-    return render(request, 'notes/notes/notes.html', {
+    return render(request, 'notes/notes.html', {
         "form": groupCreationForm
     })

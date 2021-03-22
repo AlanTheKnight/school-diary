@@ -19,7 +19,7 @@ def add_student(request, pk: int):
         if request.method == "POST":
             me.klass.add_new_student(s)
             return redirect('klasses:my-klass')
-        return render(request, 'klasses/klasses/add_student.html', {'s': s})
+        return render(request, 'klasses/add_student.html', {'s': s})
     context = {
         'message': "Вы пытаетесь добавить к себе в класс ученика, который уже состоит в классе."
     }
@@ -63,7 +63,7 @@ def my_klass(request):
         form = forms.StudentSearchForm(request.GET)
         search = form.get_students()
         context["search"] = search
-    return render(request, 'klasses/klasses/my_klass.html', context)
+    return render(request, 'klasses/my_klass.html', context)
 
 
 # def students_marks(request, student_id):
@@ -130,7 +130,7 @@ def delete_student(request, pk: int):
             group.students.remove(student)
         student.save()
         return redirect('klasses:my-klass')
-    return render(request, 'klasses/klasses/delete_student.html', {'s': student})
+    return render(request, 'klasses/delete_student.html', {'s': student})
 
 
 @login_required(login_url="login")
@@ -144,4 +144,4 @@ def settings(request):
             form.save()
             return redirect('klasses:my-klass')
     form = forms.KlassSettingsForm(instance=me.klass)
-    return render(request, 'klasses/klasses/settings.html', {'form': form})
+    return render(request, 'klasses/settings.html', {'form': form})
