@@ -16,7 +16,7 @@
         "author": "Admin",
         "slug": "list-of-summer-literature",
         "image": "https://diary56.ru/media/news/book-shielf.png"
-    },
+    }
 ]
 ```
 

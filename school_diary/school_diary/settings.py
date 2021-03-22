@@ -5,13 +5,10 @@ from typing import List, Any, Union, Tuple
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 config = RawConfigParser()
-this_folder = os.path.dirname(os.path.abspath(__file__))
-init_file = os.path.join(this_folder, 'settings.ini')
-config.read(init_file)
-SECRET_KEY = config.get('Settings', 'secret_key_a')
-DEBUG = (config.get("Settings", "debug") == "True")
+config.read(os.path.join(BASE_DIR, 'settings.ini'))
+SECRET_KEY = config.get('Settings', 'SECRET_KEY')
+DEBUG = (config.get("Settings", "DEBUG") == "True")
 
 ALLOWED_HOSTS = ['.diary56.ru', '64.227.75.146']
 
@@ -27,18 +24,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Apps
-    'timetable.apps.TimetableConfig',
-    'minimum.apps.MinimumConfig',
-    'diary.apps.DiaryConfig',
-    'news.apps.NewsConfig',
-    'klasses.apps.KlassesConfig',
-    'homework.apps.HomeworkConfig',
-    'admin_panel',
-    'pages',
-    'accounts',
-    'api',
-    'core',
-    'notes',
+    'apps.timetable.apps.TimetableConfig',
+    'apps.minimum.apps.MinimumConfig',
+    'apps.diary.apps.DiaryConfig',
+    'apps.news.apps.NewsConfig',
+    'apps.klasses.apps.KlassesConfig',
+    'apps.homework.apps.HomeworkConfig',
+    'apps.admin_panel',
+    'apps.pages',
+    'apps.accounts',
+    'apps.api',
+    'apps.core',
+    'apps.notes',
     # Third party
     'rest_framework',  # Working with API
     'rest_framework.authtoken',  # Token authentication for REST API
@@ -143,8 +140,8 @@ if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 else:
     STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-MEDIA_URL = '/media/'
 
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'

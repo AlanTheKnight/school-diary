@@ -137,4 +137,4 @@ school_diary/db.sqlite3
 /venv/
 .pylintrc
 diaryenv/
-school_diary/school_diary/settings.ini
+school_diary/settings.ini

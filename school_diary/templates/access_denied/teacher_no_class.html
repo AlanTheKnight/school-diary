@@ -1,0 +1,19 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Вы не классный руководитель</title>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center">
+        <img src="{% static 'icons/padlock.svg' %}" alt="" height="80">
+        <div class="mt-4 mb-4">
+            Доступ к этой странице запрещен, так как вы не являетесь классным руководителем
+            <div class="text-muted mt-2">Обратитесь к администратору электронного дневника, чтобы создать свой класс</div>
+        </div>
+         <a href="{% url 'homepage' %}" class="btn btn-outline-primary">Вернуться на главную</a>
+    </div>
+</div>
+{% endblock %}

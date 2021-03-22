@@ -1,0 +1,22 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Удаление сообщения</title>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card my-5">
+        <div class="card-body">
+            <p>Вы уверены, что хотите удалить сообщение от {{ obj.date }}</p>
+            <form action="{% url 'users:message-delete' obj.pk %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger">Подтвердить</button>
+                <a href="{% url 'users:messages' %}" class="btn btn-outline-success">Отмена</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

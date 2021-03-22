@@ -1,0 +1,44 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    <title>Добавить минимум</title>
+    <style>
+        .card {
+            margin: 0 auto;
+            float: none;
+            margin-bottom: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card my-5">
+            <div class="card-body">
+                <h2 class="card-title">Создать минимум</h2>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form.grade.label }}
+                        {{ form.grade }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.subject.label }}
+                        {{ form.subject }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.term.label }}
+                        {{ form.term }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.file.label }}
+                        {{ form.file }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

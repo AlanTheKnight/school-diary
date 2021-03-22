@@ -1,0 +1,36 @@
+{% extends 'base/base.html' %}
+
+
+{% block content %}
+
+<div class="container my-5">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'admin_panel' %}">Панель</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:users' 1 %}">Пользователи</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'users:messages' 1 %}">Сообщения</a></li>
+            <li class="breadcrumb-item active">{{ m.id }}</li>
+        </ol>
+    </nav>
+
+
+    <div>
+        <b>Тема: </b> {{ m.subject }}
+    </div>
+    <div>
+        <b>Время отправки: </b>{{ m.date|date:"G:i d/m/y" }}
+    </div>
+    <div>
+        <b>Отправитель: </b> {{ m.sender.surname }} {{ m.sender.first_name }} {{ m.sender.second_name }}
+    </div>
+    <div class="mt-3">
+        {{ m.content|linebreaks }}
+    </div>
+    <div class="mt-3">
+        <a href="{% url 'users:message-delete' m.pk %}" class="btn btn-outline-danger"><i class="fas fa-trash"></i></a>
+    </div>
+
+</div>
+
+{% endblock %}

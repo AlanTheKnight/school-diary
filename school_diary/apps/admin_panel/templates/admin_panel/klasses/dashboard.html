@@ -1,0 +1,48 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+    <title>Классы</title>
+{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <nav class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'admin_panel' %}">Панель</a></li>
+                <li class="breadcrumb-item active">Классы</li>
+            </ol>
+        </nav>
+
+        <div class="mb-3">
+            <a href="#" class="btn btn-outline-success" data-bs-target="#create-klass-modal" data-bs-toggle="modal"><i
+                    class="fas fa-plus"></i></a>
+        </div>
+
+        {% if klasses %}
+            <table class="table">
+            <thead class="table-dark">
+                <tr>
+                    <th>Класс</th>
+                    <th>Руководитель</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for klass in klasses %}
+                    <tr>
+                        <td style="width: 5%; white-space: nowrap;">{{ klass }}</td>
+                        <td>{{ klass.head_teacher }}</td>
+                        <td style="width: 1%"><a href="{% url 'klasses:edit' klass.pk %}"><i class="fas fa-edit"></i></a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <div class="alert alert-primary">
+                Ни один класс ещё не был добавлен
+            </div>
+        {% endif %}
+
+        {% include 'admin_panel/klasses/create_klass_modal.html' %}
+    </div>
+{% endblock %}

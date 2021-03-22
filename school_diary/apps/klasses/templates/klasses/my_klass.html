@@ -1,0 +1,16 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Мой класс</title>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center">{{ klass }}</h1>
+
+    {% include 'klasses/students_list.html' %}
+
+    {% include 'klasses/students_search.html' %}
+</div>
+{% endblock %}

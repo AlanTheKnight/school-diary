@@ -1,0 +1,77 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+
+{% block title %}
+    <title>Мой аккаунт</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <!-- Avatar -->
+        <div class="text-center mt-5">
+            {% if user.is_admin %}
+                <img src="{% static 'user_types/roots.png' %}" alt="" height=100 class="avatar">
+                <p class="text-muted">Администратор</p>
+            {% elif user.is_teacher %}
+                {% if user.teacher.avatar %}
+                    <img src="{{ teacher.avatar.url }}" alt="" height=100 width=100 style="object-fit: cover;"
+                         class="avatar">
+                {% else %}
+                    <img src="{% static 'user_types/teachers.png' %}" alt="Учитель" height=100 width=100
+                         style="object-fit: cover;" class="avatar">
+                {% endif %}
+            {% elif user.is_student %}
+                <img src="{% static 'user_types/students.png' %}" alt="Ученик" height=100 class="avatar">
+                <p class="text-muted">Ученик</p>
+            {% endif %}
+        </div>
+
+        <!-- Tab bar -->
+        <ul class="nav nav-tabs" id="accountTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="account-tab" data-bs-toggle="tab" href="#account" role="tab">Профиль</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="settings-tab" data-bs-toggle="tab" href="#settings" role="tab">Настройки</a>
+            </li>
+        </ul>
+
+        <!-- Tab bar content -->
+        <div class="tab-content my-3" id="accountTabContent">
+            <div class="tab-pane fade show active" id="account" role="tabpanel">
+                <h4><i class="fas fa-user-circle me-2"></i>Данные аккаунта</h4>
+                <div class="my-3">
+                    <div class="mb-1"><b>Email: </b>{{ user.email }}</div>
+                    <div class="mb-1"><b>Имя: </b>{{ user.first_name }}</div>
+                    <div class="mb-1"><b>Фамилия: </b>{{ user.surname }}</div>
+                    <div class="mb-1"><b>Отчество: </b>{{ user.second_name }}</div>
+                    <div class="mb-1"><b>Дата регистрации: </b>{{ user.registration_date }}</div>
+
+                    {% if user.is_student %}
+                        {% if user.student.in_klass %}
+                            <div class="mb-1"><b>Класс: </b>{{ user.student.klass }}</div>
+                        {% else %}
+                            <div class="text-muted mb-1">
+                                Вы еще не были добавлены в класс. Для того, чтобы в полной мере<br>
+                                пользоваться функционалом дневника, попросите сделать это вашего классного руководителя.
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="settings" role="tabpanel">
+                <div class="mb-3">
+                    <a href="{% url 'reset_password' %}"><i class="fas fa-key me-2"></i>Сбросить пароль</a>
+                </div>
+                <div class="mb-3">
+                    <a href="{% url 'message_to_admin' %}"><i class="fas fa-edit me-2"></i>Изменить данные аккаунта</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

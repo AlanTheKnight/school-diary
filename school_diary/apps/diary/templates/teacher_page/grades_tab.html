@@ -1,0 +1,75 @@
+{% load static %}
+
+<div id="grades-app">
+    <div v-if="grades === undefined">
+        <div class="text-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div v-else-if="grades.lessons.length == 0">
+        <div class="mt-4 alert alert-primary">
+            Ни один урок ещё не был добавлен. Добавьте новые уроки или перенесите уроки из запланированных.
+        </div>
+    </div>
+    <div v-else>
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered table-sm">
+                <thead class="thead-light">
+                <tr>
+                    <th class="table-light"></th>
+                    <th class="table-light" colspan="2"></th>
+                    <template v-for="l in header">
+                        <th :colspan="l[1]" class="text-center table-light">[[ l[0] ]]</th>
+                    </template>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-light">Ученик</th>
+                    <th title="Среднее арифметическое" style="width: 7%" class="table-light">AVG</th>
+                    <th title="Взвешенный средний балл" style="width: 7%" class="table-light">SM.AVG</th>
+                    <th v-for="lesson in grades.lessons" scope="col">
+                        <a
+                                v-on:click="editLessonModal($event, lesson)"
+                                tabindex="-1"
+                                class="lesson-link text-center"
+                                v-on:contextmenu="showPopover($event, lesson)"
+                                onfocusout="$(this).popover('dispose')">
+                            [[ getDateDay(lesson.date) ]]
+                        </a>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="student in grades.scope">
+                    <td scope="row" class="student-name">
+                        [[ student.student.surname ]] [[ student.student.first_name ]]
+                    </td>
+                    <td :id="student.student.pk ">[[ renderAvg(student.avg) ]]</td>
+                    <td :id="'s_' + student.student.pk">
+                        [[ renderAvg(student.sm_avg) ]]
+                    </td>
+                    <template
+                            v-for="grade in getAllGrades(student, grades.lessons)"
+                            :set="grade = getGrade(student, lesson)">
+                        <td class="grade-cell">
+                            <select
+                                    :name="String(student.student.pk) + '|' + grade.lesson_id"
+                                    class="inp-table select"
+                                    onchange="saveMark(this)"
+                                    oncontextmenu="commentDialog(this); return false;">
+                                <option value="0" :selected="grade.amount === null"></option>
+                                <option value="5" :selected="grade.amount == 5">5</option>
+                                <option value="4" :selected="grade.amount == 4">4</option>
+                                <option value="3" :selected="grade.amount == 3">3</option>
+                                <option value="2" :selected="grade.amount == 2">2</option>
+                                <option value="-1" :selected="grade.amount == -1">Н</option>
+                            </select>
+                        </td>
+                    </template>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

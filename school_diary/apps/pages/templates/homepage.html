@@ -1,0 +1,178 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Электронный дневник diary56</title>
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'pages/homepage.css' %}"/>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        {% for m in messages %}
+            <div class="alert my-5 alert-info">{{ m }}</div>
+        {% endfor %}
+
+        <div id="update-info" class="mt-5">
+            <div class="card">
+                <div class="card-header">
+                    <a id="hide-update-info"><i class="fas fa-times"></i></a>
+                </div>
+                <div class="card-body text-center">
+                    <h1>Diary56 2.0 🥳</h1>
+                    <div>
+                        Встречайте ещё больше интересных функций 🔥
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if user.is_student and not user.student.in_klass %}
+            <div class="alert alert-warning mt-5">
+                Вы не состоите в классе. Попросите вашего классного руководителя добавить
+                вас в класс - до этого большая часть функционала будет недоступна.
+            </div>
+        {% endif %}
+
+
+        <div class="row my-4">
+            {% if user.is_admin %}
+                <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+                    <div class="card h-100">
+                        <a href="{% url 'admin_panel' %}">
+                            <img src="{% static '/icons/panel.png' %}" id="admin-panel" class="card-img-top"
+                                 alt="Панель администратора"/>
+                            <div class="card-body">
+                                <h5 class="card-title">Панель администратора</h5>
+                                <p class="card-text text-muted">
+                                    Изменяйте данные системы электронного дневника
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            {% elif user.is_teacher %}
+                {% include 'homepage/teachers.html' %}
+            {% elif user.is_student and user.student.in_klass %}
+                <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+                    <div class="card h-100">
+                        <a href="{% url 'homework' %}"><img src="{% static 'icons/studying.png' %}" class="card-img-top"
+                                                            alt="Мой класс">
+                            <div class="card-body">
+                                <h5 class="card-title">Домашнее задание</h5>
+                                <p class="card-text text-muted">Домашнее задание, добавленное учителями</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+                    <div class="card h-100">
+                        <a href="{% url 'diary' %}"><img src="{% static 'icons/score.png' %}" class="card-img-top"
+                                                         alt="Дневник">
+                            <div class="card-body">
+                                <h5 class="card-title">Дневник</h5>
+                                <p class="card-text text-muted">Просмотр своих оценок и успеваемости</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+                    <div class="card h-100">
+                        <a href="{% url 'notes:notes' %}"><img src="{% static 'icons/pencil.png' %}"
+                                                               class="card-img-top" alt="">
+                            <div class="card-body">
+                                <h5 class="card-title">Конспекты</h5>
+                                <p class="card-text text-muted">Выкладывайте конспект по различным предметам</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+                <div class="card h-100">
+                    <a href="{% url 'timetable' %}">
+                        <img
+                                src="{% static 'icons/calendar.png' %}"
+                                class="card-img-top"
+                                alt="Расписание"
+                        />
+                        <div class="card-body">
+                            <h5 class="card-title">Расписание</h5>
+                            <p class="card-text text-muted">
+                                Школьное расписание с учетом последних изменений
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+                <div class="card h-100">
+                    <a href="{% url 'minimum' %}">
+                        <img
+                                src="{% static 'icons/paper.png' %}"
+                                class="card-img-top"
+                                alt="Минимум"
+                        />
+                        <div class="card-body">
+                            <h5 class="card-title">Минимум</h5>
+                            <p class="card-text text-muted">
+                                Образовательный минимум по всем предметам
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+                <div class="card h-100">
+                    <a href="{% url 'news' 1 %}">
+                        <img
+                                src="{% static 'icons/newspaper.png' %}"
+                                class="card-img-top"
+                                alt="Новости"
+                        />
+                        <div class="card-body">
+                            <h5 class="card-title">Новости</h5>
+                            <p class="card-text text-muted">
+                                Новостной блок от администраторов дневника
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 col-lg-3 my-3">
+                <div class="card h-100">
+                    <a href="{% url 'about' %}">
+                        <img
+                                src="{% static 'icons/team.png' %}"
+                                class="card-img-top"
+                                alt="О проекте"/>
+                        <div class="card-body">
+                            <h5 class="card-title">О проекте</h5>
+                            <p class="card-text text-muted">
+                                Информация об этой версии электронного дневника
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (localStorage.hasOwnProperty("hide_update_info")) {
+            $("#update-info").hide();
+        } else {
+            $("#hide-update-info").on("click", () => {
+                localStorage.setItem("hide_update_info", "True");
+                $("#update-info").hide();
+            })
+        }
+    </script>
+{% endblock %}

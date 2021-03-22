@@ -1,0 +1,63 @@
+<div class="modal fade" id="create-klass-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавление класса</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-warning">
+                            Такой класс уже был добавлен
+                        </div>
+                    {% endif %}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col">
+                            {% with field=form.number %}
+                                {% include 'field.html' %}
+                            {% endwith %}
+                        </div>
+                        <div class="col">
+                            {% with field=form.letter %}
+                                {% include 'field.html' %}
+                            {% endwith %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {% with field=form.head_teacher %}
+                            {% include 'field.html' %}
+                        {% endwith %}
+                    </div>
+
+                    <div class="mb-3">
+                        {% with field=form.subjects %}
+                            {% include 'field.html' %}
+                        {% endwith %}
+                    </div>
+
+                    <div class="mb-3">
+                        {% with field=form.teachers %}
+                            {% include 'field.html' %}
+                        {% endwith %}
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-outline-primary">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if form.errors %}
+<script>
+    // Show the modal on page load if form has any errors
+    new bootstrap.Modal(document.getElementById("create-klass-modal")).show();
+</script>
+{% endif %}
