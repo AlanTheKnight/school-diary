@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     'apps.klasses.apps.KlassesConfig',
     'apps.homework.apps.HomeworkConfig',
     'apps.admin_panel',
-    'apps.pages',
     'apps.accounts',
     'apps.api',
     'apps.core',
