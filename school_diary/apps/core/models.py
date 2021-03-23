@@ -91,9 +91,19 @@ class Klasses(models.Model):
         return queryset
 
     def get_exams(self, start_date: datetime.date, delta: int = 7):
+        """
+        Gets a list of lessons for next ``delta`` days starting from ``start_date``.
+
+        Parameters
+        ----------
+        start_date
+            Date from which the search starts
+        delta: int
+            For how many days starting from `start_date` is the search.
+        """
         end_date = start_date + datetime.timedelta(days=delta)
         return Lessons.objects.filter(
-            control__notify=True, theme__iregex=r'\S+',
+            control__notify=True, theme__iregex=r'\S+', group__klass=self,
             date__range=(start_date, end_date)).order_by('date')
 
 

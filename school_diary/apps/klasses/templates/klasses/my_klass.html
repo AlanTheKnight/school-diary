@@ -2,15 +2,45 @@
 {% load static %}
 
 {% block title %}
-<title>Мой класс</title>
+    <title>Мой класс</title>
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <h1 class="text-center">{{ klass }}</h1>
+    <div class="container my-5">
+        <h1 class="text-center">{{ klass }}</h1>
 
-    {% include 'klasses/students_list.html' %}
+        <div class="my-4">
+            {% if students %}
+                <h2 class="card-title text-center">Ученики в классе</h2>
+                <div class="table-responsive">
+                    <table class="table my-3 text-center table-sm">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>Почта</th>
+                            <th>Имя</th>
+                            <th>Фамилия</th>
+                            <th>Удаление</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for s in students %}
+                            <tr>
+                                <td>{{ s.account.email }}</td>
+                                <td>{{ s.account.first_name }}</td>
+                                <td>{{ s.account.surname }}</td>
+                                <td><a href="#" class="text-primary"><i class="fas fa-edit"></i></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="my-4 text-center">
+                    <img src="{% static 'icons/detective.svg' %}" alt="" height="70">
+                    <div class="mt-3">Мы не можем найти ни одного ученика в вашем классе.<br>Попросите администратора их добавить.</div>
+                </div>
+            {% endif %}
+        </div>
 
-    {% include 'klasses/students_search.html' %}
-</div>
+    </div>
 {% endblock %}

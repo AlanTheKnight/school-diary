@@ -31,7 +31,7 @@
             <tr :id="lesson.id" v-for="lesson in lessons" class="lesson-table-row">
               <td class="text-center" onclick="changePlanState(this)">
                 <div v-if="lesson.is_planned" class="plan-badge">
-                  <span class="badge bg-success">ПЛАН</span>
+                  <span class="text-success"><i class="fas fa-check"></i></span>
                 </div>
               </td>
               <td>

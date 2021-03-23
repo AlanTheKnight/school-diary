@@ -30,7 +30,7 @@ def show_homework(request):
     tasks = klass.get_homework(start_date=start_date, end_date=end_date)
     form = forms.DatePickForm()
 
-    exams = klass.get_exams(datetime.date.today() + datetime.timedelta(days=1))
+    exams = klass.get_exams(datetime.date.today() + datetime.timedelta(days=1), 10)
     return render(request, 'homework/homework.html', {'form': form, 'homework': tasks, 'exams': exams})
 
 
