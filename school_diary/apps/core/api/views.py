@@ -14,28 +14,34 @@ class SaveMark(APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         serializer = serializers.SaveMarkSerializer(data=request.POST)
         serializer.is_valid(raise_exception=True)
-        student = models.Students.objects.get(
-            pk=serializer.validated_data['student'])
-        lesson = models.Lessons.objects.get(
-            pk=serializer.validated_data['lesson'])
-        term = lesson.quarter
 
+        student = models.Students.objects.get(pk=serializer.validated_data['student'])
+        lesson = models.Lessons.objects.get(pk=serializer.validated_data['lesson'])
+        grade, created = models.Grades.objects.get_or_create(student=student, lesson=lesson)
+        term = lesson.quarter
         value = int(serializer.validated_data['value'])
-        grade = models.Grades.objects.get_or_create(
-            student=student, lesson=lesson)[0]
+
+        data = models.AverageValues.objects.get(student=student, subject=lesson.group.subject)
+
         if value != 0:  # Otherwise we need to delete mark
-            grade.amount = value
+            if created:
+                grade.amount = value
+                data.add_new_grade_data(grade)
+            else:
+                data.delete_old_grade_data(grade)
+                grade.amount = value
+                grade.save()
+                data.add_new_grade_data(grade)
             grade.save()
         else:
+            data.delete_old_grade_data(grade)
             grade.delete()
-
-        grades = student.grades_set.filter(
-            lesson__group=lesson.group, lesson__quarter=term)
-        grades_data = models.Grades.get_data(grades)
+        data.save()
+        avg, sm_avg = data.get_avg()
         data = {
             "pk": str(student.pk),
-            "sm_avg": grades_data["sm_avg"],
-            "avg": grades_data["avg"]
+            "sm_avg": sm_avg,
+            "avg": avg
         }
         return Response(data, status=status.HTTP_200_OK)
 

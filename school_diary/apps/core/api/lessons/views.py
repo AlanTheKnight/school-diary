@@ -56,8 +56,6 @@ class ChangeLessonIsPlanned(views.APIView):
 
 class ListStudentGrades(views.APIView):
     def post(self, request):
-        # if not (request.user.is_authenticated and request.user.account_type) == 2:
-        #     return response.Response(status=status.HTTP_403_FORBIDDEN)
         serializer = serializers.ListStudentGradesSerializer(
             data=request.data
         )

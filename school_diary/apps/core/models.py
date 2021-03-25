@@ -1,19 +1,17 @@
 from __future__ import annotations
 
 import datetime
-from typing import Union
+from typing import Union, Tuple, Optional
 
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Group
 from django.core.mail import send_mail
 from django.db import models
-from django.db.models import Q, UniqueConstraint
+from django.db.models import Q, UniqueConstraint, QuerySet
 
-from . import utils
 from .users import manager
 
-import pprint
 
 class Subjects(models.Model):
     name = models.CharField(
@@ -196,6 +194,19 @@ class Lessons(models.Model):
     def __str__(self):
         return '{} {}'.format(str(self.group), self.date)
 
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._old_control = dict(zip(field_names, values)).get("control_id")
+        return instance
+
+    def save(self, *args, **kwargs):
+        if self.control_id != getattr(self, '_old_control', None):
+            # If control field was changed, AverageValues objects that were
+            # created for this klass are deleted
+            AverageValues.objects.filter(subject=self.group.subject, student__klass=self.group.klass).delete()
+        super().save(*args, **kwargs)
+
 
 class Grades(models.Model):
     student = models.ForeignKey(
@@ -212,36 +223,6 @@ class Grades(models.Model):
 
     def __str__(self):
         return '"{}" {} {}'.format(self.amount, self.lesson, self.student)
-
-    @classmethod
-    def get_data(cls, queryset) -> dict:
-        """
-        Take Grades QuerySet and get a smart average, average,
-        qua, list of all marks' amounts, needed
-        mark and a number of lesson have been missed.
-        """
-        data = [0, 0, 0, 0, [], 0]
-        for grade in queryset:
-            if grade.amount == -1:
-                data[5] += 1
-                continue
-            if grade.lesson.control.weight != 100:
-                data[0] += grade.amount * grade.lesson.control.weight
-                data[1] += grade.lesson.control.weight
-                data[2] += grade.amount
-                data[3] += 1
-                data[4].append(grade.amount)
-        avg, sm_avg = utils.calculate_avg(data)
-        return {
-            "sm_avg": sm_avg,
-            "avg": avg,
-            "amount": data[3],
-            "list": data[4],
-            "needed": (
-                utils.get_needed_mark(data[2], data[3], avg)
-                if avg != '-' else '-'),
-            "missed": data[5]
-        }
 
 
 class AdminMessages(models.Model):
@@ -362,23 +343,22 @@ class Groups(models.Model):
             lesson__quarter=quarter,
             student__in=students,
         )
-        scope = self.api_process_grades(grades, students, lessons)
+        scope = self.api_process_grades(self.subject, grades, students, lessons)
         return {'lessons': lessons, 'scope': scope}
 
     @classmethod
-    def api_process_grades(cls, grades, students, lessons):
+    def api_process_grades(cls, subject: Subjects, grades, students, lessons):
         result = []
-        pprint.pprint(students)
         for student in students:
             qs = grades.filter(student=student)
             student_grades = {grade.lesson_id: grade for grade in qs}
-            grades_data = Grades.get_data(qs)
+            avg, sm_avg = AverageValues.get_avg_by_subject(student, subject, qs)
             lessons_data = []
             data = {
                 "student": student,
                 "grades": lessons_data,
-                "avg": grades_data["avg"],
-                "sm_avg": grades_data["sm_avg"]
+                "avg": avg,
+                "sm_avg": sm_avg,
             }
             for lesson in lessons:
                 if lesson.id in student_grades:
@@ -386,8 +366,6 @@ class Groups(models.Model):
                 else:
                     lessons_data.append({"lesson_id": lesson.id})
             result.append(data)
-
-        pprint.pprint(result)
         return result
 
     @classmethod
@@ -617,3 +595,81 @@ class Admins(models.Model):
 
     def __str__(self):
         return '{}'.format(self.account.get_full_name())
+
+
+class AverageValues(models.Model):
+    student = models.ForeignKey("Students", models.CASCADE, "average")
+    subject = models.ForeignKey("Subjects", models.CASCADE)
+    weights_x_values = models.IntegerField("Сумма произведений весов и значений оценок")
+    weights_sum = models.IntegerField("Сумма весов оценок")
+    grades_number = models.IntegerField("Количество оценок")
+    grades_sum = models.IntegerField("Сумма значений оценок")
+    missed = models.IntegerField("Количество пропущенных уроков", default=0)
+
+    class Meta:
+        verbose_name = "Данные об оценках учеников"
+        unique_together = ("student", "subject")
+
+    @classmethod
+    def get_avg_by_subject(cls, student: Students, subject: Subjects, qs: Optional[QuerySet[Grades]]) -> Tuple[Optional[float], Optional[float]]:
+        try:
+            d = cls.objects.get(student=student, subject=subject)
+        except cls.DoesNotExist:
+            d = cls.create_new_record(student, subject, qs)
+        try:
+            return (
+                round(d.grades_sum / d.grades_number, 2),
+                round(d.weights_x_values / d.weights_sum, 2)
+            )
+        except ZeroDivisionError:
+            return None, None
+
+    @classmethod
+    def create_new_record(cls, student: Students, subject: Subjects, queryset: QuerySet[Grades]):
+        data = [0, 0, 0, 0, 0]
+        for grade in queryset:
+            if grade.amount == -1:
+                data[4] += 1
+                continue
+            if grade.lesson.control.weight != 100:
+                data[0] += grade.amount * grade.lesson.control.weight
+                data[1] += grade.lesson.control.weight
+                data[2] += grade.amount
+                data[3] += 1
+        print(f"New AverageValue record for {student}")
+        return cls.objects.create(
+            student=student, subject=subject,
+            weights_x_values=data[0], weights_sum=data[1],
+            grades_sum=data[2], grades_number=data[3], missed=data[4]
+        )
+
+    def get_avg(self):
+        try:
+            return (
+                round(self.grades_sum / self.grades_number, 2),
+                round(self.weights_x_values / self.weights_sum, 2)
+            )
+        except ZeroDivisionError:
+            return None, None
+
+    def delete_old_grade_data(self, grade: Grades):
+        if grade.amount == - 1:
+            self.missed -= 1
+            return
+        weight = grade.lesson.control.weight
+        if weight != 100:
+            self.grades_number -= 1
+            self.grades_sum -= grade.amount
+            self.weights_x_values -= weight * grade.amount
+            self.weights_sum -= weight
+
+    def add_new_grade_data(self, grade: Grades):
+        if grade.amount == -1:
+            self.missed += 1
+            return
+        weight = grade.lesson.control.weight
+        if weight != 100:
+            self.grades_number += 1
+            self.grades_sum += grade.amount
+            self.weights_sum += weight
+            self.weights_x_values += weight * grade.amount
