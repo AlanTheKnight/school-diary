@@ -112,10 +112,12 @@ class UserEditForm(forms.ModelForm):
 class StudentEditForm(UserEditForm):
     klass = forms.ModelChoiceField(
         queryset=models.Klasses.objects.all(), label="Класс", required=False)
+    president = forms.BooleanField(label="Может добавлять д/з?")
 
     def save(self, *args, **kwargs):
         u = super().save(commit=False)
         u.student.klass = self.cleaned_data['klass']
+        u.student.president = self.cleaned_data['president']
         u.student.save()
         return u
 

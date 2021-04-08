@@ -18,7 +18,6 @@ class SaveMark(APIView):
         student = models.Students.objects.get(pk=serializer.validated_data['student'])
         lesson = models.Lessons.objects.get(pk=serializer.validated_data['lesson'])
         grade, created = models.Grades.objects.get_or_create(student=student, lesson=lesson)
-        term = lesson.quarter
         value = int(serializer.validated_data['value'])
 
         data = models.AverageValues.objects.get(student=student, subject=lesson.group.subject)

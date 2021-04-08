@@ -1,30 +1,36 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}
-    <title>Домашнее задание</title>
-{% endblock %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'css/../../static/css/homework.css' %}">
+    <link rel="stylesheet" href="{% static 'css/homework.css' %}">
+    <link rel="stylesheet" href="{% static 'js/viewerjs/viewer.min.css' %}">
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/viewerjs/viewer.min.js' %}"></script>
+    <script src="{% static 'js/marked.min.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.1/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.1/highlight.min.js"></script>
+    <script src="{% static 'js/marked_setup.js' %}"></script>
+    <script src="{% static 'js/clipboard.min.js' %}"></script>
 {% endblock %}
 
 
 {% block content %}
-    <div class="container my-5">
+    <script src="{% static 'js/homework.js' %}" type="module"></script>
 
-        <form method="GET">
+    <div class="container my-5">
+        <form>
             <div class="row" id="search-wrapper">
                 <div class="col-12 col-md-6">
                     <div class="input-group mb-4">
-                        {% with field=form.date hide_label=True hide_errors=True %}
-                            {% include "field.html" %}
-                        {% endwith %}
-                        <button type="submit" class="btn btn-outline-primary">Найти</button>
+                        <input type="date" name="date" class="form-control" required id="id_date">
+                        <button type="button" id="dateSelectBtn" class="btn btn-outline-primary">Найти</button>
                     </div>
                 </div>
                 <div class="col-12 col-sm-auto mb-4">
-                    <a href="{% url 'homework' %}" class="btn btn-outline-primary">Д/з на неделю</a>
+                    <button role="button" id="weekHwBtn" class="btn btn-outline-primary">Д/з на неделю</button>
                 </div>
                 <div class="col-auto mb-4">
                     <a href="{% url 'homework-stats' %}" class="btn btn-outline-primary"><i
@@ -32,7 +38,6 @@
                 </div>
             </div>
         </form>
-
         <div class="row">
             {% if request.user.student.president %}
                 <div class="col-auto">
@@ -41,103 +46,58 @@
                 </div>
             {% endif %}
         </div>
-
-        {% if exams %}
-        <div id="carouselExampleIndicators" class="carousel slide my-4" data-bs-ride="carousel">
-            <div class="carousel-inner text-center">
-                {% for exam in exams %}
-                    <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %}">
-                        <h1>{{ exam.group.subject }}</h1>
-                        <div>
-                            <b>{{ exam.control.name }}</b><br>
-                            "{{ exam.theme }}"
-                        </div>
-                        <div>
-                            {{ exam.date|date:"j E" }}
-                        </div>
-                    </div>
-                {% endfor %}
+        <div id="homework-app" class="my-4">
+            <div v-if="homework === undefined" class="text-center py-4">
+                <div class="spinner-border" role="status"></div>
             </div>
-            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </a>
-        </div>
-        {% endif %}
+            <div v-else-if="homework.length > 0" class="card card-body">
+                <h2 class="card-title text-center mb-4">[[ getDate(date) ]]</h2>
+                <div v-for="(task, index) in homework">
 
-        <div class="card card-body my-4">
-            {% if "date" in request.GET %}
-                <h2 class="card-title text-center mb-4">Домашнее задание на {{ date|date:"d.m, D" }}</h2>
-                {% if homework %}
-                    {% for task in homework %}
-
-                        <div class="row h-100">
-                            <div class="col-2 col-lg-1 col-md-2 col-sm-2 subject-icon-parent h-100">
-                                {% if task.subject.icon %}
-                                    <img src="{{ task.subject.icon.url }}" class="subject-icon" alt="">
-                                {% endif %}
-                            </div>
-                            <div class="col-10 col-lg-10 col-md-8 col-sm-8">
-                                <h5>{{ task.subject }}</h5>
-                                {% if task.content %}
-                                    <div>{{ task.content|linebreaks }}</div>
-                                {% endif %}
-                                {% if task.file_attached %}
-                                    <a href="{{ task.file.url }}" download><i class="fas fa-file me-2"></i>Скачать
-                                        приложенный файл</a>
-                                {% endif %}
+                    <div class="row h-100">
+                        <div class="col-2 col-lg-1 col-md-2 col-sm-2 subject-icon-parent h-100">
+                            <div v-if="task.subject.icon">
+                                <img :src="task.subject.icon" class="subject-icon" alt="">
                             </div>
                         </div>
+                        <div class="col-10 col-lg-10 col-md-8 col-sm-8">
+                            <h5><span v-if="date[0] === 'week'" class="badge bg-primary me-2">[[ getDateBadge(task.lesson.date) ]]</span>[[
+                                task.subject.name ]]</h5>
+                            <div v-if="task.content" v-html="marked(task.content)">
 
-                        {% ifnotequal forloop.counter homework|length %}
-                            <hr>
-                        {% endifnotequal %}
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center my-3">
-                        <img src="{% static 'book.svg' %}" alt="" width="100">
-                        <p>Домашнее задание не задано.</p>
-                    </div>
-                {% endif %}
-            {% else %}
-                <h2 class="card-title text-center mb-4">Домашнее задание на неделю:</h2>
-                {% if homework %}
-                    {% for task in homework %}
-                        <div class="row h-100">
-                            <div class="col-2 col-lg-1 col-md-2 col-sm-2 subject-icon-parent h-100">
-                                {% if task.subject.icon %}
-                                    <img src="{{ task.subject.icon.url }}" class="subject-icon" alt="">
-                                {% endif %}
                             </div>
-                            <div class="col-10 col-lg-10 col-md-8 col-sm-8">
-                                <h5><span
-                                        class="badge bg-primary me-2">{{ task.lesson.date|date:"d.m, D" }}</span>{{ task.subject }}
-                                </h5>
-                                {% if task.content %}
-                                    <div>{{ task.content|linebreaks }}</div>
-                                {% endif %}
-                                {% if task.file_attached %}
-                                    <a href="{{ task.file.url }}" download><i class="fas fa-file me-2"></i>Скачать
-                                        приложенный файл</a>
-                                {% endif %}
+                            <div v-if="task.h_file" class="mt-2">
+                                <a :href="task.h_file" @click="showOrDownload" download><i class="fas fa-file me-2"></i>Скачать
+                                    приложенный файл</a>
                             </div>
+
                         </div>
-
-                        {% ifnotequal forloop.counter homework|length %}
-                            <hr>
-                        {% endifnotequal %}
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center my-3">
-                        <img src="{% static 'icons/relaxing.png' %}" alt="" width="100">
-                        <p>Домашнее задание не задано.</p>
                     </div>
-                {% endif %}
-            {% endif %}
+
+                    <div v-if="(index + 1) !== homework.length">
+                        <hr>
+                    </div>
+                </div>
+            </div>
+            <div v-else>
+                <div class="text-center my-3">
+                    <img src="{% static 'icons/relaxing.png' %}" alt="" width="100">
+                    <p>Домашнее задание не задано.</p>
+                </div>
+            </div>
         </div>
     </div>
+
+
+    <div class="modal" id="code-snippet-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body" id="code-snippet-modal-body">
+                    <pre class="px-3 py-4 code-snippet" id="code-snippet-modal-code" data-clipboard-target="#code-snippet-modal-code"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 {% endblock %}

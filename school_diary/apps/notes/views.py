@@ -4,6 +4,8 @@ from . import forms
 
 
 def main(request):
+    return render(request, 'access_denied/not_implemented.html')
+
     groupCreationForm = forms.NotesGroupCreationForm()
     if request.method == "POST" and "addNoteGroup" in request.POST:
         groupCreationForm = forms.NotesGroupCreationForm(request.POST)

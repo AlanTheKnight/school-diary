@@ -17,19 +17,19 @@
   width: fit-content;
 }
 
-.grade-2 {
+.grade-2 > select {
   color: red;
 }
 
-.grade-3 {
+.grade-3 > select {
   color: orangered;
 }
 
-.grade-4 {
+.grade-4 > select {
   color: rgb(4, 0, 255);
 }
 
-.grade-5 {
+.grade-5 > select {
   color: green;
 }
 

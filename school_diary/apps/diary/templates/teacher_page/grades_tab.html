@@ -45,18 +45,17 @@
                     <td scope="row" class="student-name">
                         [[ student.student.surname ]] [[ student.student.first_name ]]
                     </td>
-                    <td :id="student.student.pk ">[[ renderAvg(student.avg) ]]</td>
-                    <td :id="'s_' + student.student.pk">
+                    <td :id="'avg' + student.student.pk">[[ renderAvg(student.avg) ]]</td>
+                    <td :id="'sm_avg' + student.student.pk">
                         [[ renderAvg(student.sm_avg) ]]
                     </td>
                     <template
                             v-for="grade in getAllGrades(student, grades.lessons)"
                             :set="grade = getGrade(student, lesson)">
-                        <td class="grade-cell">
+                        <td :class="'grade-cell' + ((grade.amount) ? ' grade-' + grade.amount : '')" :id="'cell-' + student.student.pk + '-' + grade.lesson_id">
                             <select
-                                    :name="String(student.student.pk) + '|' + grade.lesson_id"
                                     class="inp-table select"
-                                    onchange="saveMark(this)"
+                                    @change="saveGrade(student.student.pk, grade.lesson_id, $event)"
                                     oncontextmenu="commentDialog(this); return false;">
                                 <option value="0" :selected="grade.amount === null"></option>
                                 <option value="5" :selected="grade.amount == 5">5</option>

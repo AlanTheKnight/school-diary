@@ -46,7 +46,7 @@
                 <a
                         class="nav-link active"
                         id="grades-tab"
-                        data-bs-toggle="pill"
+                        data-bs-toggle="tab"
                         href="#tab-grades-content"
                         role="tab"
                 ><i class="fas fa-table me-2"></i>Оценки</a
@@ -56,7 +56,7 @@
                 <a
                         class="nav-link"
                         id="lessons-tab"
-                        data-bs-toggle="pill"
+                        data-bs-toggle="tab"
                         href="#tab-lessons-content"
                         role="tab"
                 ><i class="far fa-list-alt me-2"></i>Уроки</a
@@ -81,5 +81,5 @@
         {% include 'teacher_page/edit_lesson.html' %}
 
     </div>
-    <script src="{% static 'js/teacher.js' %}"></script>
+    <script src="{% static 'js/teacher.js' %}" type="module"></script>
 {% endblock %}

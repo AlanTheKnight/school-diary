@@ -1,0 +1,15 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center">
+        <img src="{% static 'icons/padlock.svg' %}" alt="" height="80">
+        <div class="mt-4 mb-4">
+            Доступ к этой странице запрещен, так как вы не были добавлены в класс
+            <div class="text-muted mt-2">Обратитесь к своему классному руководителю</div>
+        </div>
+         <a href="{% url 'homepage' %}" class="btn btn-outline-primary">Вернуться на главную</a>
+    </div>
+</div>
+{% endblock %}

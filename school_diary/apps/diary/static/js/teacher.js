@@ -1,4 +1,4 @@
-const csrf = Cookies.get("csrftoken");
+import {API} from './inbuiltAPI.js';
 
 const app = new Vue({
     el: "#app",
@@ -12,166 +12,86 @@ const app = new Vue({
             let date = $("#date" + pk).val();
             let theme = $("#theme" + pk).val();
             let control = Number($("#control" + pk).val());
-            $.ajax({
-                headers: {
-                    "X-CSRFToken": csrf,
-                },
-                data: {
-                    date: date,
-                    theme: theme,
-                    control: control,
-                },
-                url: "/api/inbuilt/lessons/edit-lesson/" + pk,
-                method: "PATCH",
-                success: function (data) {
-                    refreshSelection();
-                },
-            });
+            let data = {
+                date: date,
+                theme: theme,
+                control: control,
+            };
+            API.lessons.edit(pk, data);
+        },
+        refresh: function () {
+            let d = {
+                group: Cookies.get("group_id"),
+                quarter: Cookies.get("quarter"),
+            };
+            API.lessons.list(d, function (data) {
+                app.lessons = data;
+            })
+        },
+        changePlanned: function (pk, is_planned) {
+            planApp.pk = pk;
+            planApp.previousState = is_planned;
+            $("#plan-lesson").modal("toggle");
+        },
+        showMenu: function (pk) {
+            modalApp.pk = pk;
+            $("#delete-lesson").modal("toggle");
         },
     },
+    mounted: function () {
+        let vm = this;
+        API.controls.list(function (data) {
+            vm.controls = data;
+        })
+    }
 });
 
 const modalApp = new Vue({
     el: "#delete-lesson",
     delimiters: ["[[", "]]"],
     data: {
-        id: undefined,
+        pk: undefined,
     },
+    methods: {
+        deleteLesson: function (e) {
+            if (!this.pk) return;
+            API.lessons.delete(this.pk, function (data) {
+                $("#delete-lesson").modal("hide");
+                app.refresh();
+            });
+        },
+    }
 });
 
 const planApp = new Vue({
     el: "#plan-lesson",
     delimiters: ["[[", "]]"],
     data: {
-        id: undefined,
+        pk: undefined,
+        previousState: undefined,
     },
-});
-
-function refresh(group, quarter) {
-    $.ajax({
-        url: "/api/inbuilt/lessons/list-lessons",
-        method: "GET",
-        data: {
-            group: group,
-            term: quarter,
-        },
-        success: function (data) {
-            app.lessons = data;
-            grades_app.refreshTable(group, quarter);
-        },
-    });
-}
-
-function showMenu(that) {
-    modalApp.id = $(that).parent().attr("id");
-    $("#delete-lesson").modal("toggle");
-}
-
-function getControls() {
-    $.ajax({
-        url: "/api/inbuilt/list-controls",
-        method: "GET",
-        success: function (data) {
-            app.controls = data;
-        },
-    });
-}
-
-getControls();
-refreshSelection();
-
-function changeLessonPlanState(id) {
-    $.ajax({
-        url: "/api/inbuilt/lessons/change-is-plan",
-        method: "POST",
-        data: {
-            csrfmiddlewaretoken: csrf,
-            lesson: Number(id),
-        },
-        success: function (data) {
-            refreshSelection();
+    methods: {
+        changePlanned: function () {
+            let d = {
+                is_planned: !this.previousState
+            }
+            API.lessons.edit(this.pk, d, function () {
+                app.refresh();
+            })
             $("#plan-lesson").modal("hide");
-        },
-    });
-}
-
-function deleteLesson(id) {
-    $.ajax({
-        url: "/api/inbuilt/lessons/delete-lesson/" + id,
-        method: "DELETE",
-        headers: {
-            "X-CSRFToken": csrf,
-        },
-        data: {
-            lesson: Number(id),
-        },
-        success: function (data) {
-            refreshSelection();
-            $("#delete-lesson").modal("hide");
-        },
-    });
-}
-
-function changePlanState(that) {
-    planApp.id = $(that).parent().attr("id");
-    $("#plan-lesson").modal("toggle");
-}
-
-function renderAvg(s) {
-    if (s === null) return "-";
-    return Number(s).toPrecision(2).replace(".", ",");
-}
-
-function saveMark(that) {
-    $(that).parent().addClass("grade-changed");
-
-    $.each($(that).attr("class").split(/\s+/), function (index, item) {
-        if (item.startsWith("grade-")) {
-            $(that).removeClass(item);
         }
-    });
-    $(that).addClass("grade-" + $(that).val());
-
-    let value = Number(that.value); // Value of mark
-    let mark_data = that.name.split("|").map((x) => Number(x));
-    $.ajax({
-        url: "/api/inbuilt/save-mark",
-        method: "POST",
-        headers: {
-            "X-CSRFToken": csrf,
-        },
-        data: {
-            student: mark_data[0],
-            lesson: mark_data[1],
-            value: value,
-        },
-        success: function (data) {
-            let sm_avg = $("#s_" + mark_data[0]);
-            let avg = $("#" + mark_data[0]);
-            sm_avg.html(renderAvg(data.sm_avg));
-            avg.html(renderAvg(data.avg));
-        },
-    });
-}
+    }
+});
 
 function commentDialog(that) {
     let data = that.name.split("|").map((x) => Number(x));
     let csrf = $("input[name='csrfmiddlewaretoken']").val();
-    $.ajax({
-        url: "/api/inbuilt/get-comment",
-        method: "POST",
-        data: {
-            csrfmiddlewaretoken: csrf,
-            lesson: data[1],
-            student: data[0],
-        },
-        success: function (data) {
-            if (data.status === "aborted") return;
-            $("#comment-text").val(data.comment);
-            $("#comment-hidden").val(that.name);
-            $("#comment-modal").modal("show");
-        },
-    });
+    API.comments.get(data[0], data[1], function (data) {
+        if (data.status === "aborted") return;
+        $("#comment-text").val(data.comment);
+        $("#comment-hidden").val(that.name);
+        $("#comment-modal").modal("show");
+    })
 }
 
 function addComment() {
@@ -203,24 +123,13 @@ const grades_app = new Vue({
         header: undefined,
     },
     methods: {
-        refreshTable: function (group, quarter) {
-            $.ajax({
-                headers: {
-                    "X-CSRFToken": csrf,
-                },
-                data: {
-                    group: group,
-                    quarter: quarter,
-                },
-                method: "POST",
-                url: "/api/inbuilt/lessons/grades",
-                success: function (data) {
-                    console.info("Grades table was successfully refreshed");
-                    grades_app.grades = data;
-                    if (data.lessons !== undefined && data.lessons.length !== 0) {
-                        grades_app.header = grades_app.getLessonMonths();
-                    }
-                },
+        refreshTable: function () {
+            let v = this;
+            API.getGradesTable(Cookies.get("group_id"), Cookies.get("quarter"), function (data) {
+                v.grades = data;
+                if (data.lessons !== undefined && data.lessons.length !== 0) {
+                    v.header = grades_app.getLessonMonths();
+                }
             });
         },
         showPopover: function (e, lesson) {
@@ -274,6 +183,65 @@ const grades_app = new Vue({
                 return grades_app.getGrade(student, lesson);
             });
         },
+        getDateDay: function (date) {
+            return new Date(date).getDate();
+        },
+        renderAvg: function (s) {
+            if (s === null) return "-";
+            return Number(s).toPrecision(2).replace(".", ",");
+        },
+        editLessonModal: function (event, lesson) {
+            API.lessons.get(lesson.id, data => {
+                const modal = new bootstrap.Modal(document.getElementById("editLessonModal"));
+                const prefix = "edit";
+                const fields = ["homework", "theme", "date", "is_planned", "control", "id"]
+                for (let field of fields) {
+                    let fieldInput = $("#id_" + prefix + "-" + field)
+                    fieldInput.val(data[field]);
+                    fieldInput.attr("name", field);
+                }
+                modal.show();
+                let form = document.querySelector("#editLessonModal form");
+                form.onsubmit = function (e) {
+                    e.preventDefault();
+                    let fd = new FormData(form);
+                    API.lessons.edit(
+                        lesson.id, fd,
+                        (data) => {
+                            modal.hide();
+                            grades_app.refreshTable();
+                        },
+                        {
+                            processData: false,
+                            contentType: false,
+                            dataType: 'json',
+                            enctype: 'multipart/form-data',
+                        });
+                }
+            })
+        },
+        saveGrade: function (student, lesson, event) {
+            const value = event.target.value;
+            let v = this;
+            API.grades.save(
+                {
+                    student: student,
+                    lesson: lesson,
+                    value: value
+                }, (data) => {
+                    document.getElementById("avg" + student).innerHTML = this.renderAvg(data.avg);
+                    document.getElementById("sm_avg" + student).innerHTML = this.renderAvg(data.sm_avg);
+                    const cell = document.getElementById('cell-' + student + '-' + lesson);
+                    /**
+                     * @type {Array}
+                     */
+                    let scope = v.grades.scope;
+                    let r = scope.find(value1 => value1.student.pk === student);
+                    console.log(r);
+                    if (!cell.classList.contains('grade-changed')) cell.classList.add('grade-changed');
+                }
+            )
+        }
     },
 });
 
@@ -285,55 +253,30 @@ Date.prototype.getMonthName = function () {
     return this.toLocaleString("ru", {month: "long"}).capitalize();
 };
 
-function getDateDay(date) {
-    return new Date(date).getDate();
-}
 
 function refreshSelection() {
     let subject = $("#id_subjects").val();
     let klass = $("#id_classes").val();
     let quarter = Number($("#id_quarters").val());
-    $.ajax({
-        headers: {
-            "X-CSRFToken": csrf,
-        },
-        url: "/api/inbuilt/lessons/get-group",
-        method: "POST",
-        data: {
-            klass_id: Number(klass),
-            subject_id: Number(subject),
-        },
-        success: function (data) {
-            if (data) {
-                refresh(data.id, quarter);
-                Cookies.set("group_id", data.id);
-                Cookies.set("quarter", quarter);
-            }
-        },
+    let data = {
+        klass_id: Number(klass),
+        subject_id: Number(subject),
+    };
+    API.groups.get(data, function (data) {
+        Cookies.set("group_id", data.id);
+        Cookies.set("quarter", quarter);
+        grades_app.refreshTable();
     });
 }
 
-//
-const editLesson = new Vue({
-    el: "#editLessonApp",
-    delimiters: ["[[", "]]"],
-    data: {
-        lesson: undefined,
-    },
-});
 
-function editLessonModal(event, lesson) {
-    $.ajax({
-        url: "/api/inbuilt/lessons/" + String(lesson.id),
-        method: "GET",
-        success: function (data) {
-            editLesson.lesson = data;
-            const prefix = "edit";
-            const fields = ["homework", "theme", "date", "is_planned", "control", "id"]
-            for (let field of fields) {
-                $("#id_" + prefix + "-" + field).val(data[field]);
-            }
-            $("#editLessonModal").modal("show");
-        }
-    })
-}
+refreshSelection();
+
+
+document.getElementById("grades-tab").addEventListener('shown.bs.tab', function (event) {
+    grades_app.refreshTable();
+})
+
+document.getElementById("lessons-tab").addEventListener('shown.bs.tab', function (event) {
+    app.refresh();
+})
