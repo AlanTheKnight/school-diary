@@ -81,7 +81,7 @@ def in_klass(function):
     def wrapper(request, *args, **kwargs):
         if request.user.student.in_klass:
             return function(request, *args, **kwargs)
-        return render(request, 'access_denied.html', MESSAGES['NO_GRADE'])
+        return render(request, 'access_denied/student_no_class.html')
     return wrapper
 
 

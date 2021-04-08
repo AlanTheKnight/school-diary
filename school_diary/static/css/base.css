@@ -1,20 +1,27 @@
 @font-face {
   font-family: Montserrat;
-  src: url(../fonts/Montserrat/Montserrat-Medium.ttf) format("truetype");
+  src: url(../fonts/Montserrat/Montserrat-Medium.ttf) format('truetype') ;
 }
 
+@font-face {
+  font-family: Iosevka;
+  src: url(../fonts/Iosevka/iosevka-regular.ttf) format('truetype');
+}
 
 html {
   position: relative;
   min-height: 100%;
 }
 
-* {
+body {
+  margin-bottom: 320px;
   font-family: "Montserrat", sans-serif;
 }
 
-body {
-  margin-bottom: 320px;
+.code-snippet {
+    font-family: "Iosevka", monospace !important;
+    background-color: #282c34;
+    color: #abb2bf;
 }
 
 .footer {

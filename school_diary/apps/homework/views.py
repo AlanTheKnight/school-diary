@@ -18,20 +18,8 @@ def show_homework(request):
     """
     student = request.user.student
     klass = student.klass
-    if "date" in request.GET:
-        form = forms.DatePickForm(request.GET)
-        if form.is_valid():
-            date = form.cleaned_data['date']
-            tasks = klass.get_homework(start_date=date)
-            context = {'form': form, 'homework': tasks, 'date': date}
-            return render(request, 'homework/homework.html', context)
-    start_date = datetime.date.today() + datetime.timedelta(days=1)
-    end_date = start_date + datetime.timedelta(days=7)
-    tasks = klass.get_homework(start_date=start_date, end_date=end_date)
-    form = forms.DatePickForm()
-
     exams = klass.get_exams(datetime.date.today() + datetime.timedelta(days=1), 10)
-    return render(request, 'homework/homework.html', {'form': form, 'homework': tasks, 'exams': exams})
+    return render(request, 'homework/homework.html', {'exams': exams})
 
 
 @student_only

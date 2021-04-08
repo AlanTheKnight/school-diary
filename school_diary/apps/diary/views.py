@@ -97,6 +97,8 @@ def delete_lesson(request, pk):
 @student_only
 @in_klass
 def students_diary(request):
+    return render(request, 'access_denied/not_implemented.html')
+
     student: models.Students = request.user.student
     chosen_quarter = models.Quarters.get_default_quarter().number
     if 'quarter' in request.GET:
@@ -163,12 +165,6 @@ def teachers_diary(request):
             hw_form = forms.HomeworkForm(prefix="homework")
 
     lesson_edit_form = forms.LessonCreationForm(prefix="edit")
-    if request.method == "POST" and "editLesson" in request.POST:
-        lesson = models.Lessons.objects.get(pk=int(request.POST.get("id")))
-        lesson_edit_form = forms.LessonCreationForm(request.POST, request.FILES, prefix="edit", instance=lesson)
-        if lesson_edit_form.is_valid():
-            lesson_edit_form.save(group=group)
-            lesson_edit_form = forms.LessonCreationForm(prefix="edit")
 
     students_form = forms.VisibleStudentsForm(instance=group)
     if request.method == "POST" and 'visibleStudents' in request.POST:
@@ -206,6 +202,8 @@ def diary(request):
 @in_klass
 def stats(request, pk, quarter: int):
     """Return a page with results for one specified subject."""
+    return render(request, 'access_denied/not_implemented.html')
+
     student: models.Students = request.user.student
     klass = student.klass
     subject = get_object_or_404(models.Subjects, pk=pk)

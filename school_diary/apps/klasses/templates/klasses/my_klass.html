@@ -1,34 +1,32 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}
-    <title>Мой класс</title>
-{% endblock %}
 
 {% block content %}
     <div class="container my-5">
         <h1 class="text-center">{{ klass }}</h1>
 
+        <div class="my-4 alert alert-warning">
+            Просмотр оценок учеников временно недоступен
+        </div>
+
         <div class="my-4">
             {% if students %}
-                <h2 class="card-title text-center">Ученики в классе</h2>
                 <div class="table-responsive">
                     <table class="table my-3 text-center table-sm">
                         <thead class="table-dark">
                         <tr>
-                            <th>Почта</th>
                             <th>Имя</th>
                             <th>Фамилия</th>
-                            <th>Удаление</th>
+                            <th>Оценки</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for s in students %}
                             <tr>
-                                <td>{{ s.account.email }}</td>
                                 <td>{{ s.account.first_name }}</td>
                                 <td>{{ s.account.surname }}</td>
-                                <td><a href="#" class="text-primary"><i class="fas fa-edit"></i></a></td>
+                                <td><a href="#" class="text-primary"><i class="fas fa-eye"></i></a></td>
                             </tr>
                         {% endfor %}
                         </tbody>

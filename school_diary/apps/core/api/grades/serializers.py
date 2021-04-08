@@ -1,23 +1,6 @@
 from rest_framework import serializers
+
 from apps.core import models
-
-
-class LessonsListSerializer(serializers.ModelSerializer):
-    control_name = serializers.CharField(source="control.name")
-
-    class Meta:
-        model = models.Lessons
-        fields = '__all__'
-
-
-class ChangeLessonIsPlannedSerializer(serializers.Serializer):
-    lesson = serializers.IntegerField(required=True)
-
-
-class EditLessonSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Lessons
-        fields = '__all__'
 
 
 class ListStudentGradesSerializer(serializers.Serializer):
@@ -26,7 +9,6 @@ class ListStudentGradesSerializer(serializers.Serializer):
 
 
 class GradesSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.Grades
         fields = ("amount", "lesson_id")
@@ -70,11 +52,5 @@ class GetGroupSerializer(serializers.Serializer):
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Groups
-        fields = '__all__'
-
-
-class RetrieveLessonSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Lessons
         fields = '__all__'
 

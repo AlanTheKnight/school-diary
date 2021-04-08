@@ -39,6 +39,13 @@
                             {% include "field.html" %}
                         {% endwith %}
                     </div>
+                    {% if form.president %}
+                        <div class="mb-3">
+                            {% with field=form.president %}
+                                {% include "field.html" %}
+                            {% endwith %}
+                        </div>
+                    {% endif %}
                     {% if form.klass %}
                         <div class="mb-3">
                             {% with field=form.klass %}
