@@ -9,7 +9,7 @@ from apps.timetable.api import utils
 class TestTimeTable(TestCase):
     def setUp(self) -> None:
         klass = models.Klasses.objects.create(number=11, letter="А")
-        with open("timetable/tests/testData.json", "r") as f:
+        with open("testData.json", "r") as f:
             data = json.load(f)
         self.lessons = [
             models.Lessons.objects.create(
