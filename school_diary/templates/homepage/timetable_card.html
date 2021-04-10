@@ -1,0 +1,49 @@
+<div class="card card-body" id="tt-card">
+    <h4 class="card-title text-center mb-3"><a href="{% url 'timetable' %}"><i class="fas fa-calendar me-2"></i>Расписание</a>
+    </h4>
+    <div id="timetable-app">
+        <div v-if="currentDay === undefined" class="text-center">
+            <div class="spinner-border text-primary my-5"></div>
+        </div>
+        <div v-else-if="currentDay.lessons && currentDay.lessons.length > 0" id="tt-view">
+            <div class="mb-3">[[ getDayName(selectedDay) ]]</div>
+            <div v-for="(lesson, index) in currentDay.lessons">
+                <div class="row mt-1">
+                    <div class="col-2 text-center">
+                        <div v-if="lesson.subject.icon" class="subject-icon-wrapper"><img
+                                class="subject-icon" :src="lesson.subject.icon" alt=""></div>
+                    </div>
+                    <div class="col" style="position: relative;">
+                        <div style="position: absolute; top: 0; right: 1rem; text-align: end">
+                            <div>[[ lesson.n ]]</div>
+                            <div>[[ renderTime(lesson.start) ]] - [[ renderTime(lesson.end) ]]
+                            </div>
+                        </div>
+                        <div><b>[[ lesson.subject.name ]]</b></div>
+                        <div>[[ lesson.classroom ]]</div>
+                    </div>
+                    <div v-if="index + 1 !== currentDay.lessons.length">
+                        <hr>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div v-else id="tt-no-tt-view">
+            Расписание на [[ days[selectedDay - 1] ]] ещё не заполнено
+        </div>
+
+        <hr style="margin-bottom: 0;">
+
+        <div class="text-center text-primary" id="tt-buttons-wrapper">
+            <div v-if="selectedDay !== 1" style="width: 50%; margin-right: auto;">
+                <div class="tt-btn" id="tt-left-arrow" @click="changeDay('prev')"><i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+            <div v-if="selectedDay !== 6" style="width: 50%; margin-left: auto;">
+                <div class="tt-btn" id="tt-right-arrow" @click="changeDay('next')"><i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

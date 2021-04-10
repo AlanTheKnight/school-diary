@@ -24,3 +24,9 @@ class ControlSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Controls
         exclude = ('weight', )
+
+
+class SubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Subjects
+        fields = "__all__"

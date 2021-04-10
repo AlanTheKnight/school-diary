@@ -1,9 +1,5 @@
 {% extends 'base/base.html' %}
 {% load static %}
-{% block title %}
-    <!--suppress HtmlUnknownTarget -->
-    <title>Панель администратора</title>
-{% endblock %}
 {% block css %}
     <style>
         table a {
@@ -38,10 +34,6 @@
             <tr>
                 <td><i class="fas fa-clock"></i></td>
                 <td><a href="{% url 'timetable_dashboard' %}">Расписание</a></td>
-            </tr>
-            <tr>
-                <td><i class="fas fa-bell"></i></td>
-                <td><a href="{% url 'bells_dashboard' 1 %}">Звонки</a></td>
             </tr>
             <tr class="bg-dark text-white">
                 <td colspan="2" class="text-center">Минимумы</td>

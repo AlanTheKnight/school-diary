@@ -12,10 +12,48 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.295);
 }
 
-.card img {
+.card img.icon {
     display: block;
     /* position: relative; */
     width: 40%;
     margin: 20% auto;
 }
 
+.subject-icon {
+    width: 40px;
+}
+
+.subject-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+#tt-view {
+    max-height: 300px;
+    min-height: 300px;
+    overflow-y: scroll;
+    padding-right: 1rem;
+    padding-left: 1rem;
+}
+
+#tt-no-tt-view {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.tt-btn {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+#tt-buttons-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
