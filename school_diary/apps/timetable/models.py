@@ -1,14 +1,8 @@
 from django.db import models
+from apps.core.models import Subjects, Klasses
 
 
-DAYS = [
-    ("Понедельник", "Понедельник"),
-    ("Вторник", "Вторник"),
-    ("Среда", "Среда"),
-    ("Четверг", "Четверг"),
-    ("Пятница", "Пятница"),
-    ("Суббота", "Суббота")
-]
+days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]
 
 SCHOOLS = [
     (1, "Младшая школа"),
@@ -16,32 +10,8 @@ SCHOOLS = [
 ]
 
 
-LITERAS = [
-    ("А", "А"),
-    ("Б", "Б"),
-    ("В", "В"),
-    ("Г", "Г"),
-    ("Д", "Д"),
-    ("Е", "Е"),
-    ("Ж", "Ж"),
-    ("З", "З"),
-    ("И", "И"),
-    ("К", "К")
-]
-
-GRADES = [
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5),
-    (6, 6),
-    (7, 7),
-    (8, 8),
-    (9, 9),
-    (10, 10),
-    (11, 11)
-]
+LETTERS = [(i, i) for i in list("АБВГДЕЖЗИК")]
+GRADES = [(i, i) for i in range(1, 12)]
 
 
 class BellsTimeTable(models.Model):
@@ -62,11 +32,14 @@ class BellsTimeTable(models.Model):
 
 class Lessons(models.Model):
     klass = models.ForeignKey(
-        "Klasses", default=None, on_delete=models.CASCADE, null=True,
+        Klasses, default=None, on_delete=models.CASCADE, null=True,
         related_name="lessons", verbose_name="Класс")
-    day = models.CharField(max_length=11, choices=DAYS, verbose_name="День недели", blank=False)
+    day = models.IntegerField(
+        "День недели",
+        choices=[(i+1, days[i]) for i in range(len(days))]
+    )
     number = models.ForeignKey(BellsTimeTable, on_delete=models.CASCADE, verbose_name="Номер урока")
-    subject = models.CharField(max_length=50, verbose_name="Предмет")
+    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, verbose_name="Предмет")
     classroom = models.CharField(max_length=50, verbose_name="Кабинет")
 
     class Meta:
@@ -75,27 +48,4 @@ class Lessons(models.Model):
         verbose_name_plural = "Уроки"
 
     def __str__(self):
-        if self.day != "Вторник":
-            return str(self.number.n) + "й урок в " + self.day.lower() + " у " + str(self.klass)
-        else:
-            return str(self.number.n) + "й урок во " + self.day.lower() + " у " + str(self.klass)
-
-
-class Klasses(models.Model):
-    """
-    Model that represents a grade in a timetable.
-
-    Fields:
-        id (PK), number (int), letter (str)
-    """
-    number = models.IntegerField(choices=GRADES, verbose_name="Класс")
-    letter = models.CharField(max_length=2, choices=LITERAS, verbose_name="Буква")
-
-    class Meta:
-        ordering = ['number', 'letter']
-        verbose_name = "Класс"
-        verbose_name_plural = "Классы"
-        unique_together = ('number', 'letter')
-
-    def __str__(self):
-        return '{}{}'.format(self.number, self.letter)
+        return f"Урок №{self.number.n} | {days[self.day]} | {self.klass}"

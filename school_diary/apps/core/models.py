@@ -37,7 +37,7 @@ class Klasses(models.Model):
         related_name="klasses")
     subjects = models.ManyToManyField(Subjects, verbose_name="Предметы")
     head_teacher = models.OneToOneField(
-        "Teachers", verbose_name='Классный руководитель',
+        "Teachers", verbose_name='Классный руководитель', null=True,
         on_delete=models.PROTECT, related_name='klass')
 
     class Meta:

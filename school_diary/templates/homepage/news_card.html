@@ -1,0 +1,9 @@
+<div class="card card-body">
+    <h3 class="card-title text-center"><a href="{% url 'news' 1 %}"><i
+            class="fas fa-newspaper me-2"></i>Новости</a></h3>
+    <div id="news-app">
+        <div v-if="news === undefined" class="text-center">
+            <div class="spinner-border text-primary my-5"></div>
+        </div>
+    </div>
+</div>
