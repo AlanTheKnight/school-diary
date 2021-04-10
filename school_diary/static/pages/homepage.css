@@ -52,6 +52,10 @@
     padding-bottom: 1rem;
 }
 
+#tt-card {
+    padding-bottom: 0;
+}
+
 #tt-buttons-wrapper {
     width: 100%;
     display: flex;

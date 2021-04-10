@@ -220,3 +220,5 @@ ACCOUNT_TYPES = [
     (2, "Учитель"),
     (3, "Ученик"),
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

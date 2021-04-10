@@ -2,82 +2,85 @@
 {% load static %}
 
 {% block title %}
-<title>Расписание</title>
+    <title>Расписание</title>
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/../../static/css/timetable.css' %}">
+    <link rel="stylesheet" href="{% static 'css/timetable.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col col-md-9 col-lg-6">
-            <div class="card card-body">
-                <form>
-                    <div class="mb-3">
-                        {% with field=form.grade %}
-                            {% include 'field.html' %}
-                        {% endwith %}
-                    </div>
-                    <div class="mb-3">
-                        {% with field=form.litera %}
-                            {% include 'field.html' %}
-                        {% endwith %}
-                    </div>
-                    <button id="timetable_btn" type="button" class="btn btn-outline-primary">Просмотреть расписание</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div id="timetable" class="my-4">
-        <div v-if="empty">
-            <div class="row justify-content-center">
-                <div class="col col-md-9 col-lg-6">
-                    <div class="alert alert-primary">
-                        Расписание на ваш класс ещё не заполнено.
-                    </div>
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col col-md-9 col-lg-6">
+                <div class="card card-body">
+                    <form>
+                        <div class="mb-3">
+                            {% with field=form.grade %}
+                                {% include 'field.html' %}
+                            {% endwith %}
+                        </div>
+                        <div class="mb-3">
+                            {% with field=form.litera %}
+                                {% include 'field.html' %}
+                            {% endwith %}
+                        </div>
+                        <div class="text-center">
+                            <button id="timetable_btn" type="button" class="btn btn-outline-primary">Просмотр</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        <div v-else>
-            <div class="row justify-content-center">
-                <div class="col col-md-9 col-lg-6">
-                    <div v-for="day in days">
-                        <div class="card my-4 card-body" v-if="day.lessons.length != 0">
-                            <div class="card-title text-center">
-                                <div v-if="day.weekday == 'tomorrow'">
-                                    <h4>Расписание на завтра</h4>
+
+        <div id="timetable" class="my-4">
+            <div v-if="empty">
+                <div class="row justify-content-center">
+                    <div class="col col-md-9 col-lg-6">
+                        <div class="alert alert-primary">
+                            Расписание на ваш класс ещё не заполнено.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else>
+                <div class="row justify-content-center">
+                    <div class="col col-md-9 col-lg-6">
+                        <div v-for="day in days">
+                            <div class="card my-4 card-body" v-if="day.lessons.length != 0">
+                                <div class="card-title text-center">
+                                    <div v-if="day.weekday === 'tomorrow'">
+                                        <h4>Расписание на завтра</h4>
+                                    </div>
+                                    <div v-else-if="day.weekday === 'today'">
+                                        <h4>Расписание на сегодня</h4>
+                                    </div>
+                                    <div v-else>
+                                        <h4>[[ getDayName(day.weekday) ]]</h4>
+                                    </div>
                                 </div>
-                                <div v-else-if="day.weekday == 'today'">
-                                    <h4>Расписание на сегодня</h4>
+                                <div v-for="(lesson, index) in day.lessons">
+                                    <div class="row mt-1">
+                                        <div class="col-2 text-center">
+                                            <div v-if="lesson.subject.icon" class="subject-icon-wrapper"><img
+                                                    class="subject-icon" :src="lesson.subject.icon" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="col" style="position: relative;">
+                                            <div style="position: absolute; top: 0; right: 1rem; text-align: end">
+                                                <div>[[ lesson.n ]]</div>
+                                                <div>[[ renderTime(lesson.start) ]] - [[ renderTime(lesson.end)
+                                                    ]]
+                                                </div>
+                                            </div>
+                                            <div><b>[[ lesson.subject.name ]]</b></div>
+                                            <div>[[ lesson.classroom ]]</div>
+                                        </div>
+                                        <div v-if="index + 1 !== day.lessons.length">
+                                            <hr>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div v-else>
-                                    <h4>[[ day.weekday ]]</h4>
-                                </div>
-                            </div>
-                            <div class="table-responsive-md">
-                                <table class="table-sm table">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Предмет</th>
-                                            <th>Кабинет</th>
-                                            <th>Начало</th>
-                                            <th>Конец</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="lesson in day.lessons">
-                                            <td>[[ lesson.n ]]</td>
-                                            <td>[[ lesson.subject ]]</td>
-                                            <td>[[ lesson.classroom ]]</td>
-                                            <td>[[ lesson.start.substr(0, 5) ]]</td>
-                                            <td>[[ lesson.end.substr(0, 5) ]]</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
                             </div>
                         </div>
                     </div>
@@ -85,78 +88,9 @@
             </div>
         </div>
     </div>
-</div>
-
-</div>
 {% endblock %}
 
 
 {% block js %}
-    <script>
-
-    let tt = new Vue({
-        delimiters: ['[[', ']]'],
-        el: '#timetable',
-        data: {
-            days: [],
-            empty: false,
-        }
-    })
-
-    /*
-    Checks data got from Ajax call.
-    
-    Returns:
-        0 - timetable has at least one lesson
-        for every day
-        2 - timetable has unfilled days
-        1 - timetable isn't filled at all
-    */
-    function checkTimeTable(data) {
-        let counter = 0;
-        for (let i = 2; i < data.length; i++) {
-            if (! data[i].lessons.length)
-                counter++;
-        }
-        if (counter == 0) return 0;
-        if (counter == 7) return 1;
-        return 2;
-    }
-
-    function getTimeTable() {
-        let number = $('#id_grade').val();
-        let letter = $('#id_litera').val();
-        let url = "/api/timetable/" + number + '/' + letter + '/';
-        $.ajax({
-            url: url,
-            format: 'json',
-            success: function (data) {
-                // If successfully got a request, display them via Vue
-                // and check if every day has a full timetable.
-                switch (checkTimeTable(data)) {
-                    case 2:
-                        tt.empty = false;
-                        break;
-                    case 1:
-                        tt.empty = true;
-                        break;
-                    case 0:
-                        tt.empty = false;
-                        break;
-                }
-
-                tt.days = data;
-            },
-            error: function(xhr, ajaxOptions, thrownError) {
-                tt.empty = true;
-            },
-        });
-    }
-
-    $(document).ready(function() {
-        $("#timetable_btn").on("click", function() {
-            getTimeTable();
-        });
-    });
-</script>
+    <script src="{% static 'js/timetable.js' %}"></script>
 {% endblock %}
