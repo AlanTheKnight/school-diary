@@ -13,5 +13,6 @@ urlpatterns = [
     path('quarter-valid', val_views.QuarterValidator.as_view(), name="quarter-valid"),
     path("lessons/", include("apps.core.api.lessons.urls", namespace="lessons")),
     path("grades/", include("apps.core.api.grades.urls", namespace="grades")),
-    path("homework/", include("apps.core.api.homework.urls", namespace="homework"))
+    path("homework/", include("apps.core.api.homework.urls", namespace="homework")),
+    path("users/", include("apps.core.api.users.urls", namespace="users"))
 ]

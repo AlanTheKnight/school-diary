@@ -59,10 +59,7 @@ const homeworkApp = new Vue({
                         console.log(e);
                     })
                 })
-            }, {
-                date_before: end,
-                date_after: start,
-            });
+            }, [["date_before", end], ["date_after", start]]);
         },
         getDate: function(date) {
             if (date[0] === "week") return "Домашнее задание на неделю";

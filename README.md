@@ -1,81 +1,74 @@
+<div style="text-align: center;">
+
 # School Diary
 
-## Setting up project on your computer
+Open-source digital diary website for schools made with Django.
 
-Clone this repository.
+<img alt="Python 3.9+" src="https://img.shields.io/badge/Python_Version-3.9+-blue.svg">
+<img alt="Python 3.9+" src="https://img.shields.io/badge/License-MIT-yellow.svg">
 
-Then activate your virtual environment and install requirements:
 
-    python -m pip install -r requirements.txt
+## This project uses
 
-Make migrations to database:
+<img alt="Python" src="https://img.shields.io/badge/python%20-%2314354C.svg?&style=for-the-badge&logo=python&logoColor=white"/>
+<img alt="Django" src="https://img.shields.io/badge/django%20-%23092E20.svg?&style=for-the-badge&logo=django&logoColor=white"/>
+<img alt="JavaScript" src="https://img.shields.io/badge/javascript%20-%23323330.svg?&style=for-the-badge&logo=javascript&logoColor=%23F7DF1E"/>
+<img alt="HTML5" src="https://img.shields.io/badge/html5%20-%23E34F26.svg?&style=for-the-badge&logo=html5&logoColor=white"/>
+<img alt="CSS3" src="https://img.shields.io/badge/css3%20-%231572B6.svg?&style=for-the-badge&logo=css3&logoColor=white"/>
+<img alt="Vue.js" src="https://img.shields.io/badge/vuejs%20-%2335495e.svg?&style=for-the-badge&logo=vue.js&logoColor=%234FC08D"/>
+<img alt="Bootstrap" src="https://img.shields.io/badge/bootstrap%20-%23563D7C.svg?&style=for-the-badge&logo=bootstrap&logoColor=white"/>
+<img alt="SQLite" src ="https://img.shields.io/badge/sqlite-%2307405e.svg?&style=for-the-badge&logo=sqlite&logoColor=white"/>
+<img alt="Postgres" src ="https://img.shields.io/badge/postgres-orangered.svg?&style=for-the-badge&logo=postgresql"/>
 
-    python manage.py makemigrations
-    python manage.py migrate
+## Development setup
 
-Before you will run server, create superuser account:
+<div style="text-align: left;">
 
-    python manage.py createsuperuser
-    Email: your_email@email.com
-    Account type: 0
-    Password: somerandompassword
+### Preparation
 
-Now you can run server.
+Make sure you've installed Python 3.9+ and added it to `PATH`.
+It's recommended to create empty virtual environment before installing dependencies.
 
-    python manage.py runserver
+### Installing dependencies
 
-Go to 127.0.0.1:8000 in your browser and enjoy our website.
+```
+pip install poetry
+poetry install
+```
 
-Superuser account let you create other administrators and teachers. Students register by themself.
+### Adding settings file
 
-### Tip: easier way for Linux users
+Create a file called `settings.ini` in root directory
+of project (the same where `manage.py` is located).
 
-Linux users can also use ``setup.sh`` file, that is located in the root folder.
+```ini
+[Settings]
+DEBUG = True
+SECRET_KEY = <generate-secret-key>
 
-    chmod +x setup.sh
-    ./setup.sh
+[Email]
+user = <your email address>
+password = <your email password>
+```
 
-Usage:
 
-    setup.sh [-r] for installing requirements
-             [-m] for migrations
-             [-u] for superuser
-             [-s] for django shell
-             [-t] for test
+### Django stuff
 
-## Screenshots
+```
+cd school_diary
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+```
 
-![Teacher account](https://sun9-13.userapi.com/c856132/v856132311/21cdaf/2UbbgjtKKPs.jpg)
+Then open https://127.0.0.1:8000 and enjoy.
 
-![Teacher interface](https://sun9-46.userapi.com/c856132/v856132311/21cda5/0hD1H2vYibQ.jpg)
+</div>
 
-## Useful functions
+## Contact us
 
-### Creating a map with all models in project
+<a href="mailto:ideasoft.spb@gmail.com"><img alt="Gmail" src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white"/></a>
+<a href="https://t.me/AlanTheKnight"><img alt="Telegram" src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white"></a>
 
-    pip install pyparsing pydot
-    sudo apt install python-pydot python-pydot-ng graphviz
-    python manage.py graph_models --pydot -a -g -o my_project_visualized.png
+</div>
 
-### List all urls in the project
-
-    python manage.py show_urls
-
-## Code styling & recommendations
-
-- It's highly recommended using a linter, for example, *flake8*.
-- Lines maximal length is 99 symbols (comments and docstrings are 79).
-- Follow [PEP8](https://pep8.org)
-- Indent using 4 spaces
-
-We highly prefer using ```{% url %}``` tags is than using simple links because the address can be changed easily without changing any code. If you need to pass some parameters inside, use 
-```{% url 'some_name' page=1 %}``` as keyword argument and ```{% url 'some_name' 1 %}``` as a positional one.
-
-Also our Django views are **NOT** using class-based views.
-
-As it was mentioned, you can create a cool .png map with all models and their connections.
-There you will be able to see that we have the most part of our model created inside 'diary'
-app. That's because before we started doing a code review and refresh our legacy code, almost all
-of the project was there. Then we separated it and increased the readability of our code.
-Anyway, traditionally we want to keep most of the models in the one app and import them from others.
-That's it.

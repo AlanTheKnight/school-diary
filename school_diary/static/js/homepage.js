@@ -1,28 +1,30 @@
-const timetableApp = new Vue({
+import {API} from "/static/js/inbuiltAPI.js"
+
+const DAY_NOW = (new Date()).getDay();
+
+
+/*
+TODO: Should we still use Django template tags to prevent users stop
+      seeing timetable card for students or it's better to replace it
+      with API call to check whether request.user is student?
+*/
+if (document.getElementById("timetable-app") !== null) {
+    const timetableApp = new Vue({
     el: "#timetable-app",
     delimiters: ["[[", "]]"],
     data: {
         days: ["понедельник", "вторник", "среду", "четверг", "пятницу", "субботу"],
         currentDay: undefined,
         timetable: undefined,
-        selectedDay: (new Date()).getDay()
+        selectedDay: ((DAY_NOW === 0) ? 1 : DAY_NOW),
     },
     methods: {
         getTimetable: function () {
             let vm = this;
-            $.ajax("/api/timetable/9/%D0%97/", {
-                /**
-                 * @param {Array} data
-                 */
-                success: function (data) {
-                    vm.timetable = data;
-                    vm.currentDay = data.find(value => value.weekday === vm.selectedDay);
-                },
-                error: function (...args) {
-                    vm.timetable = {};
-                    vm.currentDay = [];
-                }
-            });
+            API.timetable.list("9", "З", (data) => {
+                vm.timetable = data;
+                vm.currentDay = data.find(value => value.weekday === vm.selectedDay);
+            })
         },
         renderTime: function (s) {
             return s.slice(((s[0] === "0") ? 1 : 0), 5);
@@ -43,8 +45,13 @@ const timetableApp = new Vue({
         }
     }
 })
+    document.addEventListener("DOMContentLoaded", function() {
+        timetableApp.getTimetable();
+    })
+}
 
 
+// TODO: Finish working on news card.
 const newsApp = new Vue({
     el: "#news-app",
     delimiters: ["[[", "]]"],
@@ -57,10 +64,3 @@ const newsApp = new Vue({
         }
     }
 })
-
-
-document.addEventListener("DOMContentLoaded", function() {
-    timetableApp.getTimetable();
-})
-
-

@@ -584,6 +584,7 @@ class Students(models.Model):
         return self.klass is not None and self.klass.head_teacher is not None
 
 
+# TODO: Deprecate Admins model
 class Admins(models.Model):
     account = models.OneToOneField(
         Users, on_delete=models.CASCADE,

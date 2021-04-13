@@ -96,9 +96,11 @@
             </div>
             <div class="col-12 col-lg-6 col-xl-4">
                 <div class="row">
-                    <div class="col-12 col-lg-12 mb-3">
-                        {% include 'homepage/timetable_card.html' %}
-                    </div>
+                    {% if request.user.is_student and request.user.student.in_klass %}
+                        <div class="col-12 col-lg-12 mb-3">
+                            {% include 'homepage/timetable_card.html' %}
+                        </div>
+                    {% endif %}
                     <div class="col-12 col-lg-12">
                         {% include 'homepage/news_card.html' %}
                     </div>
@@ -108,10 +110,12 @@
     </div>
 
     <script>
-        if (localStorage.hasOwnProperty("hide_update_info")) {
+        // Prevents "update info" card from being showed once it was hidden by user
+        // by adding "hide_update_info" to localStorage.
+        if (localStorage.hasOwnProperty("hide_update_info"))
             $("#update-info").hide();
-        } else {
-            $("#hide-update-info").on("click", () => {
+        else {
+            $("#hide-update-info").on("click", (e) => {
                 localStorage.setItem("hide_update_info", "True");
                 $("#update-info").hide();
             })

@@ -1,17 +1,24 @@
 const csrf = Cookies.get("csrftoken");
 
-const BASE_URL = "/api/inbuilt/";
-const editLessonAPIURL = "lessons/";
-const listLessonsAPIURL = "lessons/";
-const listControlsAPIURL = 'controls/';
-const getGradesTableAPIURL = 'grades/table/';
-const getGradesAPIURL = 'grades/'
-const getGroupAPIURL = 'grades/group';
-const saveGradeAPIURL = 'save-mark';
+const BASE_URL = "/api";
+const editLessonAPIURL = "/inbuilt/lessons/";
+const listLessonsAPIURL = "/inbuilt/lessons/";
+const listControlsAPIURL = '/inbuilt/controls/';
+const getGradesTableAPIURL = '/inbuilt/grades/table/';
+const getGradesAPIURL = '/inbuilt/grades/'
+const getGroupAPIURL = '/inbuilt/grades/group';
+const saveGradeAPIURL = '/inbuilt/save-mark';
 
 const URLS = {
     homework: {
-        list: 'homework/'
+        list: '/inbuilt/homework/',
+    },
+    users: {
+        list: '/inbuilt/users/',
+        details: '/inbuilt/users/'
+    },
+    timetable: {
+        list: '/timetable/'
     }
 }
 
@@ -27,16 +34,16 @@ const URLS = {
  * @param {Object} data
  * @param {ajaxCallCallback} callback
  * @param {Object} options
- * @param {Object} filters
+ * @param {Array} filters
  */
 function inbuiltAPIWrapper(
     method, url, data = null,
     callback = null, options = null, filters = null) {
-    let ajax_url = BASE_URL + url;
+    let ajax_url = BASE_URL + encodeURI(url);
     if (filters) {
         let params = [];
-        for (let [key, value] of Object.entries(filters)) {
-          params.push(`${key}=${value}`);
+        for (let value of filters) {
+          params.push(`${value[0]}=${value[1]}`);
         }
         ajax_url += "?" + params.join("&");
         console.log(ajax_url);
@@ -134,6 +141,17 @@ export const API = {
     homework: {
         list: function (callback = null, filters = null) {
             inbuiltAPIWrapper("GET", URLS.homework.list, null, callback, null, filters)
+        }
+    },
+    users: {
+        list: function (callback = null, filters = null) {
+            inbuiltAPIWrapper("GET", URLS.homework.list, null, callback, null, filters)
+        }
+    },
+    timetable: {
+        list: function (number, letter, callback = null, filters = []) {
+            filters.push(["number", number], ["letter", letter]);
+            inbuiltAPIWrapper("GET", URLS.timetable.list, null, callback, null, filters);
         }
     }
 }
