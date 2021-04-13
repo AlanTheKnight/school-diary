@@ -1,14 +1,15 @@
 import os
+import toml
 from configparser import RawConfigParser
 
 from typing import List, Any, Union, Tuple
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-config = RawConfigParser()
-config.read(os.path.join(BASE_DIR, 'settings.ini'))
-SECRET_KEY = config.get('Settings', 'SECRET_KEY')
-DEBUG = (config.get("Settings", "DEBUG") == "True")
+toml_config = toml.load(os.path.join(BASE_DIR, 'config.toml'))
+
+SECRET_KEY = toml_config['main']['secret_key']
+DEBUG = (toml_config['main'].get("debug", True))
 
 ALLOWED_HOSTS = ['.diary56.ru', '64.227.75.146']
 
@@ -85,9 +86,9 @@ if not DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': config.get("DataBase", 'name'),
-            'USER': config.get("DataBase", 'user'),
-            'PASSWORD': config.get('DataBase', 'password'),
+            'NAME': toml_config.get("DataBase", 'name'),
+            'USER': toml_config.get("DataBase", 'user'),
+            'PASSWORD': toml_config.get('DataBase', 'password'),
             'HOST': 'localhost',
             'PORT': '',
             'ATOMIC_REQUESTS': True,
@@ -151,16 +152,12 @@ EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = config.get("Email", 'user')
-EMAIL_HOST_PASSWORD = config.get("Email", 'password')
+EMAIL_HOST_USER = toml_config['email'].get("address")
+EMAIL_HOST_PASSWORD = toml_config['email'].get("password")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-ADMINS = [
-    ('Maxim', 'alantheknight2@gmail.com'),
-    ('IdeaSoft', 'ideasoft-spb@yandex.ru'),
-    ('Pasha', 'pashs.ba@gmail.com')
-]
+ADMINS = toml_config['other']['admins']
 
 if not DEBUG:
     LOGGING = {

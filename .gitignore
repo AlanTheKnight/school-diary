@@ -138,3 +138,4 @@ school_diary/db.sqlite3
 .pylintrc
 diaryenv/
 school_diary/settings.ini
+school_diary/config.toml
