@@ -30,7 +30,7 @@ Open-source digital diary website for schools made with Django.
 
 ## Development setup
 
-<div style="text-align: left;">
+<div align="left">
 
 ### Preparation
 
