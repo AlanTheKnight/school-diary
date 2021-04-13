@@ -39,7 +39,8 @@ poetry install
 ### Adding settings file
 
 Create a file called `settings.ini` in root directory
-of project (the same where `manage.py` is located).
+of the project (the same where `manage.py` is located) with
+the following content:
 
 ```ini
 [Settings]
