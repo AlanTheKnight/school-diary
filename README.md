@@ -1,4 +1,4 @@
-<div style="text-align: center;">
+<div align="center">
 
 # School Diary
 
@@ -20,6 +20,14 @@ Open-source digital diary website for schools made with Django.
 <img alt="SQLite" src ="https://img.shields.io/badge/sqlite-%2307405e.svg?&style=for-the-badge&logo=sqlite&logoColor=white"/>
 <img alt="Postgres" src ="https://img.shields.io/badge/postgres-orangered.svg?&style=for-the-badge&logo=postgresql"/>
 
+## Screenshots
+
+![](screenshots/1.png)
+
+![](screenshots/2.png)
+
+![](screenshots/3.png)
+
 ## Development setup
 
 <div style="text-align: left;">
@@ -27,7 +35,8 @@ Open-source digital diary website for schools made with Django.
 ### Preparation
 
 Make sure you've installed Python 3.9+ and added it to `PATH`.
-It's recommended to create empty virtual environment before installing dependencies.
+It's recommended to create an empty virtual environment before
+installing dependencies.
 
 ### Installing dependencies
 
@@ -38,8 +47,9 @@ poetry install
 
 ### Adding settings file
 
-Create a file called `settings.ini` in root directory
-of project (the same where `manage.py` is located).
+Create a file called `settings.ini` in the root directory
+of the project (the same where `manage.py` is located) with
+the following content:
 
 ```ini
 [Settings]
