@@ -1,19 +1,16 @@
 import os
-from configparser import RawConfigParser
+import toml
 
 from typing import List, Any, Union, Tuple
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-config = RawConfigParser()
-config.read(os.path.join(BASE_DIR, 'settings.ini'))
-SECRET_KEY = config.get('Settings', 'SECRET_KEY')
-DEBUG = (config.get("Settings", "DEBUG") == "True")
+toml_config = toml.load(os.path.join(BASE_DIR, 'config.toml'))
 
-ALLOWED_HOSTS = ['.diary56.ru', '64.227.75.146']
+SECRET_KEY = toml_config['main']['secret_key']
+DEBUG = (toml_config['main'].get("debug", True))
 
-if DEBUG:
-    ALLOWED_HOSTS.extend(['127.0.0.1', 'localhost'])
+ALLOWED_HOSTS = toml_config['main']['allowed_hosts']
 
 INSTALLED_APPS = [
     # Django
@@ -85,11 +82,11 @@ if not DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': config.get("DataBase", 'name'),
-            'USER': config.get("DataBase", 'user'),
-            'PASSWORD': config.get('DataBase', 'password'),
-            'HOST': 'localhost',
-            'PORT': '',
+            'NAME': toml_config['database']['postgres']['name'],
+            'USER': toml_config['database']['postgres']['user'],
+            'PASSWORD': toml_config['database']['postgres']['password'],
+            'HOST': toml_config['database']['postgres']['host'],
+            'PORT': toml_config['database']['postgres'].get("port", ""),
             'ATOMIC_REQUESTS': True,
         }
     }
@@ -97,7 +94,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'NAME': toml_config['database']['sqlite'].get("name", "db.sqlite3"),
             'ATOMIC_REQUESTS': True,
         }
     }
@@ -147,20 +144,17 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True
-EMAIL_HOST_USER = config.get("Email", 'user')
-EMAIL_HOST_PASSWORD = config.get("Email", 'password')
+EMAIL_HOST = toml_config['email']['host']
+EMAIL_PORT = toml_config['email']['port']
+EMAIL_USE_TLS = toml_config['email']['use_tls']
+EMAIL_USE_SSL = toml_config['email']['use_ssl']
+EMAIL_HOST_USER = toml_config['email']['address']
+EMAIL_HOST_PASSWORD = toml_config['email']['password']
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-ADMINS = [
-    ('Maxim', 'alantheknight2@gmail.com'),
-    ('IdeaSoft', 'ideasoft-spb@yandex.ru'),
-    ('Pasha', 'pashs.ba@gmail.com')
-]
+ADMINS = toml_config['other']['admins']
+
 
 if not DEBUG:
     LOGGING = {
