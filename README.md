@@ -47,18 +47,41 @@ poetry install
 
 ### Adding settings file
 
-Create a file called `settings.ini` in the root directory
+Create a file called `config.toml` in the root directory
 of the project (the same where `manage.py` is located) with
 the following content:
 
-```ini
-[Settings]
-DEBUG = True
-SECRET_KEY = <generate-secret-key>
+```toml
+[main]
+debug = true
+secret_key = "<django secret key>"
+allowed_hosts = ['127.0.0.1', 'localhost']
 
-[Email]
-user = <your email address>
-password = <your email password>
+[email]
+host = "<smtp server>"
+address = "<email address>"
+password = "<email passoword>"
+port = <smpt server port>
+use_tls = true
+use_ssl = true
+
+[other]
+admins = [
+    ['<name>', '<email>'],
+    ['<name2>', '<email2>']
+]
+
+[database]
+[database.postgres]
+name = "<db name>"
+user = "<db user>"
+password = "<db password>"
+host = "<db host>"
+port = "<db port>"
+
+[database.sqlite]
+name = "db.sqlite3"
+
 ```
 
 
