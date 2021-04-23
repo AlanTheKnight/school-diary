@@ -4,10 +4,12 @@ const DAY_NOW = (new Date()).getDay();
 
 
 /*
-TODO: Should we still use Django template tags to prevent users stop
-      seeing timetable card for students or it's better to replace it
-      with API call to check whether request.user is student?
+TODO: Should we still use Django template tags to prevent users
+      from seeing timetable card for students or it's better to
+      replace it with API call to check whether request.user is
+      student?
 */
+
 if (document.getElementById("timetable-app") !== null) {
     const timetableApp = new Vue({
     el: "#timetable-app",
@@ -21,7 +23,7 @@ if (document.getElementById("timetable-app") !== null) {
     methods: {
         getTimetable: function () {
             let vm = this;
-            API.timetable.list("9", "З", (data) => {
+            API.timetable.current((data) => {
                 vm.timetable = data;
                 vm.currentDay = data.find(value => value.weekday === vm.selectedDay);
             })

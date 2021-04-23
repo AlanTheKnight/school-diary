@@ -112,7 +112,7 @@ class UserEditForm(forms.ModelForm):
 class StudentEditForm(UserEditForm):
     klass = forms.ModelChoiceField(
         queryset=models.Klasses.objects.all(), label="Класс", required=False)
-    president = forms.BooleanField(label="Может добавлять д/з?")
+    president = forms.BooleanField(label="Может добавлять д/з?", required=False, initial=False)
 
     def save(self, *args, **kwargs):
         u = super().save(commit=False)
@@ -124,6 +124,7 @@ class StudentEditForm(UserEditForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance:
+            self.fields['president'].initial = self.instance.student.president
             self.fields['klass'].initial = self.instance.student.klass
 
 

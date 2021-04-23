@@ -1,24 +1,25 @@
 const csrf = Cookies.get("csrftoken");
 
-const BASE_URL = "/api";
-const editLessonAPIURL = "/inbuilt/lessons/";
-const listLessonsAPIURL = "/inbuilt/lessons/";
-const listControlsAPIURL = '/inbuilt/controls/';
-const getGradesTableAPIURL = '/inbuilt/grades/table/';
-const getGradesAPIURL = '/inbuilt/grades/'
-const getGroupAPIURL = '/inbuilt/grades/group';
-const saveGradeAPIURL = '/inbuilt/save-mark';
+const BASE_URL = "/api/";
+const editLessonAPIURL = "inbuilt/lessons/";
+const listLessonsAPIURL = "inbuilt/lessons/";
+const listControlsAPIURL = 'inbuilt/controls/';
+const getGradesTableAPIURL = 'inbuilt/grades/table/';
+const getGradesAPIURL = 'inbuilt/grades/'
+const getGroupAPIURL = 'inbuilt/grades/group';
+const saveGradeAPIURL = 'inbuilt/save-mark';
 
 const URLS = {
     homework: {
-        list: '/inbuilt/homework/',
+        list: 'inbuilt/homework/',
     },
     users: {
-        list: '/inbuilt/users/',
-        details: '/inbuilt/users/'
+        list: 'inbuilt/users/',
+        details: 'inbuilt/users/'
     },
     timetable: {
-        list: '/timetable/'
+        list: 'timetable/',
+        current: 'timetable/'
     }
 }
 
@@ -149,9 +150,12 @@ export const API = {
         }
     },
     timetable: {
-        list: function (number, letter, callback = null, filters = []) {
-            filters.push(["number", number], ["letter", letter]);
-            inbuiltAPIWrapper("GET", URLS.timetable.list, null, callback, null, filters);
+        list: function (number, letter, callback = null, options = null) {
+            let url = URLS.timetable.list + number + letter;
+            inbuiltAPIWrapper("GET", url, null, callback, options);
+        },
+        current: function (callback = null, options = null) {
+            inbuiltAPIWrapper("GET", URLS.timetable.current, null, callback, options);
         }
     }
 }

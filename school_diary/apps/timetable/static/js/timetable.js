@@ -1,3 +1,6 @@
+import {API} from '/static/js/inbuiltAPI.js'
+
+
 const timeTableApp = new Vue({
     delimiters: ['[[', ']]'],
     el: '#timetable',
@@ -31,31 +34,24 @@ const timeTableApp = new Vue({
             let vm = this;
             let number = $('#id_grade').val();
             let letter = $('#id_litera').val();
-            let url = "/api/timetable/" + number + '/' + letter + '/';
-            $.ajax({
-                url: url,
-                format: 'json',
-                success: function (data) {
-                    // If successfully got a request, display them via Vue
-                    // and check if every day has a full timetable.
-                    switch (vm.checkTimeTable(data)) {
-                        case 2:
-                            vm.empty = false;
-                            break;
-                        case 1:
-                            vm.empty = true;
-                            break;
-                        case 0:
-                            vm.empty = false;
-                            break;
-                    }
-
-                    vm.days = data;
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
+            API.timetable.list(number, letter, function(data) {
+                switch (vm.checkTimeTable(data)) {
+                    case 2:
+                        vm.empty = false;
+                        break;
+                    case 1:
+                        vm.empty = true;
+                        break;
+                    case 0:
+                        vm.empty = false;
+                        break;
+                }
+                vm.days = data;
+            }, {
+                error: function (e) {
                     vm.empty = true;
-                },
-            });
+                }
+            })
         }
     }
 })

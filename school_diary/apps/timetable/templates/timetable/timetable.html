@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="{% static 'css/timetable.css' %}">
 {% endblock %}
 
+{% block js %}
+    <script src="{% static 'js/timetable.js' %}" type="module"></script>
+{% endblock %}
+
 {% block content %}
     <div class="container my-5">
         <div class="row justify-content-center">
@@ -88,9 +92,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
-
-
-{% block js %}
-    <script src="{% static 'js/timetable.js' %}"></script>
 {% endblock %}

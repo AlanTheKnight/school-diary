@@ -5,12 +5,15 @@
     <link rel="stylesheet" href="{% static 'pages/homepage.css' %}"/>
 {% endblock %}
 
-{% block content %}
+{% block js %}
     <script src="{% static 'js/homepage.js' %}" type="module"></script>
+{% endblock %}
+
+{% block content %}
     <div class="container">
 
         {% for m in messages %}
-            <div class="alert my-5 alert-info">{{ m }}</div>
+            <div class="alert my-4 alert-info">{{ m }}</div>
         {% endfor %}
 
         <div id="update-info" class="mt-5">
@@ -34,14 +37,15 @@
             </div>
         {% endif %}
 
-        <div class="row my-4">
+        <div class="row my-5">
             <div class="col-12 col-lg-6 col-xl-8">
                 <div class="row">
                     {% if user.is_admin %}
                         <div class="col-6 col-md-6 col-sm-6 col-lg-6 mb-3">
                             <div class="card h-100">
                                 <a href="{% url 'admin_panel' %}">
-                                    <img src="{% static '/icons/panel.png' %}" id="admin-panel" class="card-img-top icon" alt="Панель администратора"/>
+                                    <img src="{% static '/icons/panel.png' %}" id="admin-panel"
+                                         class="card-img-top icon" alt="Панель администратора"/>
                                     <div class="card-body"><h5 class="card-title">Панель администратора</h5></div>
                                 </a>
                             </div>
@@ -56,7 +60,8 @@
                         </div>
                         <div class="col-6 col-md-6 col-sm-6 col-lg-6 mb-3">
                             <div class="card h-100">
-                                <a href="{% url 'diary' %}"><img src="{% static 'icons/open-book.png' %}" class="card-img-top icon" alt="Дневник">
+                                <a href="{% url 'diary' %}"><img src="{% static 'icons/open-book.svg' %}"
+                                                                 class="card-img-top icon" alt="Дневник">
                                     <div class="card-body"><h5 class="card-title">Журнал</h5></div>
                                 </a>
                             </div>
@@ -64,7 +69,7 @@
                     {% elif user.is_student and user.student.in_klass %}
                         <div class="col-6 col-md-6 col-sm-6 col-lg-6 mb-3">
                             <div class="card h-100">
-                                <a href="{% url 'homework' %}"><img src="{% static 'icons/studying.png' %}" class="card-img-top icon" alt="">
+                                <a href="{% url 'homework' %}"><img src="{% static 'icons/studying.svg' %}" class="card-img-top icon" alt="">
                                     <div class="card-body text-center"><h5 class="card-title">Домашнее задание</h5></div>
                                 </a>
                             </div>

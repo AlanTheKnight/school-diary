@@ -1,41 +1,45 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, authentication, status
-from rest_framework.response import Response
+from rest_framework import generics, authentication
 
-from . import serializers
+from . import serializers, permissions
 from apps.timetable import models
+
+
+def get_timetable(klass: models.Klasses):
+    all_lessons = models.Lessons.objects.filter(klass=klass.id)
+    return [
+        {
+            "weekday": weekday,
+            "lessons": all_lessons.filter(day=weekday)
+        } for weekday in range(1, 7)
+    ]
 
 
 class TimeTableList(generics.ListAPIView):
     """
-    Return a timetable for selected klass
+    Return timetable for selected class.
     """
     serializer_class = serializers.LessonsSerializer
     authentication_classes = [authentication.SessionAuthentication]
 
-    def get(self, request, *args, **kwargs):
-        serializer = serializers.LessonsRequestSerializer(data=request.data)
-        if serializer.is_valid():
-            return self.list(request, *args, **kwargs)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_queryset(self):
+        class_number = self.kwargs['number']
+        class_letter = self.kwargs['letter']
+        my_klass = get_object_or_404(models.Klasses, number=class_number, letter=class_letter)
+        return get_timetable(my_klass)
+
+
+class CurrentTimetableView(generics.ListAPIView):
+    """
+    Return timetable for ``request.user.student``.
+    """
+    serializer_class = serializers.LessonsSerializer
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.StudentInKlassPermission]
 
     def get_queryset(self):
-        if self.request.GET.get("current") is not None \
-                and not self.request.user.is_anonymous and \
-                self.request.user.is_student and self.request.user.student.klass is not None:
-            my_klass = self.request.user.student.klass
-        else:
-            class_number = self.request.GET.get('number')
-            class_letter = self.request.GET.get('letter')
-            my_klass = get_object_or_404(models.Klasses, number=class_number, letter=class_letter)
-        all_lessons = models.Lessons.objects.filter(klass=my_klass.id)
-        data = [
-            {
-                "weekday": weekday,
-                "lessons": all_lessons.filter(day=weekday)
-            } for weekday in range(1, 7)
-        ]
-        return data
+        my_klass = self.request.user.student.klass
+        return get_timetable(my_klass)
 
 
 class ListBells(generics.ListAPIView):

@@ -1,32 +1,31 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="shortcut icon" type="image/png" href="{% static 'icons/book.png' %}"/>
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    {% block css %}{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block title %}
          <title>Электронный дневник diary56</title>
     {% endblock %}
-    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script> <!--JQuery-->
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script> <!--Bootstrap JS-->
-    <script src="{% static 'js/charts.min.js' %}"></script> <!--Charts.js-->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'icons/book.png' %}"/>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link href="{% static 'fontawesome/css/all.min.css' %}" rel="stylesheet"> <!--FontAwesome-->
+    {% block css %}{% endblock %} <!-- Block where CSS files are linked -->
+    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script> <!-- JQuery -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script> <!-- Bootstrap JS -->
+    <script src="{% static 'js/charts.min.js' %}"></script> <!-- Charts.js -->
     <script src="{% static 'js/js.cookie.min.js' %}"></script> <!-- Cookie.js -->
     <script src="{% static 'js/vue@2.6.12.js' %}"></script> <!-- Vue.js -->
-    <link href="{% static 'fontawesome/css/all.min.css' %}" rel="stylesheet"> <!--FontAwesome-->
-    <script src={% static 'fontawesome/js/all.min.js' %}></script>
+    <script src={% static 'fontawesome/js/all.min.js' %}></script> <!-- FontAwesome -->
+    {% block js %}{% endblock %} <!-- Block where JS files are included -->
 </head>
 
 <body>
-{% include 'base/navbar.html' %}
-{% block content %}{% endblock %}
-
-{% block js %}{% endblock %}
+{% include 'base/navbar.html' %} <!-- Navigation bar -->
+{% block content %}{% endblock %} <!-- Main content -->
 </body>
 
-{% include 'base/footer.html' %}
+{% include 'base/footer.html' %} <!-- Footer -->
 
 </html>

@@ -24,8 +24,8 @@ class LessonsRequestSerializer(serializers.Serializer):
         """
         Check that at least number & letter or current were specified.
         """
-        if ('number' in data and 'letter' in data) or data.get('current'):
-            raise serializers.ValidationError("Specify number & letter or mark current=True")
+        if not ('number' in data and 'letter' in data) and not (data.get("current")):
+            raise serializers.ValidationError("Specify number & letter or current GET parameters.")
         return data
 
 
